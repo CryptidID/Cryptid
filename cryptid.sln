@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cryptid", "cryptid\cryptid.csproj", "{DC90B6F3-FDB0-4766-AFA9-C89C82A4605F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cryptidTests", "cryptidTests\cryptidTests.csproj", "{A86C3F9E-3082-41B0-9F04-4B45D47CAE54}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{DC90B6F3-FDB0-4766-AFA9-C89C82A4605F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DC90B6F3-FDB0-4766-AFA9-C89C82A4605F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DC90B6F3-FDB0-4766-AFA9-C89C82A4605F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A86C3F9E-3082-41B0-9F04-4B45D47CAE54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A86C3F9E-3082-41B0-9F04-4B45D47CAE54}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A86C3F9E-3082-41B0-9F04-4B45D47CAE54}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A86C3F9E-3082-41B0-9F04-4B45D47CAE54}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
