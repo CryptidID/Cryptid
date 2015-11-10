@@ -1,0 +1,48 @@
+﻿Post http://localhost:8088/v1/commit-chain/?
+Commits a chain. The first step towards creating a new chain.
+
+Post http://localhost:8088/v1/reveal-chain/?
+Reveal the first entry in a chain. Required to complete the construction of a new chain.
+
+Post http://localhost:8088/v1/commit-entry/?
+Commits an entry. The first step in writing an entry to a chain.
+
+Post http://localhost:8088/v1/reveal-entry/?
+Reveal a new entry. Required to complete the writing of an entry into a chain.
+
+Post http://localhost:8088/v1/factoid-submit/?
+Submit transaction. Requires the encoded transaction as part of the call. For example, creating a transaction that sends 10 factoids from xxx to yyy might be encoded as:
+
+Get http://localhost:8088/v1/directory-block-head/?
+Returns the hash of the directory block head. No parameters are needed. Returns a JSON string of the form:
+
+Get http://localhost:8088/v1/directory-block-height/?
+Returns the current directory block height.
+
+Get http://localhost:8088/v1/get-raw-data/([^/]+)
+Returns the block assoicated with the given hash.
+
+Get http://localhost:8088/v1/directory-block-by-keymr/([^/]+)
+Returns the directory block assoicated with the given hash.
+
+Get http://localhost:8088/v1/entry-block-by-keymr/([^/]+)
+Returns an Entry Block structure. The call:
+
+Get http://localhost:8088/v1/chain-head/([^/]+)
+Returns the KeyMR of the first Entry in an Entry Chain. The call:
+
+Get http://localhost:8088/v1/entry-credit-balance/([^/]+)
+Returns the balance at the given Entry Credit address. For example, the call:
+
+Get http://localhost:8088/v1/factoid-balance/([^/]+)
+Returns the Factoid balance at the given address. For example, the call:
+
+Get http://localhost:8088/v1/factoid-get-fee/
+Returns the current exchange rate for Entry Credits. So the call:
+
+Get http://localhost:8088/v1/properties/",handleProperties)
+Returns the version numbers of various components of Factom. For example at the time of writing, the call:
+
+
+
+
