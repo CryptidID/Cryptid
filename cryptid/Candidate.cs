@@ -1,27 +1,284 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Drawing;
+using System.Globalization;
+using System.IO;
+using MsgPack;
+using MsgPack.Serialization;
+using SourceAFIS.Simple;
 
-namespace cryptid
-{
-    public class Candidate {
-        public String Dcs { get; set; }
-        public String Dac { get; set; }
-        public String Dad { get; set; }
-        public String Dbd { get; set; }
-        public String Dbb { get; set; }
-        public String Dbc { get; set; }
-        public String Day { get; set; }
-        public String Dau { get; set; }
-        public String Dag { get; set; }
-        public String Dai { get; set; }
-        public String Daj { get; set; }
-        public String Dak { get; set; }
-        public String Dcg { get; set; }
+namespace cryptid {
+    public static class Extensions {
+        public static string ANSIFormat(this Candidate.EyeColor ec) {
+            string output = null;
+            var type = ec.GetType();
+            var fi = type.GetField(ec.ToString());
+            var attrs = fi.GetCustomAttributes(typeof (StringValue), false) as StringValue[];
+            if (attrs != null && attrs.Length > 0) output = attrs[0].Value;
+            return output;
+        }
+    }
 
-        public byte[] image { get; set; }
-        public byte[] fingerprint { get; set; }
+    public class Candidate : IPackable, IUnpackable {
+        public enum EyeColor {
+            [StringValue("BLK")] Black,
+
+            [StringValue("BLUE")] Blue,
+
+            [StringValue("BRO")] Brown,
+
+            [StringValue("GRY")] Gray,
+
+            [StringValue("GRN")] Green,
+
+            [StringValue("HAZ")] Hazel,
+
+            [StringValue("MAR")] Maroon,
+
+            [StringValue("PNK")] Pink,
+
+            [StringValue("DIC")] Dichromatic,
+
+            [StringValue("UNK")] Unknown
+        }
+
+        public enum Sex {
+            Male = 1,
+            Female = 2
+        }
+
+        private const int MAP_COUNT = 15;
+        private const string DATE_FORMAT = "dd/MM/yyyy";
+
+        public byte[] Uid { get; set; }
+
+        public string Dcs { get; set; }
+        public string Dac { get; set; }
+        public string Dad { get; set; }
+        public DateTime Dbd { get; set; }
+        public DateTime Dbb { get; set; }
+        public Sex Dbc { get; set; }
+        public EyeColor Day { get; set; }
+        public Height Dau { get; set; }
+        public string Dag { get; set; }
+        public string Dai { get; set; }
+        public string Daj { get; set; }
+        public PostalCode Dak { get; set; }
+        public string Dcg { get; set; }
+        public Image Image { get; set; }
+        public Fingerprint Fingerprint { get; set; }
+
+        public byte[] Serialize() {
+            using (MemoryStream ms = new MemoryStream()) {
+                var serializer = MessagePackSerializer.Get<Candidate>();
+                serializer.Pack(ms, this);
+                return ms.ToArray();
+            }
+        }
+
+        public static Candidate Deserialize(byte[] b) {
+            var serializer = MessagePackSerializer.Get<Candidate>();
+            return serializer.Unpack(new MemoryStream(b));
+        }
+
+        public void PackToMessage(Packer packer, PackingOptions options) {
+            // pack the header for the amount of items in the map
+            packer.PackMapHeader(MAP_COUNT);
+
+            packer.Pack("DCS");
+            packer.Pack(Dcs);
+
+            packer.Pack("DAC");
+            packer.Pack(Dac);
+
+            packer.Pack("DAD");
+            packer.Pack(Dad);
+
+            packer.Pack("DBD");
+            packer.Pack(Dbd.ToString(DATE_FORMAT, CultureInfo.InvariantCulture));
+
+            packer.Pack("DBB");
+            packer.Pack(Dbb.ToString(DATE_FORMAT, CultureInfo.InvariantCulture));
+
+            packer.Pack("DBC");
+            packer.Pack((int) Dbc);
+
+            packer.Pack("DAY");
+            packer.Pack(Day.ANSIFormat());
+
+            packer.Pack("DAU");
+            packer.Pack(Dau.ANSIFormat);
+
+            packer.Pack("DAG");
+            packer.Pack(Dag);
+
+            packer.Pack("DAI");
+            packer.Pack(Dai);
+
+            packer.Pack("DAJ");
+            packer.Pack(Daj);
+
+            packer.Pack("DAK");
+            packer.Pack(Dak.ANSIFormat);
+
+            packer.Pack("DCG");
+            packer.Pack(Dcg);
+
+            // pack image
+            packer.Pack("ZAA");
+            var imageConverter = new ImageConverter();
+            packer.Pack((byte[]) imageConverter.ConvertTo(Image, typeof (byte[])));
+
+            // pack fingerprint
+            packer.Pack("ZAB");
+            packer.Pack(Fingerprint.AsIsoTemplate);
+        }
+
+        public void UnpackFromMessage(Unpacker unpacker) {
+            string dcs, dac, dad, dbd, dbb, day, dau, dag, dai, daj, dak, dcg;
+            int dbc;
+
+            if (!unpacker.IsMapHeader) throw SerializationExceptions.NewIsNotMapHeader();
+
+            if (UnpackHelpers.GetItemsCount(unpacker) != MAP_COUNT)
+                throw SerializationExceptions.NewUnexpectedArrayLength(MAP_COUNT, UnpackHelpers.GetItemsCount(unpacker));
+
+            for (var i = 0; i < MAP_COUNT; i++) {
+                string key;
+
+                if (!unpacker.ReadString(out key)) throw SerializationExceptions.NewUnexpectedEndOfStream();
+
+                switch (key) {
+                    case "DCS": {
+                        if (!unpacker.ReadString(out dcs)) throw SerializationExceptions.NewMissingProperty("dcs");
+                        Dcs = dcs;
+                        break;
+                    }
+                    case "DAC": {
+                        if (!unpacker.ReadString(out dac)) throw SerializationExceptions.NewMissingProperty("dac");
+                        Dac = dac;
+                        break;
+                    }
+                    case "DAD": {
+                        if (!unpacker.ReadString(out dad)) throw SerializationExceptions.NewMissingProperty("dad");
+                        Dad = dad;
+                        break;
+                    }
+                    case "DBD": {
+                        if (!unpacker.ReadString(out dbd)) throw SerializationExceptions.NewMissingProperty("dbd");
+                        Dbd = DateTime.Parse(dbd);
+                        break;
+                    }
+                    case "DBB": {
+                        if (!unpacker.ReadString(out dbb)) throw SerializationExceptions.NewMissingProperty("dbb");
+                        Dbb = DateTime.Parse(dbb);
+                        break;
+                    }
+                    case "DBC": {
+                        if (!unpacker.ReadInt32(out dbc)) throw SerializationExceptions.NewMissingProperty("dbc");
+                        Dbc = (Sex) dbc;
+                        break;
+                    }
+                    case "DAY": {
+                        if (!unpacker.ReadString(out day)) throw SerializationExceptions.NewMissingProperty("day");
+                        Day = GetEyeColor(day);
+                        break;
+                    }
+                    case "DAU": {
+                        if (!unpacker.ReadString(out dau)) throw SerializationExceptions.NewMissingProperty("dau");
+                        Dau.ANSIFormat = dau;
+                        break;
+                    }
+                    case "DAG": {
+                        if (!unpacker.ReadString(out dag)) throw SerializationExceptions.NewMissingProperty("dag");
+                        Dag = dag;
+                        break;
+                    }
+                    case "DAI": {
+                        if (!unpacker.ReadString(out dai)) throw SerializationExceptions.NewMissingProperty("dai");
+                        Dai = dai;
+                        break;
+                    }
+                    case "DAJ": {
+                        if (!unpacker.ReadString(out daj)) throw SerializationExceptions.NewMissingProperty("daj");
+                        Daj = daj;
+                        break;
+                    }
+                    case "DAK": {
+                        if (!unpacker.ReadString(out dak)) throw SerializationExceptions.NewMissingProperty("dak");
+                        Dak.ANSIFormat = dak;
+                        break;
+                    }
+                    case "DCG": {
+                        if (!unpacker.ReadString(out dcg)) throw SerializationExceptions.NewMissingProperty("dcg");
+                        Dcg = dcg;
+                        break;
+                    }
+                    case "ZAA": {
+                        if (!unpacker.Read()) throw SerializationExceptions.NewMissingProperty("zaa");
+                        using (var ms = new MemoryStream(unpacker.LastReadData.AsBinary()))
+                            Image = Image.FromStream(ms);
+                        break;
+                    }
+                    case "ZAB": {
+                        if (!unpacker.Read()) throw SerializationExceptions.NewMissingProperty("zab");
+                        Fingerprint.AsIsoTemplate = unpacker.LastReadData.AsBinary();
+                        break;
+                    }
+                }
+            }
+        }
+
+        public EyeColor GetEyeColor(string s) {
+            foreach (EyeColor ec in Enum.GetValues(typeof (EyeColor))) {
+                string val = null;
+                var type = ec.GetType();
+                var fi = type.GetField(ec.ToString());
+                var attrs = fi.GetCustomAttributes(typeof (StringValue), false) as StringValue[];
+                if (attrs != null && attrs.Length > 0) val = attrs[0].Value;
+                if (val.Equals(s)) return ec;
+            }
+            return EyeColor.Unknown;
+        }
+
+        public class Height {
+            public Height(int feet, int inches) {
+                Feet = feet;
+                Inches = inches;
+            }
+
+            public int Feet { get; set; }
+            public int Inches { get; set; }
+
+            public string ANSIFormat {
+                set {
+                    if (!value.Contains(" ")) throw new ArgumentException("value is not in ANSI format!");
+                    value = value.Split(' ')[0];
+
+                    var inches = -1;
+                    if (!int.TryParse(value, out inches)) throw new ArgumentException("value is not in ANSI format!");
+                    Feet = inches/12;
+                    Inches = inches - (Feet*12);
+                }
+                get { return (((Feet*12) + Inches).ToString().PadLeft(3, '0') + " IN"); }
+            }
+        }
+
+        public class PostalCode {
+            private string _postCode;
+
+            public PostalCode(string postalCode) {
+                ANSIFormat = postalCode;
+            }
+
+            public string ANSIFormat {
+                get { return _postCode; }
+                set {
+                    if (value.Length > 9)
+                        throw new ArgumentOutOfRangeException("Postal code must be 9 characters or less.");
+                    if (value == null) throw new ArgumentNullException("value");
+                    _postCode = value.PadRight(9, '0');
+                }
+            }
+        }
     }
 }
