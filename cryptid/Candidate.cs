@@ -2,11 +2,12 @@
 using System.Drawing;
 using System.Globalization;
 using System.IO;
+using Cryptid.Utils;
 using MsgPack;
 using MsgPack.Serialization;
 using SourceAFIS.Simple;
 
-namespace cryptid {
+namespace Cryptid {
     public static class Extensions {
         public static string ANSIFormat(this Candidate.EyeColor ec) {
             string output = null;

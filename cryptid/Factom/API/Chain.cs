@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace cryptid.Factom.API
+namespace Cryptid.Factom.API
 {
     public class Chain
     {

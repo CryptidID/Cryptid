@@ -1,12 +1,12 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using cryptid.Factom.API;
+using Cryptid.Factom.API;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace cryptid.Factom.API.Tests {
+namespace Cryptid.Factom.API.Tests {
     [TestClass()]
     public class ChainTests {
         [TestMethod()]
