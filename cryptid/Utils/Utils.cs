@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Specialized;
+using System.Net;
 
 namespace Cryptid.Utils {
     public class StringValue : Attribute {

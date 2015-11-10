@@ -1,41 +1,52 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
+using RestSharp;
 
 namespace Cryptid.Factom.API
 {
-    public class Chain
-    {
-        private class ChainHeadDto
-        {
+    public class Chain {
+        public class ChainHeadData {
             public string ChainHead { get; set; }
         }
 
-        public string Server = "http://localhost:8088";
+        public class EntryBlockData {
+            public class HeaderData {
+                public int BlockSequenceNumber { get; set; }
+                public string ChainID { get; set; }
+                public string PrevKeyMr { get; set; }
+                public int Timestamp { get; set; }
+            }
 
-        /*
-         * Returns Key MR of the first entry in the block
-         */
-        public string GetChainHead(string hash) {
-                var request = (HttpWebRequest)WebRequest.Create(Server + "/v1/chain-head/" + hash);
-                var response = (HttpWebResponse)request.GetResponse();
-                var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
-                return responseString;
-         }
+            public class EntryData {
+                public string EntryHash { get; set; }
+                public int Timestamp { get; set; }
+            }
 
-        public string GetEntryBlockByKeyMR(string key)
-        {
-            var request = (HttpWebRequest)WebRequest.Create(Server + "/v1/entry-block-by-keymr/" + key);
-            var response = (HttpWebResponse)request.GetResponse();
-            var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
+            public HeaderData Header { get; set; }
+            public EntryData[] EntryList { get; set; }
+        }
 
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ChainHeadDto>(responseString);
-            return result.ChainHead;
+        private const String ServerHost = "localhost";
+        private const int ServerPort = 8088;
+
+        private RestClient client = new RestClient("http://" + ServerHost + ":" + ServerPort);
+
+        ///<summary>
+        /// Returns Key MR of the first entry in the block
+        ///</summary>
+        public ChainHeadData GetChainHead(String hash) {
+            var req = new RestRequest("/chain-head/{hash}", Method.POST);
+            req.AddUrlSegment("hash", hash);
+
+            RestResponse<ChainHeadData> resp = client.Execute<ChainHeadData>(req) as RestResponse<ChainHeadData>;
+            return resp.Data;
+        }
+
+        public EntryBlockData GetEntryBlockByKeyMR(String hash) {
+            var req = new RestRequest("/entry-block-by-keymr/{hash}", Method.POST);
+            req.AddUrlSegment("hash", hash);
+
+            RestResponse<EntryBlockData> resp = client.Execute<EntryBlockData>(req) as RestResponse<EntryBlockData>;
+            return resp.Data;
         }
 
     }
