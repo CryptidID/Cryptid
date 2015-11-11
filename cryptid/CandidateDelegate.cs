@@ -6,7 +6,7 @@ using System.Text;
 using Cryptid.Utils;
 
 namespace Cryptid {
-    public class CandidateDelegate {
+    public static class CandidateDelegate {
         private const int RSA_KEY_SIZE = 4096;
 
         private static readonly byte[] CRYPTID_SALT = {
@@ -34,7 +34,7 @@ namespace Cryptid {
             0xc9, 0x72
         };
 
-        public byte[] Pack(Candidate c, string password, RSAParameters privKey) {
+        public static byte[] Pack(Candidate c, string password, RSAParameters privKey) {
             // Serialize with MsgPack
             var data = c.Serialize();
 
@@ -53,7 +53,7 @@ namespace Cryptid {
             return data;
         }
 
-        public Candidate Unpack(byte[] packed, string password, RSAParameters pubKey) {
+        public static Candidate Unpack(byte[] packed, string password, RSAParameters pubKey) {
             // Check if the RSA signature is valid
             if (!Verify(packed, pubKey))
                 throw new Exception("The packed data could not be cryptographically verified.");
@@ -73,26 +73,26 @@ namespace Cryptid {
             return c;
         }
 
-        public bool Verify(byte[] packed, RSAParameters pubKey) {
+        public static bool Verify(byte[] packed, RSAParameters pubKey) {
             var sig = Utils.Arrays.CopyOfRange(packed, packed.Length - 512, packed.Length);
             var data = Utils.Arrays.CopyOfRange(packed, 0, packed.Length - 512);
             return Crypto.RSA_Verify(data, sig, pubKey);
         }
 
         private static class Crypto {
-            public static byte[] AES_Encrypt(byte[] data, string password) {
+            internal static byte[] AES_Encrypt(byte[] data, string password) {
                 var passwordBytes = Encoding.UTF8.GetBytes(password);
                 passwordBytes = SHA256.Create().ComputeHash(passwordBytes);
                 return AES_Encrypt(data, passwordBytes);
             }
 
-            public static byte[] AES_Decrypt(byte[] data, string password) {
+            internal static byte[] AES_Decrypt(byte[] data, string password) {
                 var passwordBytes = Encoding.UTF8.GetBytes(password);
                 passwordBytes = SHA256.Create().ComputeHash(passwordBytes);
                 return AES_Decrypt(data, passwordBytes);
             }
 
-            public static byte[] AES_Encrypt(byte[] bytesToBeEncrypted, byte[] passwordBytes) {
+            internal static byte[] AES_Encrypt(byte[] bytesToBeEncrypted, byte[] passwordBytes) {
                 byte[] encryptedBytes = null;
 
                 using (var ms = new MemoryStream()) {
@@ -117,7 +117,7 @@ namespace Cryptid {
                 return encryptedBytes;
             }
 
-            public static byte[] AES_Decrypt(byte[] bytesToBeDecrypted, byte[] passwordBytes) {
+            internal static byte[] AES_Decrypt(byte[] bytesToBeDecrypted, byte[] passwordBytes) {
                 byte[] decryptedBytes = null;
 
                 using (var ms = new MemoryStream()) {

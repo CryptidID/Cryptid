@@ -71,9 +71,8 @@ namespace Cryptid.Tests {
         [DeploymentItem(@"testdata/public.xml", "testdata")]
         public void TestPackUnpack() {
             Candidate c = TestCandidate;
-            CandidateDelegate cd = new CandidateDelegate();
-            byte[] packed = cd.Pack(c, Password, PrivateKey);
-            Assert.AreEqual(c.Dcs, cd.Unpack(packed, Password, PublicKey).Dcs);
+            byte[] packed = CandidateDelegate.Pack(c, Password, PrivateKey);
+            Assert.AreEqual(c.Dcs, CandidateDelegate.Unpack(packed, Password, PublicKey).Dcs);
         }
     }
 }
