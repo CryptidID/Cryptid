@@ -1,34 +1,79 @@
 ﻿using System;
+using System.Drawing;
+using System.IO;
+using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using Cryptid;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SourceAFIS.Simple;
 
 namespace Cryptid.Tests {
     [TestClass]
     public class CandidateTest {
 
-        private Candidate TestCandidate { get; set; }
+        private const String Password = "-b{EC7R:mD+x+RFm";
 
-        public CandidateTest() {
-            TestCandidate = new Candidate {
-                Dac = "LONG-SURNAME-LONG-SURNAME",
-                Dad = "ELIZABETH-ELIZABETH",
-                Dag = "6437 CRAZYCOOLLONG ST",
-                Dai = "REALLYLONGCITY",
-                Daj = "NY",
-                Dak = new Candidate.PostalCode("14623"),
-                Dau = new Candidate.Height(5, 7),
-                Day = Candidate.EyeColor.Brown,
-                Dbb = new DateTime(1990,1,1),
-                Dbc = Candidate.Sex.Male,
-                Dbd = DateTime.UtcNow,
-                Dcg = "USA",
-                Dcs = "LONG-SURNAME-LONG-SURNAME"
-            };
+        private RSAParameters PrivateKey {
+            get {
+                var k = new RSACryptoServiceProvider();
+                k.FromXmlString(File.ReadAllText("testdata/private.xml"));
+                return k.ExportParameters(true);
+            }
+        }
+
+
+        private RSAParameters PublicKey {
+            get {
+                var k = new RSACryptoServiceProvider();
+                k.FromXmlString(File.ReadAllText("testdata/public.xml"));
+                return k.ExportParameters(false);
+            }
+        }
+
+        private Candidate TestCandidate {
+            get {
+                var c = new Candidate {
+                    Dac = "LONG-SURNAME-LONG-SURNAME",
+                    Dad = "ELIZABETH-ELIZABETH",
+                    Dag = "6437 CRAZYCOOLLONG ST",
+                    Dai = "REALLYLONGCITY",
+                    Daj = "NY",
+                    Dak = new Candidate.PostalCode("14623"),
+                    Dau = new Candidate.Height(5, 7),
+                    Day = Candidate.EyeColor.Brown,
+                    Dbb = new DateTime(1990, 1, 1),
+                    Dbc = Candidate.Sex.Male,
+                    Dbd = DateTime.UtcNow,
+                    Dcg = "USA",
+                    Dcs = "LONG-SURNAME-LONG-SURNAME",
+                    Fingerprint = new Fingerprint(),
+                    Image = Image.FromFile("testdata/test-img.png")
+                };
+
+                c.Fingerprint.AsBitmap = new Bitmap("testdata/fingerprint-test.bmp");
+
+                return c;
+            }
         }
 
         [TestMethod]
+        [DeploymentItem(@"testdata/fingerprint-test.bmp", "testdata")]
+        [DeploymentItem(@"testdata/test-img.png", "testdata")]
         public void TestSerializeDeserialize() {
-            Assert.IsFalse(Candidate.Deserialize(TestCandidate.Serialize()).Equals(TestCandidate));
+            var c = TestCandidate;
+            Assert.AreEqual(Candidate.Deserialize(c.Serialize()), c);
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"testdata/fingerprint-test.bmp", "testdata")]
+        [DeploymentItem(@"testdata/test-img.png", "testdata")]
+        [DeploymentItem(@"testdata/private.xml", "testdata")]
+        [DeploymentItem(@"testdata/public.xml", "testdata")]
+        public void TestPackUnpack() {
+            Candidate c = TestCandidate;
+            CandidateDelegate cd = new CandidateDelegate();
+            byte[] packed = cd.Pack(c, Password, PrivateKey);
+            Assert.AreEqual(c.Dcs, cd.Unpack(packed, Password, PublicKey).Dcs);
         }
     }
 }

@@ -6,7 +6,7 @@ using System.Text;
 using Cryptid.Utils;
 
 namespace Cryptid {
-    internal class CandidateDelegate {
+    public class CandidateDelegate {
         private const int RSA_KEY_SIZE = 4096;
 
         private static readonly byte[] CRYPTID_SALT = {
@@ -45,10 +45,10 @@ namespace Cryptid {
             var uid = SHA512.Create().ComputeHash(data);
 
             // Append the uid to the front of encrypted data
-            data = uid.Concat(data) as byte[];
+            data = uid.Concat(data).ToArray();
 
             // Sign the data and append the RSA signature to the end
-            data = data.Concat(Crypto.RSA_Sign(data, privKey)) as byte[];
+            data = data.Concat(Crypto.RSA_Sign(data, privKey)).ToArray();
 
             return data;
         }
@@ -75,7 +75,7 @@ namespace Cryptid {
 
         public bool Verify(byte[] packed, RSAParameters pubKey) {
             var sig = Utils.Arrays.CopyOfRange(packed, packed.Length - 512, packed.Length);
-            var data = Utils.Arrays.CopyOfRange(packed, 64, packed.Length - 512);
+            var data = Utils.Arrays.CopyOfRange(packed, 0, packed.Length - 512);
             return Crypto.RSA_Verify(data, sig, pubKey);
         }
 
