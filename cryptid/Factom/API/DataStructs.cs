@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace cryptid.Factom.API {
     public class DataStructs {
@@ -31,8 +32,7 @@ namespace cryptid.Factom.API {
                 public string PrevKeyMr { get; set; }
                 public int Timestamp { get; set; }
             }
-
-            public class EntryData {
+            public class EntryData { 
                 public string EntryHash { get; set; }
                 public int Timestamp { get; set; }
             }
