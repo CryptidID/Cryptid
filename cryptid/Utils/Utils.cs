@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 
 namespace Cryptid.Utils {
     public class StringValue : Attribute {
