@@ -14,6 +14,7 @@ namespace Cryptid.Factom.API
     {
         private const String ServerHost = "localhost";
         private const int ServerPort = 8088;
+        private const string ZeroHash = "0000000000000000000000000000000000000000000000000000000000000000";
 
         private RestClient client = new RestClient("http://" + ServerHost + ":" + ServerPort + "/v1/");
 
@@ -62,6 +63,11 @@ namespace Cryptid.Factom.API
 
         public List<EntryData> GetAllChainEntries(ChainHeadData chainHead) {
             EntryBlockData block = GetEntryBlockByKeyMR(chainHead);
+            EntryBlockData nextBlock = block;
+            List<EntryBlockData.EntryData> dataList = new List<EntryBlockData.EntryData>();
+            while (nextBlock.Header.PrevKeyMr != ZeroHash) {
+                
+            }
             return null;
         }
 
