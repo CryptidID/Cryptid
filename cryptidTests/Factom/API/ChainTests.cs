@@ -6,7 +6,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using cryptid.Factom.API;
 using Newtonsoft.Json;
 
 namespace Cryptid.Factom.API.Tests {
