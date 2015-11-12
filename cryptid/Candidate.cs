@@ -131,6 +131,11 @@ namespace Cryptid {
 
             // pack fingerprint
             packer.Pack("ZAB");
+
+            AfisEngine afis = new AfisEngine();
+            Person p = new Person(Fingerprint);
+            afis.Extract(p);
+
             packer.Pack(Fingerprint.AsIsoTemplate);
         }
 
@@ -186,6 +191,7 @@ namespace Cryptid {
                     }
                     case "DAU": {
                         if (!unpacker.ReadString(out dau)) throw SerializationExceptions.NewMissingProperty("dau");
+                        Dau = new Height();
                         Dau.ANSIFormat = dau;
                         break;
                     }
@@ -206,6 +212,7 @@ namespace Cryptid {
                     }
                     case "DAK": {
                         if (!unpacker.ReadString(out dak)) throw SerializationExceptions.NewMissingProperty("dak");
+                        Dak = new PostalCode();
                         Dak.ANSIFormat = dak;
                         break;
                     }
@@ -222,6 +229,7 @@ namespace Cryptid {
                     }
                     case "ZAB": {
                         if (!unpacker.Read()) throw SerializationExceptions.NewMissingProperty("zab");
+                        Fingerprint = new Fingerprint();
                         Fingerprint.AsIsoTemplate = unpacker.LastReadData.AsBinary();
                         break;
                     }
@@ -247,6 +255,9 @@ namespace Cryptid {
                 Inches = inches;
             }
 
+            public Height() {
+            }
+
             public int Feet { get; set; }
             public int Inches { get; set; }
 
@@ -266,6 +277,9 @@ namespace Cryptid {
 
         public class PostalCode {
             private string _postCode;
+
+            public PostalCode() {
+            }
 
             public PostalCode(string postalCode) {
                 ANSIFormat = postalCode;
