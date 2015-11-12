@@ -60,7 +60,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="Factom\API\ChainTests.cs" />
+    <Compile Include="Factom\API\FactomApiTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CandidateTest.cs" />
   </ItemGroup>
