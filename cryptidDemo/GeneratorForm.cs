@@ -18,13 +18,8 @@ using SourceAFIS.Simple;
 namespace cryptidDemo {
     //TODO: Auto generate template images/save
     public partial class GeneratorForm : Form {
-        private RSAParameters PrivateKey {
-            get {
-                var k = new RSACryptoServiceProvider();
-                k.FromXmlString(File.ReadAllText("private.xml"));
-                return k.ExportParameters(true);
-            }
-        }
+
+        private readonly RSAParameters PrivateKey = Cryptid.Utils.Keys.PrivateKey("private.xml");
 
         private Candidate _c = new Candidate();
         private FPSConnectForm connectDialog = new FPSConnectForm();
