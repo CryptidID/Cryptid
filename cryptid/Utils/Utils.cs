@@ -1,9 +1,26 @@
 ﻿using System;
+using System.IO;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Windows.Forms;
 
 namespace Cryptid.Utils {
+    public static class Keys {
+        public static RSAParameters PrivateKey(string path) {
+            var k = new RSACryptoServiceProvider();
+            k.FromXmlString(File.ReadAllText(path));
+            return k.ExportParameters(true);
+        }
+
+
+        public static RSAParameters PublicKey(string path) {
+            var k = new RSACryptoServiceProvider();
+            k.FromXmlString(File.ReadAllText(path));
+            return k.ExportParameters(false);
+        }
+    }
+
     public class StringValue : Attribute {
         public StringValue(string value) {
             Value = value;

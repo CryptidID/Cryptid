@@ -43,6 +43,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -53,8 +54,30 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
+    <Reference Include="YamlDotNet.Core, Version=2.0.1.27808, Culture=neutral, PublicKeyToken=2b53052c5884d7a1, processorArchitecture=MSIL">
+      <HintPath>..\packages\YamlDotNet.Core.2.2.0\lib\net35\YamlDotNet.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AuthForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AuthForm.Designer.cs">
+      <DependentUpon>AuthForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CandidateInfoForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CandidateInfoForm.Designer.cs">
+      <DependentUpon>CandidateInfoForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DemoLauncher.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DemoLauncher.Designer.cs">
+      <DependentUpon>DemoLauncher.cs</DependentUpon>
+    </Compile>
     <Compile Include="GeneratorForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -75,6 +98,15 @@
     <Compile Include="ScanFingerForm.Designer.cs">
       <DependentUpon>ScanFingerForm.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="AuthForm.resx">
+      <DependentUpon>AuthForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CandidateInfoForm.resx">
+      <DependentUpon>CandidateInfoForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DemoLauncher.resx">
+      <DependentUpon>DemoLauncher.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="GeneratorForm.resx">
       <DependentUpon>GeneratorForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -118,6 +150,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="private.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="public.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
