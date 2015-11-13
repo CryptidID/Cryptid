@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Globalization;
 using System.IO;
+using System.Runtime.Serialization;
 using Cryptid.Utils;
 using MsgPack;
 using MsgPack.Serialization;
