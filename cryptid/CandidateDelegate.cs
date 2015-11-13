@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using Cryptid.Utils;
+using SourceAFIS;
+using SourceAFIS.Simple;
 
 namespace Cryptid {
     public static class CandidateDelegate {
@@ -77,6 +80,17 @@ namespace Cryptid {
             var sig = Utils.Arrays.CopyOfRange(packed, packed.Length - 512, packed.Length);
             var data = Utils.Arrays.CopyOfRange(packed, 0, packed.Length - 512);
             return Crypto.RSA_Verify(data, sig, pubKey);
+        }
+
+        public static float VerifyFingerprint(Candidate c, Fingerprint fp) {
+            AfisEngine afis = new AfisEngine();
+
+            Person test = new Person(fp);
+            afis.Extract(test);
+
+            Person candidate = new Person(c.Fingerprint);
+
+            return afis.Verify(candidate, test);
         }
 
         private static class Crypto {
