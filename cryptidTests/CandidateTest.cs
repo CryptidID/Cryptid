@@ -13,22 +13,8 @@ namespace Cryptid.Tests {
 
         private const String Password = "-b{EC7R:mD+x+RFm";
 
-        private RSAParameters PrivateKey {
-            get {
-                var k = new RSACryptoServiceProvider();
-                k.FromXmlString(File.ReadAllText("testdata/private.xml"));
-                return k.ExportParameters(true);
-            }
-        }
-
-
-        private RSAParameters PublicKey {
-            get {
-                var k = new RSACryptoServiceProvider();
-                k.FromXmlString(File.ReadAllText("testdata/public.xml"));
-                return k.ExportParameters(false);
-            }
-        }
+        private readonly RSAParameters PrivateKey = Utils.Keys.PrivateKey("testdata/public.xml");
+        private readonly RSAParameters PublicKey = Utils.Keys.PublicKey("testdata/public.xml");
 
         private Candidate TestCandidate {
             get {

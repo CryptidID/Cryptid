@@ -43,7 +43,7 @@ namespace cryptidDemo {
                 while (FPS_GT511C3.IsPressingFinger() != 0) Task.Delay(1000);
                 CurrentState = State.FINGER_PRESSED;
                 CurrentState = State.TRANSFERING_DATA;
-                Fingerprint = FPS_GT511C3.GetImage();
+                Fingerprint = FPS_GT511C3.GetRawImage();
                 FPS_GT511C3.SetCmosLed(false);
                 CurrentState = State.TRANSFER_COMPLETE;
                 DialogResult = DialogResult.OK;
