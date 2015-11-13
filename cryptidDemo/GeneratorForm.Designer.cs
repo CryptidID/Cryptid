@@ -1,5 +1,5 @@
 ﻿namespace cryptidDemo {
-    partial class DemoForm {
+    partial class GeneratorForm {
         /// <summary>
         /// Required designer variable.
         /// </summary>
@@ -23,6 +23,7 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(GeneratorForm));
             this.headshotBox = new System.Windows.Forms.PictureBox();
             this.headshotDialog = new System.Windows.Forms.OpenFileDialog();
             this.firstName = new System.Windows.Forms.TextBox();
@@ -58,6 +59,8 @@
             this.sigOutput = new System.Windows.Forms.TextBox();
             this.tabPage4 = new System.Windows.Forms.TabPage();
             this.fpTemplateOutput = new System.Windows.Forms.TextBox();
+            this.tabPage5 = new System.Windows.Forms.TabPage();
+            this.save = new System.Windows.Forms.Button();
             this.fpBox = new System.Windows.Forms.PictureBox();
             this.dob = new System.Windows.Forms.DateTimePicker();
             this.issued = new System.Windows.Forms.DateTimePicker();
@@ -68,6 +71,7 @@
             this.headshotButton = new System.Windows.Forms.Button();
             this.label15 = new System.Windows.Forms.Label();
             this.password = new System.Windows.Forms.TextBox();
+            this.cidSaveDialog = new System.Windows.Forms.SaveFileDialog();
             ((System.ComponentModel.ISupportInitialize)(this.headshotBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.feet)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.inches)).BeginInit();
@@ -76,6 +80,7 @@
             this.tabPage2.SuspendLayout();
             this.tabPage3.SuspendLayout();
             this.tabPage4.SuspendLayout();
+            this.tabPage5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.fpBox)).BeginInit();
             this.SuspendLayout();
             // 
@@ -312,6 +317,7 @@
             this.tabControl.Controls.Add(this.tabPage2);
             this.tabControl.Controls.Add(this.tabPage3);
             this.tabControl.Controls.Add(this.tabPage4);
+            this.tabControl.Controls.Add(this.tabPage5);
             this.tabControl.Location = new System.Drawing.Point(516, 12);
             this.tabControl.Name = "tabControl";
             this.tabControl.SelectedIndex = 0;
@@ -396,12 +402,34 @@
             this.fpTemplateOutput.Size = new System.Drawing.Size(513, 280);
             this.fpTemplateOutput.TabIndex = 1;
             // 
+            // tabPage5
+            // 
+            this.tabPage5.Controls.Add(this.save);
+            this.tabPage5.Location = new System.Drawing.Point(4, 22);
+            this.tabPage5.Name = "tabPage5";
+            this.tabPage5.Size = new System.Drawing.Size(525, 288);
+            this.tabPage5.TabIndex = 4;
+            this.tabPage5.Text = "Misc";
+            this.tabPage5.UseVisualStyleBackColor = true;
+            // 
+            // save
+            // 
+            this.save.Location = new System.Drawing.Point(4, 4);
+            this.save.Name = "save";
+            this.save.Size = new System.Drawing.Size(518, 23);
+            this.save.TabIndex = 0;
+            this.save.Text = "Save Cryptid ID";
+            this.save.UseVisualStyleBackColor = true;
+            this.save.Click += new System.EventHandler(this.save_Click);
+            // 
             // fpBox
             // 
+            this.fpBox.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.fpBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.fpBox.Location = new System.Drawing.Point(13, 218);
+            this.fpBox.Location = new System.Drawing.Point(32, 218);
             this.fpBox.Name = "fpBox";
             this.fpBox.Size = new System.Drawing.Size(120, 108);
+            this.fpBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.fpBox.TabIndex = 26;
             this.fpBox.TabStop = false;
             // 
@@ -489,11 +517,11 @@
             this.password.UseSystemPasswordChar = true;
             this.password.TextChanged += new System.EventHandler(this.password_TextChanged);
             // 
-            // DemoForm
+            // GeneratorForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1061, 334);
+            this.ClientSize = new System.Drawing.Size(1061, 332);
             this.Controls.Add(this.label15);
             this.Controls.Add(this.password);
             this.Controls.Add(this.generateButton);
@@ -530,8 +558,10 @@
             this.Controls.Add(this.firstName);
             this.Controls.Add(this.headshotButton);
             this.Controls.Add(this.headshotBox);
-            this.Name = "DemoForm";
-            this.Text = "Cryptid Demo";
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Name = "GeneratorForm";
+            this.Text = "Cryptid ID Generator";
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.headshotBox)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.feet)).EndInit();
@@ -545,6 +575,7 @@
             this.tabPage3.PerformLayout();
             this.tabPage4.ResumeLayout(false);
             this.tabPage4.PerformLayout();
+            this.tabPage5.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.fpBox)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -598,6 +629,9 @@
         private System.Windows.Forms.Button headshotButton;
         private System.Windows.Forms.Label label15;
         private System.Windows.Forms.TextBox password;
+        private System.Windows.Forms.TabPage tabPage5;
+        private System.Windows.Forms.Button save;
+        private System.Windows.Forms.SaveFileDialog cidSaveDialog;
     }
 }
 
