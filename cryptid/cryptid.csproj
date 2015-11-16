@@ -65,6 +65,9 @@
   <ItemGroup>
     <Compile Include="Candidate.cs" />
     <Compile Include="CandidateDelegate.cs" />
+    <Compile Include="CandidateUpdatedRecord.cs" />
+    <Compile Include="CandidateOldVersionRecord.cs" />
+    <Compile Include="Crypto.cs" />
     <Compile Include="Factom\API\FactomApi.cs" />
     <Compile Include="Factom\API\Chain.cs" />
     <Compile Include="Factom\API\DataStructs.cs" />
