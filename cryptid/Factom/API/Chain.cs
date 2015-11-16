@@ -10,8 +10,6 @@ using RestSharp;
 
 namespace cryptid.Factom.API
 {
-    using ChainHeadData = DataStructs.ChainHeadData;
-    using EntryBlockData = DataStructs.EntryBlockData;
     using EntryData = DataStructs.EntryData;
     public class Chain
     {
@@ -30,9 +28,11 @@ namespace cryptid.Factom.API
             ChainType c = new ChainType();
             c.FirstEntry = entry;
             List<byte> chainHash = new List<byte>();
-            foreach (string extId in entry.ExtIDs) {
-                var h = SHA256.Create().ComputeHash(Encoding.ASCII.GetBytes(extId));
-                chainHash.AddRange(h);
+            if (entry.ExtIDs != null) {
+                foreach (string extId in entry.ExtIDs) {
+                    var h = SHA256.Create().ComputeHash(Encoding.ASCII.GetBytes(extId));
+                    chainHash.AddRange(h);
+                }
             }
             c.ChainId = Arrays.ByteArrayToHex(SHA256.Create().ComputeHash(chainHash.ToArray()));
             c.FirstEntry.ChainID = c.ChainId;
@@ -78,11 +78,10 @@ namespace cryptid.Factom.API
 
             var com = new WalletCommit();
             com.Message = Arrays.ByteArrayToHex(byteList.ToArray());
-
-            Console.WriteLine(com.Message);
-
-//            var req = new RestRequest("/commit-chain/" + name, Method.POST);
-//            req.AddParameter("application/json", com, ParameterType.RequestBody);
+            var req = new RestRequest("/commit-chain/?" + name, Method.POST);
+            req.AddParameter("application/json", com, ParameterType.RequestBody);
+            IRestResponse resp = client.Execute(req);
+            Console.WriteLine("CommitChain Resp = " + resp.Content);
 
             return true; //TODO: False for fail
         }
@@ -96,9 +95,10 @@ namespace cryptid.Factom.API
             var b = Entries.MarshalBinary(c.FirstEntry);
             r.Entry = Arrays.ByteArrayToHex(b);
 
-            var req = new RestRequest("/reveal-chain/", Method.POST);
+            var req = new RestRequest("/reveal-chain/?", Method.POST);
             req.AddParameter("application/json", r, ParameterType.RequestBody);
-
+            IRestResponse resp = client.Execute(req);
+            Console.WriteLine("RevealChain Resp = " + resp.Content);
             return true;
         }
     }

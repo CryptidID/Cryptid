@@ -164,17 +164,17 @@ namespace Cryptid.Factom.API.Tests {
 
         [TestMethod()]
         public void CommitEntryTest() {
-//            var api = new Entry();
-//            EntryData e = new EntryData();
-//            e.Content = "Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:";
-//            e.ChainID = "00511c298668bc5032a64b76f8ede6f119add1a64482c8602966152c0b936c77";
-//            var arr = new string[2] { "a136bf2a5b81a671d3f0c168f4", "b35f223db2dced312581d22c46ba4117702d03" };
-//            e.ExtIDs = arr;
-//
-//            var s = api.CommitEntry(e, "name");
-//            Console.WriteLine(s);
-//            var actual = "00015111de46c16c05277cb99f5cd3713d957da3162f34f5de34d1c41340a7caa46bb2d233c24f04";
-//            Assert.AreEqual(s,actual);
+            var api = new Entry();
+            EntryData e = new EntryData();
+            e.Content = "Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:Each directory listed in the Go path must have a prescribed structure:";
+            e.ChainID = "00511c298668bc5032a64b76f8ede6f119add1a64482c8602966152c0b936c77";
+            var arr = new string[2] { "a136bf2a5b81a671d3f0c168f4", "b35f223db2dced312581d22c46ba4117702d03" };
+            e.ExtIDs = arr;
+
+            var s = api.CommitEntry(e, "name");
+            Console.WriteLine(s);
+            var actual = "00015111de46c16c05277cb99f5cd3713d957da3162f34f5de34d1c41340a7caa46bb2d233c24f04";
+            Assert.AreEqual(s,actual);
         }
 
         [TestMethod()]
@@ -191,6 +191,36 @@ namespace Cryptid.Factom.API.Tests {
             Assert.AreEqual("aaf2c9dabc8711bf12d8be6c236717dc6f7b738d6bf7a7cab079f5c76f6eebee", x.ChainId);
 
             api.Commitchain(x, "name");
+        }
+
+        [TestMethod()]
+        public void MakeAChainTest() {
+            EntryData entry = new EntryData();
+            entry.Content = "I really hope this chain was committed properly. Tesing testinssssg!";
+            Entry entryApi = new Entry();
+            Chain chainApi = new Chain();
+            var chain = chainApi.NewChain(entry);
+            chainApi.Commitchain(chain, "CryptidHasenteredTheGame");
+            System.Threading.Thread.Sleep(11000);
+            chainApi.RevealChain(chain);
+
+            Console.WriteLine("ChainID=" + chain.ChainId);
+            Console.WriteLine("ChainID=" + chain.FirstEntry.ChainID);
+        }
+
+        [TestMethod()]
+        public void MakeAEntryTest() {
+            EntryData entry = new EntryData();
+            entry.Content = "I really hope this chain was committed properly. Tesing testinssssg!";
+            entry.ChainID = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
+            Entry entryApi = new Entry();
+            Chain chainApi = new Chain();
+            entryApi.CommitEntry(entry, "");
+            System.Threading.Thread.Sleep(11000);
+            entryApi.RevealEntry(entry);
+
+            Console.WriteLine("ChainID=" + entry.ChainID);
+            
         }
     }
 }

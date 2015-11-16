@@ -137,10 +137,14 @@ namespace Cryptid.Factom.API
             WallerCommit com = new WallerCommit();
             com.Message = Arrays.ByteArrayToHex(byteList.ToArray()); //Hex encoded string on bytelist
 
-            
-           var req = new RestRequest("/commit-entry/" + name, Method.POST);
-           req.AddParameter("application/json", com, ParameterType.RequestBody);
+           var json = JsonConvert.SerializeObject(com);
+           Console.WriteLine("CE Json = " + json);
+           var byteJson = Encoding.ASCII.GetBytes(json);
 
+           var req = new RestRequest("/commit-entry/?" + name, Method.POST);
+           req.AddParameter("application/json", byteJson, ParameterType.RequestBody);
+           IRestResponse resp = client.Execute(req);
+           Console.WriteLine("CommitEntry Resp = " + resp.Content);
 
             return true; // TODO: This, true for success, false=failed
         }
@@ -153,9 +157,13 @@ namespace Cryptid.Factom.API
             Reveal rev = new Reveal();
             byte[] marshaledEntry = Entries.MarshalBinary(entry);
             rev.Entry = Arrays.ByteArrayToHex(marshaledEntry);
-            var req = new RestRequest("/reveal-chain/", Method.POST);
-            req.AddParameter("application/json", rev, ParameterType.RequestBody);
+            var req = new RestRequest("/reveal-entry/?", Method.POST);
+            var json = JsonConvert.SerializeObject(rev);
+            Console.WriteLine("RE Json = " + json);
+            var byteJson = Encoding.ASCII.GetBytes(json);
+            req.AddParameter("application/json", byteJson, ParameterType.RequestBody);
             IRestResponse resp = client.Execute(req);
+            Console.WriteLine("RevealEntry Resp = " + resp.Content);
             return true;//TODO: This, true for success, false=failed
         }
     }
