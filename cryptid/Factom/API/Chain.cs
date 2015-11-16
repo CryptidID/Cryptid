@@ -1,111 +1,105 @@
 ﻿using System;
-using System.Drawing;
-using System.Drawing.Text;
-using System.Runtime.InteropServices;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
+using Cryptid.Factom.API;
 using Cryptid.Utils;
-using Newtonsoft.Json;
 using RestSharp;
 
-/// <summary>
-/// DEPRECIATED
-/// </summary>
-namespace Cryptid.Factom.API {
-/*
-
+namespace cryptid.Factom.API
+{
+    using ChainHeadData = DataStructs.ChainHeadData;
+    using EntryBlockData = DataStructs.EntryBlockData;
+    using EntryData = DataStructs.EntryData;
+    public class Chain
+    {
         private const String ServerHost = "localhost";
         private const int ServerPort = 8088;
+        private const string ZeroHash = "0000000000000000000000000000000000000000000000000000000000000000";
 
         private RestClient client = new RestClient("http://" + ServerHost + ":" + ServerPort + "/v1/");
 
-        private struct RevealRequest {
-            string Entry;
-
-            public RevealRequest(string Entry) {
-                this.Entry = Entry;
-            }
+        public class ChainType {
+            public string ChainId { get; set; }
+            public EntryData FirstEntry { get; set; }
         }
 
-        public String RevealChain(EntryData entry) {
-            //http://localhost:8088/v1/reveal-chain/?
-            //byte[] entryBytes = Serialization.GetBytes<EntryData>(entry);
-            byte[] entryBytes = Serialization.SerializeMessage<EntryData>(entry);
+        public ChainType NewChain(EntryData entry) {
+            ChainType c = new ChainType();
+            c.FirstEntry = entry;
+            List<byte> chainHash = new List<byte>();
+            foreach (string extId in entry.ExtIDs) {
+                var h = SHA256.Create().ComputeHash(Encoding.ASCII.GetBytes(extId));
+                chainHash.AddRange(h);
+            }
+            c.ChainId = Arrays.ByteArrayToHex(SHA256.Create().ComputeHash(chainHash.ToArray()));
+            c.FirstEntry.ChainID = c.ChainId;
+            return c;
+        }
 
-            string entryHex = BitConverter.ToString(entryBytes);
-            entryHex = entryHex.Replace("-", "");
-            Console.WriteLine(entryHex);
-            RevealRequest entryStruct = new RevealRequest(entryHex);
+        public class WalletCommit  {
+            public string Message { get; set; }
+        }
+        public bool Commitchain(ChainType c, string name) {
+            List<byte> byteList = new List<byte>();
+
+            //1 byte version
+            byteList.Add(0);
+
+            // 6 byte milliTimestamp (truncated unix time)
+            byteList.AddRange(Times.MilliTime());
+
+            var entry = c.FirstEntry;
+
+            // 32 Byte ChainID Hash
+            //byte[] chainIDHash = Encoding.ASCII.GetBytes(c.ChainId);
+            byte[] chainIDHash = Strings.DecodeHexIntoBytes(c.ChainId);
+            chainIDHash = SHA256.Create().ComputeHash(chainIDHash);
+            chainIDHash = SHA256.Create().ComputeHash(chainIDHash);
+            byteList.AddRange(chainIDHash);
+
+            // 32 byte Weld; sha256(sha256(EntryHash + ChainID))
+            byte[] cid = Strings.DecodeHexIntoBytes(c.ChainId);
+            byte[] s = Entries.HashEntry(c.FirstEntry);
+            byte[] weld = new byte[cid.Length + s.Length];
+            s.CopyTo(weld, 0); cid.CopyTo(weld, s.Length);
+            weld = SHA256.Create().ComputeHash(weld);
+            weld = SHA256.Create().ComputeHash(weld);
+            byteList.AddRange(weld);
+
+            // 32 byte Entry Hash of the First Entry
+            byteList.AddRange(Entries.HashEntry(c.FirstEntry));
+
+            // 1 byte number of Entry Credits to pay
+            sbyte cost = (sbyte)(Entries.EntryCost(entry) + 10); // TODO: check errors
+            byteList.Add(BitConverter.GetBytes(cost)[0]);
+
+            var com = new WalletCommit();
+            com.Message = Arrays.ByteArrayToHex(byteList.ToArray());
+
+            Console.WriteLine(com.Message);
+
+//            var req = new RestRequest("/commit-chain/" + name, Method.POST);
+//            req.AddParameter("application/json", com, ParameterType.RequestBody);
+
+            return true; //TODO: False for fail
+        }
+
+        public class Reveal {
+            public string Entry { get; set; }
+        }
+
+        public bool RevealChain(ChainType c) {
+            Reveal r = new Reveal();
+            var b = Entries.MarshalBinary(c.FirstEntry);
+            r.Entry = Arrays.ByteArrayToHex(b);
 
             var req = new RestRequest("/reveal-chain/", Method.POST);
-            req.AddParameter("application/json", entryStruct, ParameterType.RequestBody);
+            req.AddParameter("application/json", r, ParameterType.RequestBody);
 
-            IRestResponse resp = client.Execute(req);
-            return resp.Content;
-
+            return true;
         }
-
-
-        /// <summary>
-        /// Takes in an entry chain hash and returns Key MR of the first entry.
-        /// </summary>
-        /// <param name="hash">ChainID</param>
-        /// <returns></returns>
-        public ChainHeadData GetChainHead(String hash) {
-            var req = new RestRequest("/chain-head/{hash}", Method.GET);
-            req.AddUrlSegment("hash", hash);
-
-            IRestResponse resp = client.Execute(req);
-
-            return JsonConvert.DeserializeObject<ChainHeadData>(resp.Content);
-        }
-
-        /// <summary>
-        /// Returns an EntryBlockData
-        /// </summary>
-        /// <param name="hash"> Chainhead Hash</param>
-        /// <returns></returns>
-        public EntryBlockData GetEntryBlockByKeyMR(ChainHeadData hash) {
-            var req = new RestRequest("/entry-block-by-keymr/{hash}", Method.GET);
-            req.AddUrlSegment("hash", hash.ChainHead);
-
-            IRestResponse resp = client.Execute(req);
-            return JsonConvert.DeserializeObject<EntryBlockData>(resp.Content);
-        }
-
-        public string GetEntryBlockByKeyMRJson(String hash) {
-            var req = new RestRequest("/entry-block-by-keymr/{hash}", Method.GET);
-            req.AddUrlSegment("hash", hash);
-
-            IRestResponse resp = client.Execute(req);
-            return resp.Content;
-        }
-
-        /// <summary>
-        /// Returns the raw data of entry hash. Reccomend using GetEntryJson instead
-        /// </summary>
-        /// <param name="hash">Entry hash</param>
-        /// <returns></returns>
-        public string GetEntryRawData(string hash) {
-            var req = new RestRequest("/get-raw-data/{hash}", Method.GET);
-            req.AddUrlSegment("hash", hash);
-
-            IRestResponse resp = client.Execute(req);
-            return resp.Content;
-        }
-
-        /// <summary>
-        /// Returns the data in an entry hash in a easier to use format. ToString will convert the Content from hex into a string
-        /// </summary>
-        /// <param name="hash">Entry hash</param>
-        /// <returns></returns>
-        public EntryData GetEntryData(string hash) {
-            var req = new RestRequest("/entry-by-hash/{hash}", Method.GET);
-            req.AddUrlSegment("hash", hash);
-
-            IRestResponse resp = client.Execute(req);
-            return JsonConvert.DeserializeObject<EntryData>(resp.Content); ;
-        }
-
     }
-    */
 }
