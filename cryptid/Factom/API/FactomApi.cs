@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing.Text;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using cryptid.Factom.API;
@@ -108,6 +110,43 @@ namespace Cryptid.Factom.API
         public List<EntryBlockData.EntryData> GetAllChainEntries(string chainHeadID) {
             ChainHeadData chainHead = GetChainHead(chainHeadID);
             return GetAllChainEntries(chainHead);
+        }
+
+        public class WallerCommit {
+            string Message { get; set; }
+        }
+        public bool CommitEntry(EntryData entry, string name) {
+            List<byte> byteList = new List<byte>();
+            byteList.Add(0);
+            Int32 unixTimestamp = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+
+            return true; // TODO: This, true for success, false=failed
+        }
+
+        private byte[] milliTime() {
+            List<byte> byteList = new List<byte>();
+            DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            var unixMilliLong = (long) (DateTime.UtcNow - UnixEpoch).TotalMilliseconds;
+            byte[] unixBytes = CheckEndian(BitConverter.GetBytes(unixMilliLong));
+            
+        }
+
+        private class Reveal {
+            public string Entry { get; set; }
+        }
+        public bool RevealEntry(EntryData entry) {
+            Reveal rev = new Reveal();
+            byte[] marshaledEntry = MarshalBinary(entry);
+            rev.Entry = ByteArrayToString(marshaledEntry);
+            var req = new RestRequest("/reveal-chain/", Method.POST);
+            req.AddParameter("application/json", rev, ParameterType.RequestBody);
+            IRestResponse resp = client.Execute(req);
+            return true;//TODO: This, true for success, false=failed
+        }
+
+        private static string ByteArrayToString(byte[] ba) {
+            string hex = BitConverter.ToString(ba);
+            return hex.Replace("-", "");
         }
 
         public byte[] MarshalBinary(EntryData e) { //TODO: Make private

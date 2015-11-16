@@ -49,7 +49,7 @@ namespace Cryptid {
         }
 
         private const int MAP_COUNT = 15;
-        private const string DATE_FORMAT = "dd/MM/yyyy";
+        private const string DATE_FORMAT = "MM/dd/yyyy";
 
         public byte[] Uid { get; set; }
 
