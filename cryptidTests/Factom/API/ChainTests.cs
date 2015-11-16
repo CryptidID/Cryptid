@@ -1,36 +1,26 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Cryptid.Factom.API;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using cryptid.Factom.API;
-using Newtonsoft.Json;
+using Cryptid.Utils;
 
 namespace Cryptid.Factom.API.Tests {
-    using ChainHeadData = DataStructs.ChainHeadData;
-    using EntryBlockData = DataStructs.EntryBlockData;
-    using EntryData = DataStructs.EntryData;
-
     [TestClass()]
-    public class ChainTests {
+    class ChainTests {
         [TestMethod()]
-        public void getChainTest() {
-            //Chain api = new Chain();
+        public void NewChainTest() {
+            var api = new Chain();
+            DataStructs.EntryData e = new DataStructs.EntryData();
+            e.Content = "Each directory listed in the Go path must have a prescribed structure:";
+            e.ChainID = "00511c298668bc5032a64b76f8ede6f119add1a64482c8602966152c0b936c77";
+            var arr = new string[2] { "a136bf2a5b81a671d3f0c168f4", "b35f223db2dced312581d22c46ba4117702d03" };
+            e.ExtIDs = arr;
 
-            // Chain ID to test, 8bc16ce03a246f4fdfd93a6729f8cb3132b4df592ae82bd6f8437b9898735182
-            // http://explorer.factom.org/chain/8bc16ce03a246f4fdfd93a6729f8cb3132b4df592ae82bd6f8437b9898735182
-            // Has 2 entries
-            // Chain ID to test, 475fbcef5e3a4e1621ed9a6fda5840c1d654715e55a8f5e514af0fb879ce0aec
-            // http://explorer.factom.org/chain/475fbcef5e3a4e1621ed9a6fda5840c1d654715e55a8f5e514af0fb879ce0aec
-            // Has 2 entries
-            
-           FactomApi api = new FactomApi();
-           ChainHeadData chainHead = api.GetChainHead("8bc16ce03a246f4fdfd93a6729f8cb3132b4df592ae82bd6f8437b9898735182");
-            EntryBlockData entryBlock = api.GetEntryBlockByKeyMR(chainHead);
-             EntryData entry = api.GetEntryData(entryBlock.EntryList[0]);
+            var x = api.NewChain(e);
+            Console.WriteLine(x.ChainId);
         }
     }
 }
