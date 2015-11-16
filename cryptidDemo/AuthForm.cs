@@ -69,7 +69,13 @@ namespace cryptidDemo {
                 MessageBox.Show("You are not connected to a fingerprint scanner!");
             }
 
-            float authLikelyhood = CandidateDelegate.VerifyFingerprint(CandidateDelegate.Unpack(PackedData, Password, PublicKey), f);
+            float authLikelyhood;
+            try {
+                authLikelyhood = CandidateDelegate.VerifyFingerprint(CandidateDelegate.Unpack(PackedData, Password, PublicKey), f);
+            } catch (CryptographicException ex) {
+                MessageBox.Show("Couldn't verify provided data.");
+                return;
+            }
             MessageBox.Show("Auth likelyhood: " + authLikelyhood.ToString("R"));
         }
 
