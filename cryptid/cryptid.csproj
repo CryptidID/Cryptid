@@ -31,6 +31,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="itextsharp, Version=5.5.7.0, Culture=neutral, PublicKeyToken=8354ae6d2174ddca, processorArchitecture=MSIL">
+      <HintPath>..\packages\iTextSharp.5.5.7\lib\itextsharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="MsgPack, Version=0.6.0.0, Culture=neutral, PublicKeyToken=a2625990d5dc0167, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\MsgPack.Cli.0.6.5\lib\net45\MsgPack.dll</HintPath>
@@ -65,9 +69,11 @@
   <ItemGroup>
     <Compile Include="Candidate.cs" />
     <Compile Include="CandidateDelegate.cs" />
-    <Compile Include="Factom\API\Entry.cs" />
+    <Compile Include="CandidateUpdatedRecord.cs" />
     <Compile Include="CandidateOldVersionRecord.cs" />
+    <Compile Include="CardGenerator.cs" />
     <Compile Include="Crypto.cs" />
+    <Compile Include="Factom\API\FactomApi.cs" />
     <Compile Include="Factom\API\Chain.cs" />
     <Compile Include="Factom\API\DataStructs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -76,7 +82,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Factom\API\FactomAPI.txt" />
-    <Content Include="Factom\API\TextFile1.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
