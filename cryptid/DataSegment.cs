@@ -8,6 +8,10 @@ using System.Threading.Tasks;
 using Cryptid.Utils;
 
 namespace cryptid {
+
+    /// <summary>
+    /// Segments data into segments of a given size
+    /// </summary>
     class DataSegment {
         /// <summary>
         /// The max length of a data segment
@@ -89,7 +93,7 @@ namespace cryptid {
 
             ushort i = 0;
             foreach(byte[] segmentData in slices) {
-                segments.Add(new DataSegment(segmentData, i++, (ushort) segmentData.Length));
+                segments.Add(new DataSegment(segmentData, i++, (ushort) slices.Count()));
             }
 
             return segments;
