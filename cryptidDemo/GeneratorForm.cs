@@ -10,6 +10,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using cryptid;
 using cryptid.Scanners;
 using Cryptid;
 using SourceAFIS;
@@ -162,6 +163,23 @@ namespace cryptidDemo {
 
             if (cidSaveDialog.ShowDialog() == DialogResult.OK) {
                 File.WriteAllBytes(cidSaveDialog.FileName, output);
+            }
+        }
+
+        private void uploadBlockchain_Click(object sender, EventArgs e) {
+            //TODO
+        }
+
+        private void genCard_Click(object sender, EventArgs e) {
+            if (output == null) return;
+
+            cidSaveDialog.FileName = _c.Dcs + "-" + _c.Dad + "-" + _c.Dac + ".pdf";
+            cidSaveDialog.Filter = "PDF File (*.pdf)|*.pdf";
+
+            if (cidSaveDialog.ShowDialog() == DialogResult.OK) {
+                CardGenerator cg = new CardGenerator(_c, cidSaveDialog.FileName);
+                //TODO: THIS IS FOR DEBUG ONLY -- second param should NOT be UID but chain id
+                cg.Generate(cidSaveDialog.FileName, _c.Uid);
             }
         }
     }

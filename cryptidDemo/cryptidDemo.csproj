@@ -129,6 +129,9 @@
     <EmbeddedResource Include="ScanFingerForm.resx">
       <DependentUpon>ScanFingerForm.cs</DependentUpon>
     </EmbeddedResource>
+    <None Include="cryptid-id-template.pdf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
