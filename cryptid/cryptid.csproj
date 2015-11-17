@@ -73,15 +73,12 @@
     <Compile Include="CandidateOldVersionRecord.cs" />
     <Compile Include="CardGenerator.cs" />
     <Compile Include="Crypto.cs" />
-    <Compile Include="Factom\API\FactomApi.cs" />
+    <Compile Include="Factom\API\Entry.cs" />
     <Compile Include="Factom\API\Chain.cs" />
     <Compile Include="Factom\API\DataStructs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scanners\FPS_GT511C3.cs" />
     <Compile Include="Utils\Utils.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Factom\API\FactomAPI.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
