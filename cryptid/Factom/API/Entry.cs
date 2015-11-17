@@ -138,15 +138,20 @@ namespace Cryptid.Factom.API
             com.Message = Arrays.ByteArrayToHex(byteList.ToArray()); //Hex encoded string on bytelist
 
            var json = JsonConvert.SerializeObject(com);
+
            Console.WriteLine("CE Json = " + json);
            var byteJson = Encoding.ASCII.GetBytes(json);
+           Console.WriteLine("Byte to json = " + Encoding.ASCII.GetString(byteJson));
 
-           var req = new RestRequest("/commit-entry/?" + name, Method.POST);
-           req.AddParameter("application/json", byteJson, ParameterType.RequestBody);
+           var req = new RestRequest("/commit-entry/{name}", Method.POST);
+           req.AddUrlSegment("name", name);
+           req.AddJsonBody(json);
+           
+           //req.AddParameter("Application/Json", json, ParameterType.RequestBody);
+           //req.AddBody("application/json", json);
            IRestResponse resp = client.Execute(req);
            Console.WriteLine("CommitEntry Resp = " + resp.Content);
-
-            return true; // TODO: This, true for success, false=failed
+           return true; // TODO: This, true for success, false=failed
         }
 
         private class Reveal {
@@ -157,7 +162,7 @@ namespace Cryptid.Factom.API
             Reveal rev = new Reveal();
             byte[] marshaledEntry = Entries.MarshalBinary(entry);
             rev.Entry = Arrays.ByteArrayToHex(marshaledEntry);
-            var req = new RestRequest("/reveal-entry/?", Method.POST);
+            var req = new RestRequest("/reveal-entry/", Method.POST);
             var json = JsonConvert.SerializeObject(rev);
             Console.WriteLine("RE Json = " + json);
             var byteJson = Encoding.ASCII.GetBytes(json);
