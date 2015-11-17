@@ -20,10 +20,11 @@ namespace Cryptid.Factom.API
     public class Entry {
         private const String ServerHost = "localhost";
         private const int ServerPort = 8088;
+        private const int ServerPortMD = 8089;
         private const string ZeroHash = "0000000000000000000000000000000000000000000000000000000000000000";
 
         private RestClient client = new RestClient("http://" + ServerHost + ":" + ServerPort + "/v1/");
-
+        private RestClient clientMD= new RestClient("http://" + ServerHost + ":" + ServerPortMD + "/v1/");
         /// <summary>
         /// Takes in an entry chain hash and returns Key MR of the first entry.
         /// </summary>
@@ -32,7 +33,6 @@ namespace Cryptid.Factom.API
         public ChainHeadData GetChainHead(String hash) {
             var req = new RestRequest("/chain-head/{hash}", Method.GET);
             req.AddUrlSegment("hash", hash);
-
             IRestResponse resp = client.Execute(req);
 
             ChainHeadData chainHead = JsonConvert.DeserializeObject<ChainHeadData>(resp.Content);
@@ -142,15 +142,13 @@ namespace Cryptid.Factom.API
            Console.WriteLine("CE Json = " + json);
            var byteJson = Encoding.ASCII.GetBytes(json);
            Console.WriteLine("Byte to json = " + Encoding.ASCII.GetString(byteJson));
-
            var req = new RestRequest("/commit-entry/{name}", Method.POST);
+           req.RequestFormat = DataFormat.Json;
+           req.AddParameter("application/json", json, ParameterType.RequestBody);
            req.AddUrlSegment("name", name);
-           req.AddJsonBody(json);
-           
-           //req.AddParameter("Application/Json", json, ParameterType.RequestBody);
-           //req.AddBody("application/json", json);
-           IRestResponse resp = client.Execute(req);
-           Console.WriteLine("CommitEntry Resp = " + resp.Content);
+           IRestResponse resp = clientMD.Execute(req);
+           Console.WriteLine("CommitEntry Resp = " + resp.StatusCode + "|" + resp.StatusCode);
+           Console.WriteLine("REQ=" + req.RootElement + req.Resource);
            return true; // TODO: This, true for success, false=failed
         }
 
@@ -166,9 +164,10 @@ namespace Cryptid.Factom.API
             var json = JsonConvert.SerializeObject(rev);
             Console.WriteLine("RE Json = " + json);
             var byteJson = Encoding.ASCII.GetBytes(json);
-            req.AddParameter("application/json", byteJson, ParameterType.RequestBody);
-            IRestResponse resp = client.Execute(req);
-            Console.WriteLine("RevealEntry Resp = " + resp.Content);
+            req.RequestFormat = DataFormat.Json;
+            req.AddParameter("application/json", json, ParameterType.RequestBody);
+            IRestResponse resp = client.Execute<RestRequest>(req);
+            Console.WriteLine("RevealEntry Resp = " + resp.StatusCode + "|" + resp.StatusCode);
             return true;//TODO: This, true for success, false=failed
         }
     }
