@@ -4,7 +4,6 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using Cryptid.Factom.API;
 using Cryptid.Utils;
 using Newtonsoft.Json;
 using RestSharp;
@@ -16,9 +15,11 @@ namespace cryptid.Factom.API
     {
         private const String ServerHost = "localhost";
         private const int ServerPort = 8088;
+        private const int ServerPortMD = 8089;
         private const string ZeroHash = "0000000000000000000000000000000000000000000000000000000000000000";
 
         private RestClient client = new RestClient("http://" + ServerHost + ":" + ServerPort + "/v1/");
+        private RestClient clientMD = new RestClient("http://" + ServerHost + ":" + ServerPortMD + "/v1/");
 
         public class ChainType {
             public string ChainId { get; set; }
@@ -43,7 +44,7 @@ namespace cryptid.Factom.API
         public class WalletCommit  {
             public string Message { get; set; }
         }
-        public bool Commitchain(ChainType c, string name) {
+        public bool CommitChain(ChainType c, string name) {
             List<byte> byteList = new List<byte>();
 
             //1 byte version
@@ -79,14 +80,19 @@ namespace cryptid.Factom.API
 
             var com = new WalletCommit();
             com.Message = Arrays.ByteArrayToHex(byteList.ToArray());
-
+            
             var json = JsonConvert.SerializeObject(com);
-            var byteJson = Encoding.ASCII.GetBytes(json);
+
+            
 
             var req = new RestRequest("/commit-chain/" + name, Method.POST);
-            req.AddParameter("application/json", byteJson, ParameterType.RequestBody);
-            IRestResponse resp = client.Execute(req);
-            Console.WriteLine("CommitChain Resp = " + resp.Content);
+            req.RequestFormat = DataFormat.Json;
+            req.AddParameter("application/json", json, ParameterType.RequestBody);
+            req.AddUrlSegment("name", name);
+            IRestResponse resp = clientMD.Execute(req);
+            Console.WriteLine("CommitChain Resp = " + resp.StatusCode);
+
+            Console.WriteLine("Message= " + com.Message);
 
             return true; //TODO: False for fail
         }
@@ -104,9 +110,10 @@ namespace cryptid.Factom.API
             var byteJson = Encoding.ASCII.GetBytes(json);
 
             var req = new RestRequest("/reveal-chain/", Method.POST);
-            req.AddParameter("application/json", byteJson, ParameterType.RequestBody);
+            req.RequestFormat = DataFormat.Json;
+            req.AddParameter("application/json", json, ParameterType.RequestBody);
             IRestResponse resp = client.Execute(req);
-            Console.WriteLine("RevealChain Resp = " + resp.Content);
+            Console.WriteLine("RevealChain Resp = " + resp.StatusCode);
             return true;
         }
     }

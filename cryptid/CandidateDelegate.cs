@@ -34,7 +34,7 @@ namespace Cryptid {
             Entry entryApi = new Entry();
             Chain chainApi = new Chain();
             var chain = chainApi.NewChain(entry);
-            chainApi.Commitchain(chain, Arrays.ByteArrayToHex(candidate.Uid)); // Name is UID in hex
+            chainApi.CommitChain(chain, Arrays.ByteArrayToHex(candidate.Uid)); // Name is UID in hex
             System.Threading.Thread.Sleep(11000);
             chainApi.RevealChain(chain);
 

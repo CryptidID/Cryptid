@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection.Emit;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using cryptid.Factom.API;
@@ -178,29 +179,21 @@ namespace Cryptid.Factom.API.Tests {
         }
 
         [TestMethod()]
-        public void NewChainTest() {
-            var api = new Chain();
-            DataStructs.EntryData e = new DataStructs.EntryData();
-            e.Content = "Each directory listed in the Go path must have a prescribed structure:";
-            e.ChainID = "00511c298668bc5032a64b76f8ede6f119add1a64482c8602966152c0b936c77";
-            var arr = new string[2] { "a136bf2a5b81a671d3f0c168f4", "b35f223db2dced312581d22c46ba4117702d03" };
-            e.ExtIDs = arr;
-
-            var x = api.NewChain(e);
-            Console.WriteLine(x.ChainId);
-            Assert.AreEqual("aaf2c9dabc8711bf12d8be6c236717dc6f7b738d6bf7a7cab079f5c76f6eebee", x.ChainId);
-
-            api.Commitchain(x, "name");
-        }
-
-        [TestMethod()]
         public void MakeAChainTest() {
             EntryData entry = new EntryData();
             entry.Content = "I really hope this chain was committed properly. Tesing testinssssg!";
+            entry.ExtIDs = new string[] { "Dakota", "Steven", "Robert" };
+            var d = SHA256.Create().ComputeHash(Encoding.ASCII.GetBytes("Dakota"));
+            var s = SHA256.Create().ComputeHash(Encoding.ASCII.GetBytes("Steven"));
+            var r = SHA256.Create().ComputeHash(Encoding.ASCII.GetBytes("Robert"));
+            byte[] b = new byte[d.Length + r.Length + s.Length];
+            d.CopyTo(b, 0); s.CopyTo(b, d.Length); r.CopyTo(b, s.Length + d.Length); 
+            var chaininfo = SHA256.Create().ComputeHash(b);
+            Console.WriteLine("\nCHAINID=  " + Strings.RemoveDashes(BitConverter.ToString(chaininfo)) + "\n");
             Entry entryApi = new Entry();
             Chain chainApi = new Chain();
             var chain = chainApi.NewChain(entry);
-            chainApi.Commitchain(chain, "CryptidHasenteredTheGame");
+            chainApi.CommitChain(chain, "EC2C5BNieAgMbUAuBCpKdrquS8jeWNFyX1EdJoFPqjocB33wAsbf");
             System.Threading.Thread.Sleep(11000);
             chainApi.RevealChain(chain);
 
@@ -211,11 +204,11 @@ namespace Cryptid.Factom.API.Tests {
         [TestMethod()]
         public void MakeAEntryTest() {
             EntryData entry = new EntryData();
-            entry.Content = "I really hope this chain was committed properly. Tesing testinssssg!";
-            entry.ChainID = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
+            entry.Content = "Cryptid Entry!";
+            entry.ChainID = "5319D50D6D1DFCF4AEBB00E8DA812AC1D256C0B3E765B0240B51A708701F1985";
             Entry entryApi = new Entry();
             Chain chainApi = new Chain();
-            entryApi.CommitEntry(entry, "");
+            entryApi.CommitEntry(entry, "CCNEntryCreds");
             System.Threading.Thread.Sleep(11000);
             entryApi.RevealEntry(entry);
 
