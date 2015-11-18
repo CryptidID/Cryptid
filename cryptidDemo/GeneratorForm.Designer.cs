@@ -60,6 +60,8 @@
             this.tabPage4 = new System.Windows.Forms.TabPage();
             this.fpTemplateOutput = new System.Windows.Forms.TextBox();
             this.tabPage5 = new System.Windows.Forms.TabPage();
+            this.genCard = new System.Windows.Forms.Button();
+            this.uploadBlockchain = new System.Windows.Forms.Button();
             this.save = new System.Windows.Forms.Button();
             this.fpBox = new System.Windows.Forms.PictureBox();
             this.dob = new System.Windows.Forms.DateTimePicker();
@@ -72,8 +74,7 @@
             this.label15 = new System.Windows.Forms.Label();
             this.password = new System.Windows.Forms.TextBox();
             this.cidSaveDialog = new System.Windows.Forms.SaveFileDialog();
-            this.uploadBlockchain = new System.Windows.Forms.Button();
-            this.genCard = new System.Windows.Forms.Button();
+            this.loadCryptidIdButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.headshotBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.feet)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.inches)).BeginInit();
@@ -406,6 +407,7 @@
             // 
             // tabPage5
             // 
+            this.tabPage5.Controls.Add(this.loadCryptidIdButton);
             this.tabPage5.Controls.Add(this.genCard);
             this.tabPage5.Controls.Add(this.uploadBlockchain);
             this.tabPage5.Controls.Add(this.save);
@@ -416,11 +418,32 @@
             this.tabPage5.Text = "Misc";
             this.tabPage5.UseVisualStyleBackColor = true;
             // 
+            // genCard
+            // 
+            this.genCard.Location = new System.Drawing.Point(4, 66);
+            this.genCard.Name = "genCard";
+            this.genCard.Size = new System.Drawing.Size(518, 23);
+            this.genCard.TabIndex = 2;
+            this.genCard.Text = "Generate Identification Card";
+            this.genCard.UseMnemonic = false;
+            this.genCard.UseVisualStyleBackColor = true;
+            this.genCard.Click += new System.EventHandler(this.genCard_Click);
+            // 
+            // uploadBlockchain
+            // 
+            this.uploadBlockchain.Location = new System.Drawing.Point(4, 36);
+            this.uploadBlockchain.Name = "uploadBlockchain";
+            this.uploadBlockchain.Size = new System.Drawing.Size(518, 23);
+            this.uploadBlockchain.TabIndex = 1;
+            this.uploadBlockchain.Text = "Upload to Blockchain";
+            this.uploadBlockchain.UseVisualStyleBackColor = true;
+            this.uploadBlockchain.Click += new System.EventHandler(this.uploadBlockchain_Click);
+            // 
             // save
             // 
             this.save.Location = new System.Drawing.Point(4, 4);
             this.save.Name = "save";
-            this.save.Size = new System.Drawing.Size(518, 23);
+            this.save.Size = new System.Drawing.Size(255, 23);
             this.save.TabIndex = 0;
             this.save.Text = "Save Cryptid ID";
             this.save.UseVisualStyleBackColor = true;
@@ -521,26 +544,15 @@
             this.password.UseSystemPasswordChar = true;
             this.password.TextChanged += new System.EventHandler(this.password_TextChanged);
             // 
-            // uploadBlockchain
+            // loadCryptidIdButton
             // 
-            this.uploadBlockchain.Location = new System.Drawing.Point(4, 36);
-            this.uploadBlockchain.Name = "uploadBlockchain";
-            this.uploadBlockchain.Size = new System.Drawing.Size(518, 23);
-            this.uploadBlockchain.TabIndex = 1;
-            this.uploadBlockchain.Text = "Upload to Blockchain";
-            this.uploadBlockchain.UseVisualStyleBackColor = true;
-            this.uploadBlockchain.Click += new System.EventHandler(this.uploadBlockchain_Click);
-            // 
-            // genCard
-            // 
-            this.genCard.Location = new System.Drawing.Point(4, 66);
-            this.genCard.Name = "genCard";
-            this.genCard.Size = new System.Drawing.Size(518, 23);
-            this.genCard.TabIndex = 2;
-            this.genCard.Text = "Generate Identification Card";
-            this.genCard.UseMnemonic = false;
-            this.genCard.UseVisualStyleBackColor = true;
-            this.genCard.Click += new System.EventHandler(this.genCard_Click);
+            this.loadCryptidIdButton.Location = new System.Drawing.Point(265, 4);
+            this.loadCryptidIdButton.Name = "loadCryptidIdButton";
+            this.loadCryptidIdButton.Size = new System.Drawing.Size(257, 23);
+            this.loadCryptidIdButton.TabIndex = 3;
+            this.loadCryptidIdButton.Text = "Load Cryptid ID";
+            this.loadCryptidIdButton.UseVisualStyleBackColor = true;
+            this.loadCryptidIdButton.Click += new System.EventHandler(this.loadCryptidIdButton_Click);
             // 
             // GeneratorForm
             // 
@@ -659,6 +671,7 @@
         private System.Windows.Forms.SaveFileDialog cidSaveDialog;
         private System.Windows.Forms.Button genCard;
         private System.Windows.Forms.Button uploadBlockchain;
+        private System.Windows.Forms.Button loadCryptidIdButton;
     }
 }
 

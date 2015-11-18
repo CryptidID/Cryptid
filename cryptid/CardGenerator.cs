@@ -27,7 +27,7 @@ namespace cryptid {
         public void Generate(string outputFile, byte[] chainId) {
             if (_cardCandidate.Uid == null) throw new Exception("A UID is required to generate a new card!");
 
-            PdfReader reader = new PdfReader(_pdfTemplateFile);
+            PdfReader reader = new PdfReader("cryptid-id-template.pdf");
 
             using (PdfStamper stamper = new PdfStamper(reader, new FileStream(outputFile, FileMode.Create))) {
                 AcroFields form = stamper.AcroFields;
@@ -50,15 +50,15 @@ namespace cryptid {
                     } else if (key.Contains("HT")) {
                         form.SetField(key, _cardCandidate.Dau.ANSIFormat.TrimStart('0'));
                     } else if (key.Contains("DOB")) {
-                        form.SetField(key, _cardCandidate.Dbb.ToString("MM/dd/YY"));
+                        form.SetField(key, _cardCandidate.Dbb.ToString("MM/dd/YYYY"));
                     } else if (key.Contains("ISSUED")) {
-                        form.SetField(key, _cardCandidate.Dbd.ToString("MM/dd/YY"));
+                        form.SetField(key, _cardCandidate.Dbd.ToString("MM/dd/YYYY"));
                     } else if (key.Contains("ADDR_1")) {
                         form.SetField(key, _cardCandidate.Dag);
                     } else if (key.Contains("ADDR_2")) {
-                        form.SetField(key, _cardCandidate.Dai + ", " + _cardCandidate.Daj + " " + _cardCandidate.Dcg + " " + _cardCandidate.Dak);
+                        form.SetField(key, _cardCandidate.Dai + ", " + _cardCandidate.Daj + " " + _cardCandidate.Dcg + " " + _cardCandidate.Dak.ANSIFormat.TrimEnd('0'));
                     } else if (key.Contains("CRC")) {
-                        form.SetField(key, Arrays.ByteArrayToHex(BitConverter.GetBytes(Crypto.Crc16.ComputeChecksum(_cardCandidate.Uid))));
+                        form.SetField(key, Arrays.ByteArrayToHex(new Crypto.Crc32().ComputeHash(_cardCandidate.Uid)));
                     }
                 }
 
@@ -71,13 +71,14 @@ namespace cryptid {
                 Image mask = qr.GetImage();
                 mask.MakeMask();
                 img.ImageMask = mask;
-                img.SetAbsolutePosition(2199.75f, 704.25f);
+                //img.SetAbsolutePosition(2199.75f, 704.25f);
+                img.SetAbsolutePosition(1, 1);
                 pdfContentByte.AddImage(img);
 
                 // Add headshot
-                img = Image.GetInstance(ResizeImage(_cardCandidate.Image, 1112, 1484), ImageFormat.MemoryBmp);
+                /*img = Image.GetInstance(_cardCandidate.ImageResizeImage(_cardCandidate.Image, 1112, 1484), ImageFormat.MemoryBmp);
                 img.SetAbsolutePosition(75.75f, 704.25f);
-                pdfContentByte.AddImage(img);
+                pdfContentByte.AddImage(img);*/
             } 
         }
 
