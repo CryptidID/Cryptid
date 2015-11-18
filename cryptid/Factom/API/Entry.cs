@@ -1,7 +1,9 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Drawing.Text;
 using System.Linq;
+using System.Net;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
@@ -165,17 +167,18 @@ namespace Cryptid.Factom.API
 
             var json = JsonConvert.SerializeObject(com);
 
-            Console.WriteLine("CE Json = " + json);
-            var byteJson = Encoding.ASCII.GetBytes(json);
-            Console.WriteLine("Byte to json = " + Encoding.ASCII.GetString(byteJson));
+            Console.WriteLine("CE Json = " + json); //TODO: Remove
+
             var req = new RestRequest("/commit-entry/{name}", Method.POST);
             req.RequestFormat = DataFormat.Json;
             req.AddParameter("application/json", json, ParameterType.RequestBody);
             req.AddUrlSegment("name", name);
             IRestResponse resp = clientMD.Execute(req);
+            if (resp.StatusCode != HttpStatusCode.OK) {
+                throw new Exception("Entry Commit Failed. Message: " + resp.ErrorMessage);
+            }
             Console.WriteLine("CommitEntry Resp = " + resp.StatusCode + "|" + resp.StatusCode);
-            Console.WriteLine("REQ=" + req.RootElement + req.Resource);
-            return ChainIdOfFirstEntry(entry); // TODO: This, true for success, false=failed
+            return ChainIdOfFirstEntry(entry);
         }
 
         private class Reveal {
@@ -189,12 +192,16 @@ namespace Cryptid.Factom.API
             var req = new RestRequest("/reveal-entry/", Method.POST);
             var json = JsonConvert.SerializeObject(rev);
             Console.WriteLine("RE Json = " + json);
-            var byteJson = Encoding.ASCII.GetBytes(json);
+            
             req.RequestFormat = DataFormat.Json;
             req.AddParameter("application/json", json, ParameterType.RequestBody);
             IRestResponse resp = client.Execute<RestRequest>(req);
             Console.WriteLine("RevealEntry Resp = " + resp.StatusCode + "|" + resp.StatusCode);
-            return true;//TODO: This, true for success, false=failed
+
+            if (resp.StatusCode != HttpStatusCode.OK) {
+                throw new Exception("Entry Reveal Failed. Message: " + resp.ErrorMessage);
+            }
+            return true;
         }
     }
 }
