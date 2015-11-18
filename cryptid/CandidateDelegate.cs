@@ -10,13 +10,25 @@ using Cryptid.Factom.API;
 using Cryptid.Utils;
 using SourceAFIS;
 using SourceAFIS.Simple;
+using ChainHeadData = cryptid.Factom.API.DataStructs.ChainHeadData;
+using EntryBlockData = cryptid.Factom.API.DataStructs.EntryBlockData;
+using EntryData = cryptid.Factom.API.DataStructs.EntryData;
 
 namespace Cryptid {
-    using ChainHeadData = DataStructs.ChainHeadData;
-    using EntryBlockData = DataStructs.EntryBlockData;
-    using EntryData = DataStructs.EntryData;
-
     public static class CandidateDelegate {
+        private const string FactomWallet = "CCNEntryCreds";
+
+        private const int ExtIDsLength = 102; //2 byte header per ExtID + 2 sha256 hash + 32 byte random string
+
+        /// <summary>
+        /// Generates the ExtIDs for a packed candidate
+        /// </summary>
+        /// <param name="packedCandidate">The packed candidate to generate for</param>
+        /// <returns>An array of ExtIDs</returns>
+        public static byte[][] GenerateExtIDs(byte[] packedCandidate) {
+            return new[] { Crypto.SHA256d(packedCandidate), Crypto.CRYPTID_SALT_HASH, Encoding.UTF8.GetBytes(Strings.RandomString(32)) };
+        } 
+
         /// <summary>
         /// Enroll a candidate a to Factom. A new chain is created and the candidate data is packed and split into entries for that chain.
         /// This operation is irreversable.
@@ -27,25 +39,40 @@ namespace Cryptid {
         /// <returns>The chain ID of the enrolled candidate</returns>
         public static byte[] EnrollCandidate(Candidate c, string password, RSAParameters privKey) {
             byte[] packed = Pack(c, password, privKey);
-            var candidate = Unpack(packed, password, privKey);
-            //Upload to factom, return chain id
-            EntryData entry = new EntryData();
-            entry.Content = Arrays.ByteArrayToHex(packed);
+            byte[] hexPacked = Encoding.UTF8.GetBytes(Convert.ToBase64String(packed));
+
             Entry entryApi = new Entry();
             Chain chainApi = new Chain();
-            var chain = chainApi.NewChain(entry);
-            chainApi.Commitchain(chain, Arrays.ByteArrayToHex(candidate.Uid)); // Name is UID in hex
-            System.Threading.Thread.Sleep(11000);
-            chainApi.RevealChain(chain);
 
+            Chain.ChainType factomChain = null;
 
-            return null;
+            foreach (DataSegment segment in DataSegment.Segmentize(hexPacked, firstSegmentLength: DataSegment.DefaultMaxSegmentLength - ExtIDsLength)) {
+                byte[] dataToUpload = segment.Pack();
+                var factomEntry = entryApi.NewEntry(dataToUpload, null, null);
+                if (segment.CurrentSegment == 0) {
+                    //New chain
+                    factomEntry.ExtIDs = GenerateExtIDs(packed);
+                    factomChain = chainApi.NewChain(factomEntry);               
+                    chainApi.CommitChain(factomChain, FactomWallet); // Wallet Name
+                    System.Threading.Thread.Sleep(10100);
+                    chainApi.RevealChain(factomChain);
+                }
+                else {
+                    //new entry
+                    factomEntry.ChainID = factomChain.ChainId;
+                    entryApi.CommitEntry(factomEntry, FactomWallet);
+                    System.Threading.Thread.Sleep(10100);
+                    entryApi.RevealEntry(factomEntry);
+                }
+            }
+
+            return factomChain.ChainId;
         }
 
         /// <summary>
         /// - Verifies that we are allowed to update this chain
         /// - Enrolls a new candidate chain with a CandidateOldVersionRecord referencing the old chain
-        /// - Adds a CandidateUpdatedRecord to the old chain referencing the new chain
+        /// - Adds a OldVersionRecord to the old chain referencing the new chain
         /// - Adds a ChainUpdateRecord to the chain requesting update, forwarding it to the new chain.
         /// This operation is irreversable.
         /// </summary>
@@ -54,10 +81,28 @@ namespace Cryptid {
         /// <param name="privKey">The private key to pack the data with</param>
         /// <param name="chainToUpdate">The chain ID of the chain to be updated</param>
         /// <returns>The chain ID pointing to the updated candidate</returns>
-        public static byte[] UpdateCandidate(Candidate newCandidate, string password, RSAParameters privKey,
-            byte[] chainToUpdate) {
-            byte[] packed = Pack(newCandidate, password, privKey);
-            return null;
+        public static byte[] UpdateCandidate(Candidate newCandidate, string password, Fingerprint fp, RSAParameters privKey, byte[] chainToUpdate) {
+            if (!FullVerifyFromChain(chainToUpdate, password, fp, privKey))
+                throw new Exception("Attempted to update candidate with invalid access rights.");
+            
+            byte[] newChainId = EnrollCandidate(newCandidate, password, privKey);
+
+            CandidateOldVersionRecord ovr = new CandidateOldVersionRecord(chainToUpdate, newChainId);
+            CandidateUpdatedRecord cur = new CandidateUpdatedRecord(chainToUpdate, newChainId);
+
+            Entry entryApi = new Entry();
+            EntryData oldRecordEntry = entryApi.NewEntry(ovr.Pack(privKey), null, Arrays.ByteArrayToHex(newChainId));
+            EntryData newRecordEntry = entryApi.NewEntry(cur.Pack(privKey), null, Arrays.ByteArrayToHex(chainToUpdate));
+
+            entryApi.CommitEntry(oldRecordEntry, FactomWallet);
+            entryApi.CommitEntry(newRecordEntry, FactomWallet);
+
+            System.Threading.Thread.Sleep(10100);
+
+            entryApi.RevealEntry(oldRecordEntry);
+            entryApi.RevealEntry(newRecordEntry);
+
+            return newChainId;;
         }
 
         /// <summary>
@@ -78,6 +123,10 @@ namespace Cryptid {
         /// <param name="chainId">The id of the chain to get the candidate data from</param>
         /// <returns>The packed candidate data</returns>
         public static byte[] GetPackedCandidate(byte[] chainId) {
+            Entry entryApi = new Entry();
+            var entries = entryApi.GetAllChainEntries(chainId);
+            var entriesData = entries.Select(e => entryApi.GetEntryData(e).Content).ToList();
+
             return null;
         }
 

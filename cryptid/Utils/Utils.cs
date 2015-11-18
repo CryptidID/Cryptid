@@ -37,6 +37,27 @@ namespace Cryptid.Utils {
 
 
     public static class Arrays {
+        public static T[] CopySlice<T>(this T[] source, int index, int length, bool padToLength = false) {
+            int n = length;
+            T[] slice = null;
+
+            if (source.Length < index + length) {
+                n = source.Length - index;
+                if (padToLength) {
+                    slice = new T[length];
+                }
+            }
+
+            if (slice == null) slice = new T[n];
+            Array.Copy(source, index, slice, 0, n);
+            return slice;
+        }
+
+        public static IEnumerable<T[]> Slices<T>(this T[] source, int count, bool padToLength = false) {
+            for (var i = 0; i < source.Length; i += count)
+                yield return source.CopySlice(i, count, padToLength);
+        }
+
         public static byte[] CopyOfRange(byte[] src, int start, int end) {
             var len = end - start;
             var dest = new byte[len];
@@ -44,6 +65,11 @@ namespace Cryptid.Utils {
             return dest;
         }
 
+        /// <summary>
+        /// Converts byte[] to hex string
+        /// </summary>
+        /// <param name="ba"></param>
+        /// <returns></returns>
         public static string ByteArrayToHex(byte[] ba) {
             string hex = BitConverter.ToString(ba);
             return hex.Replace("-", "").ToLower();
@@ -63,6 +89,22 @@ namespace Cryptid.Utils {
             } else {
                 return bytes;
             }
+        }
+
+        public static bool Equality(byte[] a1, byte[] b1) {
+            int i;
+            if (a1.Length == b1.Length) {
+                i = 0;
+                while (i < a1.Length && (a1[i] == b1[i])) //Earlier it was a1[i]!=b1[i]
+                {
+                    i++;
+                }
+                if (i == a1.Length) {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 
@@ -100,7 +142,7 @@ namespace Cryptid.Utils {
             byte version = 0;
             entryBStruct.Add(version);
             // 32 byte chainid
-            byte[] chain = Strings.DecodeHexIntoBytes(e.ChainID);
+            byte[] chain = e.ChainID;
             entryBStruct.AddRange(chain);
             // Ext Ids Size
             entryBStruct.AddRange(idsSize);
@@ -112,7 +154,7 @@ namespace Cryptid.Utils {
                 entryBStruct.AddRange(ids);
             }
             // Content
-            byte[] content = Encoding.ASCII.GetBytes(e.Content);
+            byte[] content = e.Content;
             entryBStruct.AddRange(content);
 
             return entryBStruct.ToArray();
@@ -126,7 +168,7 @@ namespace Cryptid.Utils {
                 byte[] bytes = BitConverter.GetBytes(extLen);
                 bytes = Bytes.CheckEndian(bytes);
                 byteList.AddRange(bytes);
-                byte[] extIDStr = Encoding.ASCII.GetBytes(exID);
+                byte[] extIDStr = exID;
                 byteList.AddRange(extIDStr);
             }
             return byteList.ToArray();
@@ -151,12 +193,17 @@ namespace Cryptid.Utils {
                 // return Bytes.CheckEndian(bytes);
             }
         }
-
+        /// <summary>
+        /// Caculates the cost of an entry
+        /// </summary>
+        /// <param name="entry"></param>
+        /// <returns></returns>
         public static sbyte EntryCost(DataStructs.EntryData entry) {
             byte[] entryBinary = Entries.MarshalBinary(entry);
             var len = entryBinary.Length - 35;
             if (len > 10240) {
-                return 10; //Error, cannot be larger than 10kb
+                //Error, cannot be larger than 10kb
+                throw new System.ArgumentException("Parameter cannot exceed 10kb of content", "entry");
             }
             var r = len % 1024;
             sbyte n = (sbyte)(len / 1024); // Capacity of Entry Payment
@@ -172,6 +219,18 @@ namespace Cryptid.Utils {
     }
 
     public static class Strings {
+        public static string RandomString(int length) {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            var random = new Random();
+            return new string(Enumerable.Repeat(chars, length)
+              .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+
+        /// <summary>
+        /// Converts string hex into byte[]
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
         public static byte[] DecodeHexIntoBytes(string input) {
             var result = new byte[(input.Length + 1) >> 1];
             int lastcell = result.Length - 1;
@@ -186,6 +245,14 @@ namespace Cryptid.Utils {
             return result;
         }
 
+        /// <summary>
+        /// If hex string has "-", this method removes them
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static string RemoveDashes(string s) {
+            return s.Replace("-", "");
+        }
 
         private static int HexToInt(char c) {
             switch (c) {
