@@ -7,10 +7,13 @@ using System.Threading.Tasks;
 using Cryptid.Utils;
 
 namespace cryptid {
+    public interface IRecord {
+    };
+
     /// <summary>
     /// Updated Record for use when updating candidates to new chains.
     /// </summary>
-    class CandidateUpdatedRecord {
+    public class CandidateUpdatedRecord : IRecord {
         /// <summary>
         /// The length of a chain ID
         /// </summary>
@@ -18,16 +21,16 @@ namespace cryptid {
         /// <summary>
         /// The record identier for this record
         /// </summary>
-        private static readonly byte[] UpdatedRecordPrefix = { 0x0, 0x99, 0x89, 0x79, 0x69, 0x0 };
+        public static readonly byte[] UpdatedRecordPrefix = { 0x0, 0x99, 0x89, 0x79, 0x69, 0x0 };
 
         /// <summary>
         /// The chain id of the current chain
         /// </summary>
-        private byte[] CurrentChain { get; set; }
+        public byte[] CurrentChain { get; set; }
         /// <summary>
         /// The chain id of the old version chain
         /// </summary>
-        private byte[] PreviousChain { get; set; }
+        public byte[] PreviousChain { get; set; }
 
         /// <summary>
         /// Create a new CandidateUpdatedRecord

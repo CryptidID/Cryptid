@@ -120,6 +120,11 @@ namespace cryptidDemo {
                 return;
             }
 
+            if (string.IsNullOrWhiteSpace(password.Text)) {
+                MessageBox.Show("Password cannot be empty!.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
             byte[] data = CandidateDelegate.Pack(_c, password.Text, PrivateKey);
             Candidate unpacked = CandidateDelegate.Unpack(data, password.Text, PrivateKey);
 
@@ -177,11 +182,22 @@ namespace cryptidDemo {
         }
 
         private void uploadBlockchain_Click(object sender, EventArgs e) {
-            //TODO
+            if (!_c.IsComplete()) {
+                MessageBox.Show("Cannot generate an and ID for an incomplete candidate.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(password.Text)) {
+                MessageBox.Show("Password cannot be empty!.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+
+            chainId.Text = Convert.ToBase64String(CandidateDelegate.EnrollCandidate(_c, password.Text, PrivateKey));
         }
 
         private void genCard_Click(object sender, EventArgs e) {
-            if (_c == null || _c.IsComplete()) {
+            if (_c == null || !_c.IsComplete()) {
                 MessageBox.Show("Cannot generate card if no ID has been generated or the candidate is incomplete!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
@@ -191,8 +207,7 @@ namespace cryptidDemo {
 
             if (cidSaveDialog.ShowDialog() == DialogResult.OK) {
                 CardGenerator cg = new CardGenerator(_c, cidSaveDialog.FileName);
-                //TODO: THIS IS FOR DEBUG ONLY -- second param should NOT be UID but chain id
-                cg.Generate(cidSaveDialog.FileName, SHA256.Create().ComputeHash(_c.Uid));
+                cg.Generate(cidSaveDialog.FileName, Convert.FromBase64String(chainId.Text));
             }
         }
 

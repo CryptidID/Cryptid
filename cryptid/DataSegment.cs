@@ -36,7 +36,7 @@ namespace cryptid {
         /// <summary>
         /// The record identier for this record
         /// </summary>
-        private static readonly byte[] DataSegmentPrefix = { 0x0, 0x11, 0x22, 0x33, 0x44, 0x0 };
+        public static readonly byte[] DataSegmentPrefix = { 0x0, 0x11, 0x22, 0x33, 0x44, 0x0 };
 
         /// <summary>
         /// The data in this segment
