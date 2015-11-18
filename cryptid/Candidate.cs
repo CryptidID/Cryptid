@@ -133,11 +133,12 @@ namespace Cryptid {
             // pack fingerprint
             packer.Pack("ZAB");
 
-            AfisEngine afis = new AfisEngine();
-            Person p = new Person(Fingerprint);
-            afis.Extract(p);
-
-            packer.Pack(Fingerprint.AsIsoTemplate);
+            if (Fingerprint.Image != null) {
+                AfisEngine afis = new AfisEngine();
+                Person p = new Person(Fingerprint);
+                afis.Extract(p);
+            }
+            if (Fingerprint.AsIsoTemplate != null) packer.Pack(Fingerprint.AsIsoTemplate);
         }
 
         public void UnpackFromMessage(Unpacker unpacker) {
@@ -224,8 +225,8 @@ namespace Cryptid {
                     }
                     case "ZAA": {
                         if (!unpacker.Read()) throw SerializationExceptions.NewMissingProperty("zaa");
-                        using (var ms = new MemoryStream(unpacker.LastReadData.AsBinary()))
-                            Image = Image.FromStream(ms);
+                        var ms = new MemoryStream(unpacker.LastReadData.AsBinary());
+                        Image = Image.FromStream(ms);
                         break;
                     }
                     case "ZAB": {

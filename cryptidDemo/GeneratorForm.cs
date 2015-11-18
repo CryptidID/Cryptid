@@ -110,7 +110,7 @@ namespace cryptidDemo {
         }
 
         private void dob_ValueChanged(object sender, EventArgs e) {
-            _c.Dbb = issued.Value;
+            _c.Dbb = dob.Value;
         }
 
         private void generateButton_Click(object sender, EventArgs e) {
@@ -157,7 +157,10 @@ namespace cryptidDemo {
         }
 
         private void save_Click(object sender, EventArgs e) {
-            if (output == null) return;
+            if (output == null) {
+                MessageBox.Show("Cannot save ID if none has been generated!");
+                return;
+            }
 
             cidSaveDialog.FileName = _c.Dcs + "-" + _c.Dad + "-" + _c.Dac + ".cid";
             cidSaveDialog.Filter = "Cryptid ID File (*.cid)|*.cid";
@@ -172,7 +175,10 @@ namespace cryptidDemo {
         }
 
         private void genCard_Click(object sender, EventArgs e) {
-            if (_c == null) return;
+            if (_c == null) {
+                MessageBox.Show("Cannot generate card if no ID has been generated!");
+                return;
+            }
 
             cidSaveDialog.FileName = _c.Dcs + "-" + _c.Dad + "-" + _c.Dac + ".pdf";
             cidSaveDialog.Filter = "PDF File (*.pdf)|*.pdf";
@@ -180,16 +186,41 @@ namespace cryptidDemo {
             if (cidSaveDialog.ShowDialog() == DialogResult.OK) {
                 CardGenerator cg = new CardGenerator(_c, cidSaveDialog.FileName);
                 //TODO: THIS IS FOR DEBUG ONLY -- second param should NOT be UID but chain id
-                cg.Generate(cidSaveDialog.FileName, _c.Uid);
+                cg.Generate(cidSaveDialog.FileName, SHA256.Create().ComputeHash(_c.Uid));
             }
         }
 
         private void loadCryptidIdButton_Click(object sender, EventArgs e) {
+            if (string.IsNullOrEmpty(password.Text)) {
+                MessageBox.Show("You must enter the password associated with this ID.");
+                return;
+            }
+                
+
             headshotDialog.DefaultExt = "*.cid";
             headshotDialog.DefaultExt = "Cryptid ID File (*.cid)|*.cid";
             if (headshotDialog.ShowDialog() == DialogResult.OK) {
                 byte[] packed = File.ReadAllBytes(headshotDialog.FileName);
-                _c = CandidateDelegate.Unpack(packed, password.Text, PrivateKey);
+                output = packed;
+                var c = CandidateDelegate.Unpack(packed, password.Text, PrivateKey);
+
+                lastName.Text = c.Dcs;
+                firstName.Text = c.Dac;
+                middleName.Text = c.Dad;
+                issued.Value = c.Dbd;
+                dob.Value = c.Dbb;
+                sex.SelectedIndex = ((int) c.Dbc) - 1;
+                eye.SelectedIndex = ((int) c.Day);
+                inches.Value = c.Dau.Inches;
+                feet.Value = c.Dau.Feet;
+                address.Text = c.Dag;
+                city.Text = c.Dai;
+                state.Text = c.Daj;
+                zipcode.Text = c.Dak.ANSIFormat;
+                country.Text = c.Dcg;
+                headshotBox.Image = c.Image;
+
+                _c = c;
             }
         }
     }
