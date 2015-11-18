@@ -132,6 +132,16 @@ namespace Cryptid.Utils {
             return h3;
         }
 
+        public static byte[] ChainIdOfFirstEntry(DataStructs.EntryData entry) {
+            List<byte> byteList = new List<byte>();
+            foreach (var ext in entry.ExtIDs) {
+                byteList.AddRange(SHA256.Create().ComputeHash(ext));
+            }
+            byte[] b = byteList.ToArray();
+            var chainInfo = SHA256.Create().ComputeHash(b);
+            return chainInfo;
+        }
+
         public static byte[] MarshalBinary(DataStructs.EntryData e) { //TODO: Make private
             List<byte> entryBStruct = new List<byte>();
             byte[] idsSize = MarshalExtIDsSize(e);
