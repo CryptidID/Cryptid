@@ -73,6 +73,7 @@
     <Compile Include="CandidateOldVersionRecord.cs" />
     <Compile Include="CardGenerator.cs" />
     <Compile Include="Crypto.cs" />
+    <Compile Include="DataSegment.cs" />
     <Compile Include="Factom\API\Entry.cs" />
     <Compile Include="Factom\API\Chain.cs" />
     <Compile Include="Factom\API\DataStructs.cs" />
