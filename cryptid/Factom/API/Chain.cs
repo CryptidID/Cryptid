@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -54,8 +55,8 @@ namespace cryptid.Factom.API
         /// </summary>
         /// <param name="c">ChainType</param>
         /// <param name="name">Name of Entry  Credit wallet</param>
-        /// <returns></returns>
-        public bool CommitChain(ChainType c, string name) {
+        /// <returns>ChainID</returns>
+        public byte[] CommitChain(ChainType c, string name) {
             List<byte> byteList = new List<byte>();
 
             //1 byte version
@@ -99,11 +100,14 @@ namespace cryptid.Factom.API
             req.AddParameter("application/json", json, ParameterType.RequestBody);
             req.AddUrlSegment("name", name);
             IRestResponse resp = clientMD.Execute(req);
-            Console.WriteLine("CommitChain Resp = " + resp.StatusCode);
 
-            Console.WriteLine("Message= " + com.Message);
+            Console.WriteLine("CommitChain Resp = " + resp.StatusCode);// TODO: Remove
+            Console.WriteLine("Message= " + com.Message); // TODO: Remove
 
-            return true; //TODO: False for fail
+            if (resp.StatusCode != HttpStatusCode.OK) {
+                throw new Exception("Chain Commit Failed. Message: " + resp.ErrorMessage);
+            }
+            return Entries.ChainIdOfFirstEntry(c.FirstEntry);
         }
 
         private class Reveal {
@@ -127,7 +131,11 @@ namespace cryptid.Factom.API
             req.RequestFormat = DataFormat.Json;
             req.AddParameter("application/json", json, ParameterType.RequestBody);
             IRestResponse resp = client.Execute(req);
-            Console.WriteLine("RevealChain Resp = " + resp.StatusCode);
+            Console.WriteLine("RevealChain Resp = " + resp.StatusCode); //TODO: Remove
+
+            if (resp.StatusCode != HttpStatusCode.OK) {
+                throw new Exception("Chain Reveal Failed. Message: " + resp.ErrorMessage);
+            }
             return true;
         }
     }
