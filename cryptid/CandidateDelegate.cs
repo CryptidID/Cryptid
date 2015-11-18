@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -8,6 +9,7 @@ using cryptid;
 using cryptid.Factom.API;
 using Cryptid.Factom.API;
 using Cryptid.Utils;
+using iTextSharp.text;
 using SourceAFIS;
 using SourceAFIS.Simple;
 using ChainHeadData = cryptid.Factom.API.DataStructs.ChainHeadData;
@@ -82,8 +84,7 @@ namespace Cryptid {
         /// <param name="chainToUpdate">The chain ID of the chain to be updated</param>
         /// <returns>The chain ID pointing to the updated candidate</returns>
         public static byte[] UpdateCandidate(Candidate newCandidate, string password, Fingerprint fp, RSAParameters privKey, byte[] chainToUpdate) {
-            if (!FullVerifyFromChain(chainToUpdate, password, fp, privKey))
-                throw new Exception("Attempted to update candidate with invalid access rights.");
+            if (FullVerifyFromChain(chainToUpdate, password, fp, privKey) < 50f) throw new Exception("Access confidence to low to update candidate.");
             
             byte[] newChainId = EnrollCandidate(newCandidate, password, privKey);
 
@@ -112,9 +113,10 @@ namespace Cryptid {
         /// <param name="password">The candidates password</param>
         /// <param name="fp">The candidates fingerprint</param>
         /// <param name="publicKey">The public key to verify the data with</param>
-        /// <returns>Whether or not the chain data is valid</returns>
-        public static bool FullVerifyFromChain(byte[] chainId, string password, Fingerprint fp, RSAParameters publicKey) {
-            return false;
+        /// <returns>The threshold at which the fingerprint verified</returns>
+        public static float FullVerifyFromChain(byte[] chainId, string password, Fingerprint fp, RSAParameters publicKey) {
+            var packed = GetPackedCandidate(chainId);
+            return VerifyFingerprint(Unpack(packed, password, publicKey), fp);
         }
 
         /// <summary>
@@ -126,17 +128,89 @@ namespace Cryptid {
             Entry entryApi = new Entry();
             var entries = entryApi.GetAllChainEntries(chainId);
             var entriesData = entries.Select(e => entryApi.GetEntryData(e).Content).ToList();
-
-            return null;
+            List<DataSegment> segments = new List<DataSegment>();
+            foreach (byte[] data in entriesData) {
+                if(Bytes.StartsWith(data, DataSegment.DataSegmentPrefix)) segments.Add(DataSegment.Unpack(data));
+            }
+            return DataSegment.Desegmentize(segments);
         }
 
         /// <summary>
-        /// Get all the UIDs used by a candidate (Follows OldVersionRecords and UpdatedRecords)
+        /// 
+        /// </summary>
+        /// <param name="chainId"></param>
+        /// <param name="publicKey">The public key to verify the data with</param>
+        /// <returns></returns>
+        public static List<CandidateOldVersionRecord> GetOldVersionRecords(byte[] chainId, RSAParameters pubKey) {
+            Entry entryApi = new Entry();
+            var entries = entryApi.GetAllChainEntries(chainId);
+            var entriesData = entries.Select(e => entryApi.GetEntryData(e).Content).ToList();
+            List<CandidateOldVersionRecord> records = new List<CandidateOldVersionRecord>();
+            foreach (byte[] data in entriesData) {
+                if (Bytes.StartsWith(data, CandidateOldVersionRecord.CandidateOldVersionPrefix)) records.Add(CandidateOldVersionRecord.Unpack(data, pubKey));
+            }
+            return records;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="chainId"></param>
+        /// <param name="publicKey">The public key to verify the data with</param>
+        /// <returns></returns>
+        public static List<CandidateUpdatedRecord> GetCandidateUpdatedRecords(byte[] chainId, RSAParameters pubKey) {
+            Entry entryApi = new Entry();
+            var entries = entryApi.GetAllChainEntries(chainId);
+            var entriesData = entries.Select(e => entryApi.GetEntryData(e).Content).ToList();
+            List<CandidateUpdatedRecord> records = new List<CandidateUpdatedRecord>();
+            foreach (byte[] data in entriesData) {
+                if (Bytes.StartsWith(data, CandidateUpdatedRecord.UpdatedRecordPrefix)) records.Add(CandidateUpdatedRecord.Unpack(data, pubKey));
+            }
+            return records;
+        }
+
+        /// <summary>
+        /// Get all the chains used by a candidate (Follows OldVersionRecords and UpdatedRecords)
         /// </summary>
         /// <param name="chainId">The id of a chain owned by the candidate</param>
-        /// <returns></returns>
-        public static byte[][] GetCandidateUIDHistory(byte chainId) {
-            return null;
+        /// <returns>A list of all the chains owned by a candidate</returns>
+        public static List<byte[]> GetCandidateChainHistory(byte chainId, RSAParameters pubKey) {
+            List<IRecord> toSort = new List<IRecord>();
+            List<byte[]> ret = new List<byte[]>();
+
+            while (toSort.Count > 0) {
+                IRecord curr = toSort[0];
+                if (curr is CandidateUpdatedRecord) {
+                    var cur = (CandidateUpdatedRecord) curr;
+                    if (!ret.Any(x => x.SequenceEqual(cur.PreviousChain))) {
+                        ret.Add(cur.PreviousChain);
+                        toSort.AddRange(GetCandidateUpdatedRecords(cur.PreviousChain, pubKey));
+                        toSort.AddRange(GetOldVersionRecords(cur.PreviousChain, pubKey));
+                    }
+
+                    if (!ret.Any(x => x.SequenceEqual(cur.CurrentChain))) {
+                        ret.Add(cur.CurrentChain);
+                        toSort.AddRange(GetCandidateUpdatedRecords(cur.CurrentChain, pubKey));
+                        toSort.AddRange(GetOldVersionRecords(cur.CurrentChain, pubKey));
+                    }
+                } else if (curr is CandidateOldVersionRecord) {
+                    var ovr = (CandidateOldVersionRecord) curr;
+                    if (!ret.Any(x => x.SequenceEqual(ovr.NextChain))) {
+                        ret.Add(ovr.NextChain);
+                        toSort.AddRange(GetCandidateUpdatedRecords(ovr.NextChain, pubKey));
+                        toSort.AddRange(GetOldVersionRecords(ovr.NextChain, pubKey));
+                    }
+
+                    if (!ret.Any(x => x.SequenceEqual(ovr.CurrentChain))) {
+                        ret.Add(ovr.CurrentChain);
+                        toSort.AddRange(GetCandidateUpdatedRecords(ovr.CurrentChain, pubKey));
+                        toSort.AddRange(GetOldVersionRecords(ovr.CurrentChain, pubKey));
+                    }
+                }
+                toSort.RemoveAt(0);
+            }
+
+            return ret;
         }
 
         /// <summary>

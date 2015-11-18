@@ -60,6 +60,7 @@
             this.tabPage4 = new System.Windows.Forms.TabPage();
             this.fpTemplateOutput = new System.Windows.Forms.TextBox();
             this.tabPage5 = new System.Windows.Forms.TabPage();
+            this.loadBlockChain = new System.Windows.Forms.Button();
             this.loadCryptidIdButton = new System.Windows.Forms.Button();
             this.genCard = new System.Windows.Forms.Button();
             this.uploadBlockchain = new System.Windows.Forms.Button();
@@ -75,7 +76,8 @@
             this.label15 = new System.Windows.Forms.Label();
             this.password = new System.Windows.Forms.TextBox();
             this.cidSaveDialog = new System.Windows.Forms.SaveFileDialog();
-            this.loadBlockChain = new System.Windows.Forms.Button();
+            this.tabPage6 = new System.Windows.Forms.TabPage();
+            this.chainId = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.headshotBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.feet)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.inches)).BeginInit();
@@ -86,6 +88,7 @@
             this.tabPage4.SuspendLayout();
             this.tabPage5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.fpBox)).BeginInit();
+            this.tabPage6.SuspendLayout();
             this.SuspendLayout();
             // 
             // headshotBox
@@ -321,6 +324,7 @@
             this.tabControl.Controls.Add(this.tabPage2);
             this.tabControl.Controls.Add(this.tabPage3);
             this.tabControl.Controls.Add(this.tabPage4);
+            this.tabControl.Controls.Add(this.tabPage6);
             this.tabControl.Controls.Add(this.tabPage5);
             this.tabControl.Location = new System.Drawing.Point(516, 12);
             this.tabControl.Name = "tabControl";
@@ -419,6 +423,15 @@
             this.tabPage5.TabIndex = 4;
             this.tabPage5.Text = "Misc";
             this.tabPage5.UseVisualStyleBackColor = true;
+            // 
+            // loadBlockChain
+            // 
+            this.loadBlockChain.Location = new System.Drawing.Point(265, 37);
+            this.loadBlockChain.Name = "loadBlockChain";
+            this.loadBlockChain.Size = new System.Drawing.Size(257, 23);
+            this.loadBlockChain.TabIndex = 4;
+            this.loadBlockChain.Text = "Load From Blockchain";
+            this.loadBlockChain.UseVisualStyleBackColor = true;
             // 
             // loadCryptidIdButton
             // 
@@ -556,14 +569,23 @@
             this.password.UseSystemPasswordChar = true;
             this.password.TextChanged += new System.EventHandler(this.password_TextChanged);
             // 
-            // loadBlockChain
+            // tabPage6
             // 
-            this.loadBlockChain.Location = new System.Drawing.Point(265, 37);
-            this.loadBlockChain.Name = "loadBlockChain";
-            this.loadBlockChain.Size = new System.Drawing.Size(257, 23);
-            this.loadBlockChain.TabIndex = 4;
-            this.loadBlockChain.Text = "Load From Blockchain";
-            this.loadBlockChain.UseVisualStyleBackColor = true;
+            this.tabPage6.Controls.Add(this.chainId);
+            this.tabPage6.Location = new System.Drawing.Point(4, 22);
+            this.tabPage6.Name = "tabPage6";
+            this.tabPage6.Size = new System.Drawing.Size(525, 288);
+            this.tabPage6.TabIndex = 5;
+            this.tabPage6.Text = "Chain ID";
+            this.tabPage6.UseVisualStyleBackColor = true;
+            // 
+            // chainId
+            // 
+            this.chainId.Location = new System.Drawing.Point(3, 3);
+            this.chainId.Multiline = true;
+            this.chainId.Name = "chainId";
+            this.chainId.Size = new System.Drawing.Size(519, 280);
+            this.chainId.TabIndex = 2;
             // 
             // GeneratorForm
             // 
@@ -625,6 +647,8 @@
             this.tabPage4.PerformLayout();
             this.tabPage5.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.fpBox)).EndInit();
+            this.tabPage6.ResumeLayout(false);
+            this.tabPage6.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -684,6 +708,8 @@
         private System.Windows.Forms.Button uploadBlockchain;
         private System.Windows.Forms.Button loadCryptidIdButton;
         private System.Windows.Forms.Button loadBlockChain;
+        private System.Windows.Forms.TabPage tabPage6;
+        private System.Windows.Forms.TextBox chainId;
     }
 }
 

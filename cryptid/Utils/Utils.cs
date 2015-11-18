@@ -1,17 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Windows.Forms;
-using System.Linq;
-using System.Text;
 using cryptid.Factom.API;
 
 namespace Cryptid.Utils {
-
-
     public static class Keys {
         public static RSAParameters PrivateKey(string path) {
             var k = new RSACryptoServiceProvider();
@@ -38,7 +35,7 @@ namespace Cryptid.Utils {
 
     public static class Arrays {
         public static T[] CopySlice<T>(this T[] source, int index, int length, bool padToLength = false) {
-            int n = length;
+            var n = length;
             T[] slice = null;
 
             if (source.Length < index + length) {
@@ -66,19 +63,19 @@ namespace Cryptid.Utils {
         }
 
         /// <summary>
-        /// Converts byte[] to hex string
+        ///     Converts byte[] to hex string
         /// </summary>
         /// <param name="ba"></param>
         /// <returns></returns>
         public static string ByteArrayToHex(byte[] ba) {
-            string hex = BitConverter.ToString(ba);
+            var hex = BitConverter.ToString(ba);
             return hex.Replace("-", "").ToLower();
         }
     }
 
     public static class Bytes {
         /// <summary>
-        /// Will correct a little endian byte[]
+        ///     Will correct a little endian byte[]
         /// </summary>
         /// <param name="bytes"></param>
         /// <returns></returns>
@@ -86,9 +83,8 @@ namespace Cryptid.Utils {
             if (BitConverter.IsLittleEndian) {
                 var byteList = bytes.Reverse(); // Must be in bigendian
                 return byteList.ToArray();
-            } else {
-                return bytes;
             }
+            return bytes;
         }
 
         public static bool Equality(byte[] a1, byte[] b1) {
@@ -106,34 +102,45 @@ namespace Cryptid.Utils {
 
             return false;
         }
+
+        public static bool StartsWith(byte[] haystack, byte[] needle) {
+            if (needle.Length > haystack.Length) return false;
+            for (var i = 0; i < needle.Length; i++) {
+                if (haystack[i] != needle[i]) return false;
+            }
+            return true;
+        }
     }
 
     public static class Times {
-        public static byte[] MilliTime() {// TODO Make private
-            List<byte> byteList = new List<byte>();
-            DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        public static byte[] MilliTime() {
+// TODO Make private
+            var byteList = new List<byte>();
+            var UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
             // 6 Byte millisec unix time
-            var unixMilliLong = (long)(DateTime.UtcNow - UnixEpoch).TotalMilliseconds;
-            byte[] unixBytes = Bytes.CheckEndian(BitConverter.GetBytes(unixMilliLong));
+            var unixMilliLong = (long) (DateTime.UtcNow - UnixEpoch).TotalMilliseconds;
+            var unixBytes = Bytes.CheckEndian(BitConverter.GetBytes(unixMilliLong));
             unixBytes = Arrays.CopyOfRange(unixBytes, 2, unixBytes.Length);
             return unixBytes;
         }
     }
 
     public static class Entries {
-        public static byte[] HashEntry(DataStructs.EntryData entry) { //TODO: Make private, public for tests
-            byte[] data = MarshalBinary(entry); // TODO: Check for error
-            byte[] h1 = SHA512.Create().ComputeHash(data);
-            byte[] h2 = new byte[h1.Length + data.Length];
+        public static byte[] HashEntry(DataStructs.EntryData entry) {
+            //TODO: Make private, public for tests
+            var data = MarshalBinary(entry); // TODO: Check for error
+            var h1 = SHA512.Create().ComputeHash(data);
+            var h2 = new byte[h1.Length + data.Length];
             h1.CopyTo(h2, 0);
             data.CopyTo(h2, h1.Length);
-            byte[] h3 = SHA256.Create().ComputeHash(h2);
+            var h3 = SHA256.Create().ComputeHash(h2);
             return h3;
         }
 
-        public static byte[] MarshalBinary(DataStructs.EntryData e) { //TODO: Make private
-            List<byte> entryBStruct = new List<byte>();
-            byte[] idsSize = MarshalExtIDsSize(e);
+        public static byte[] MarshalBinary(DataStructs.EntryData e) {
+            //TODO: Make private
+            var entryBStruct = new List<byte>();
+            var idsSize = MarshalExtIDsSize(e);
 
 
             idsSize = Bytes.CheckEndian(idsSize);
@@ -142,7 +149,7 @@ namespace Cryptid.Utils {
             byte version = 0;
             entryBStruct.Add(version);
             // 32 byte chainid
-            byte[] chain = e.ChainID;
+            var chain = e.ChainID;
             entryBStruct.AddRange(chain);
             // Ext Ids Size
             entryBStruct.AddRange(idsSize);
@@ -150,25 +157,25 @@ namespace Cryptid.Utils {
             // Payload
             // ExtIDS
             if (e.ExtIDs != null) {
-                byte[] ids = MarshalExtIDsBinary(e);
+                var ids = MarshalExtIDsBinary(e);
                 entryBStruct.AddRange(ids);
             }
             // Content
-            byte[] content = e.Content;
+            var content = e.Content;
             entryBStruct.AddRange(content);
 
             return entryBStruct.ToArray();
         }
 
         private static byte[] MarshalExtIDsBinary(DataStructs.EntryData e) {
-            List<byte> byteList = new List<byte>();
+            var byteList = new List<byte>();
             foreach (var exID in e.ExtIDs) {
                 // 2 byte size of ExtID
-                Int16 extLen = Convert.ToInt16(exID.Length);
-                byte[] bytes = BitConverter.GetBytes(extLen);
+                var extLen = Convert.ToInt16(exID.Length);
+                var bytes = BitConverter.GetBytes(extLen);
                 bytes = Bytes.CheckEndian(bytes);
                 byteList.AddRange(bytes);
-                byte[] extIDStr = exID;
+                var extIDStr = exID;
                 byteList.AddRange(extIDStr);
             }
             return byteList.ToArray();
@@ -176,37 +183,39 @@ namespace Cryptid.Utils {
 
         private static byte[] MarshalExtIDsSize(DataStructs.EntryData e) {
             if (e.ExtIDs == null) {
-                Int16 extLen = 0;
-                byte[] bytes = BitConverter.GetBytes(extLen);
+                short extLen = 0;
+                var bytes = BitConverter.GetBytes(extLen);
                 return Bytes.CheckEndian(bytes);
-            } else {
+            }
+            else {
                 var totalSize = 0;
                 foreach (var extElement in e.ExtIDs) {
                     totalSize += extElement.Length + 2;
                 }
 
-                Int16 extLen = Convert.ToInt16(totalSize);
+                var extLen = Convert.ToInt16(totalSize);
 
 
-                byte[] bytes = BitConverter.GetBytes(extLen);
+                var bytes = BitConverter.GetBytes(extLen);
                 return bytes;
                 // return Bytes.CheckEndian(bytes);
             }
         }
+
         /// <summary>
-        /// Caculates the cost of an entry
+        ///     Caculates the cost of an entry
         /// </summary>
         /// <param name="entry"></param>
         /// <returns></returns>
         public static sbyte EntryCost(DataStructs.EntryData entry) {
-            byte[] entryBinary = Entries.MarshalBinary(entry);
+            var entryBinary = MarshalBinary(entry);
             var len = entryBinary.Length - 35;
             if (len > 10240) {
                 //Error, cannot be larger than 10kb
-                throw new System.ArgumentException("Parameter cannot exceed 10kb of content", "entry");
+                throw new ArgumentException("Parameter cannot exceed 10kb of content", "entry");
             }
-            var r = len % 1024;
-            sbyte n = (sbyte)(len / 1024); // Capacity of Entry Payment
+            var r = len%1024;
+            var n = (sbyte) (len/1024); // Capacity of Entry Payment
 
             if (r > 0) {
                 n += 1;
@@ -223,21 +232,21 @@ namespace Cryptid.Utils {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             var random = new Random();
             return new string(Enumerable.Repeat(chars, length)
-              .Select(s => s[random.Next(s.Length)]).ToArray());
+                .Select(s => s[random.Next(s.Length)]).ToArray());
         }
 
         /// <summary>
-        /// Converts string hex into byte[]
+        ///     Converts string hex into byte[]
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
         public static byte[] DecodeHexIntoBytes(string input) {
             var result = new byte[(input.Length + 1) >> 1];
-            int lastcell = result.Length - 1;
-            int lastchar = input.Length - 1;
+            var lastcell = result.Length - 1;
+            var lastchar = input.Length - 1;
             // count up in characters, but inside the loop will
             // reference from the end of the input/output.
-            for (int i = 0; i < input.Length; i++) {
+            for (var i = 0; i < input.Length; i++) {
                 // i >> 1    -  (i / 2) gives the result byte offset from the end
                 // i & 1     -  1 if it is high-nibble, 0 for low-nibble.
                 result[lastcell - (i >> 1)] |= ByteLookup[i & 1, HexToInt(input[lastchar - i])];
@@ -246,7 +255,7 @@ namespace Cryptid.Utils {
         }
 
         /// <summary>
-        /// If hex string has "-", this method removes them
+        ///     If hex string has "-", this method removes them
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
@@ -298,8 +307,8 @@ namespace Cryptid.Utils {
                     throw new FormatException("Unrecognized hex char " + c);
             }
         }
-        private static readonly byte[,] ByteLookup = new byte[,]
-        {
+
+        private static readonly byte[,] ByteLookup = {
             // low nibble
             {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f},
             // high nibble

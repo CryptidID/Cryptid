@@ -10,7 +10,7 @@ namespace cryptid {
     /// <summary>
     /// Old Version Record for use when updating candidates to new chains.
     /// </summary>
-    class CandidateOldVersionRecord {
+    public class CandidateOldVersionRecord : IRecord {
         /// <summary>
         /// The length of a chain ID
         /// </summary>
@@ -18,16 +18,16 @@ namespace cryptid {
         /// <summary>
         /// The record identier for this record
         /// </summary>
-        private static readonly byte[] CandidateOldVersionPrefix = {0x0, 0x69, 0x79, 0x89, 0x99, 0x0};
+        public static readonly byte[] CandidateOldVersionPrefix = {0x0, 0x69, 0x79, 0x89, 0x99, 0x0};
 
         /// <summary>
         /// The chain id of the current chain
         /// </summary>
-        private byte[] CurrentChain { get; set; }
+        public byte[] CurrentChain { get; set; }
         /// <summary>
         /// The chain id of the chain that updated this one
         /// </summary>
-        private byte[] NextChain { get; set; }
+        public byte[] NextChain { get; set; }
 
         /// <summary>
         /// Create a new CandidateOldVersionRecord
