@@ -60,6 +60,7 @@
             this.tabPage4 = new System.Windows.Forms.TabPage();
             this.fpTemplateOutput = new System.Windows.Forms.TextBox();
             this.tabPage5 = new System.Windows.Forms.TabPage();
+            this.loadCryptidIdButton = new System.Windows.Forms.Button();
             this.genCard = new System.Windows.Forms.Button();
             this.uploadBlockchain = new System.Windows.Forms.Button();
             this.save = new System.Windows.Forms.Button();
@@ -74,7 +75,7 @@
             this.label15 = new System.Windows.Forms.Label();
             this.password = new System.Windows.Forms.TextBox();
             this.cidSaveDialog = new System.Windows.Forms.SaveFileDialog();
-            this.loadCryptidIdButton = new System.Windows.Forms.Button();
+            this.loadBlockChain = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.headshotBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.feet)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.inches)).BeginInit();
@@ -407,6 +408,7 @@
             // 
             // tabPage5
             // 
+            this.tabPage5.Controls.Add(this.loadBlockChain);
             this.tabPage5.Controls.Add(this.loadCryptidIdButton);
             this.tabPage5.Controls.Add(this.genCard);
             this.tabPage5.Controls.Add(this.uploadBlockchain);
@@ -417,6 +419,16 @@
             this.tabPage5.TabIndex = 4;
             this.tabPage5.Text = "Misc";
             this.tabPage5.UseVisualStyleBackColor = true;
+            // 
+            // loadCryptidIdButton
+            // 
+            this.loadCryptidIdButton.Location = new System.Drawing.Point(265, 4);
+            this.loadCryptidIdButton.Name = "loadCryptidIdButton";
+            this.loadCryptidIdButton.Size = new System.Drawing.Size(257, 23);
+            this.loadCryptidIdButton.TabIndex = 3;
+            this.loadCryptidIdButton.Text = "Load Cryptid ID";
+            this.loadCryptidIdButton.UseVisualStyleBackColor = true;
+            this.loadCryptidIdButton.Click += new System.EventHandler(this.loadCryptidIdButton_Click);
             // 
             // genCard
             // 
@@ -433,7 +445,7 @@
             // 
             this.uploadBlockchain.Location = new System.Drawing.Point(4, 36);
             this.uploadBlockchain.Name = "uploadBlockchain";
-            this.uploadBlockchain.Size = new System.Drawing.Size(518, 23);
+            this.uploadBlockchain.Size = new System.Drawing.Size(255, 23);
             this.uploadBlockchain.TabIndex = 1;
             this.uploadBlockchain.Text = "Upload to Blockchain";
             this.uploadBlockchain.UseVisualStyleBackColor = true;
@@ -544,15 +556,14 @@
             this.password.UseSystemPasswordChar = true;
             this.password.TextChanged += new System.EventHandler(this.password_TextChanged);
             // 
-            // loadCryptidIdButton
+            // loadBlockChain
             // 
-            this.loadCryptidIdButton.Location = new System.Drawing.Point(265, 4);
-            this.loadCryptidIdButton.Name = "loadCryptidIdButton";
-            this.loadCryptidIdButton.Size = new System.Drawing.Size(257, 23);
-            this.loadCryptidIdButton.TabIndex = 3;
-            this.loadCryptidIdButton.Text = "Load Cryptid ID";
-            this.loadCryptidIdButton.UseVisualStyleBackColor = true;
-            this.loadCryptidIdButton.Click += new System.EventHandler(this.loadCryptidIdButton_Click);
+            this.loadBlockChain.Location = new System.Drawing.Point(265, 37);
+            this.loadBlockChain.Name = "loadBlockChain";
+            this.loadBlockChain.Size = new System.Drawing.Size(257, 23);
+            this.loadBlockChain.TabIndex = 4;
+            this.loadBlockChain.Text = "Load From Blockchain";
+            this.loadBlockChain.UseVisualStyleBackColor = true;
             // 
             // GeneratorForm
             // 
@@ -672,6 +683,7 @@
         private System.Windows.Forms.Button genCard;
         private System.Windows.Forms.Button uploadBlockchain;
         private System.Windows.Forms.Button loadCryptidIdButton;
+        private System.Windows.Forms.Button loadBlockChain;
     }
 }
 
