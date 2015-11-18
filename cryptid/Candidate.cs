@@ -239,6 +239,20 @@ namespace Cryptid {
             }
         }
 
+        public bool IsComplete() {
+            if (string.IsNullOrWhiteSpace(Dcs)) return false;
+            if (string.IsNullOrWhiteSpace(Dac)) return false;
+            if (string.IsNullOrWhiteSpace(Dad)) return false;
+            if (string.IsNullOrWhiteSpace(Dag)) return false;
+            if (string.IsNullOrWhiteSpace(Dai)) return false;
+            if (string.IsNullOrWhiteSpace(Daj)) return false;
+            if (string.IsNullOrWhiteSpace(Dcg)) return false;
+            if (Image == null) return false;
+            if (Fingerprint.AsIsoTemplate == null || Fingerprint.AsBitmap == null) return false;
+            if (Dbd == null || Dbb == null | Dbc == null || Day == null || Dau == null || Dak == null) return false;
+            return true;
+        }
+
         public EyeColor GetEyeColor(string s) {
             foreach (EyeColor ec in Enum.GetValues(typeof (EyeColor))) {
                 string val = null;

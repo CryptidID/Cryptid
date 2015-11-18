@@ -50,11 +50,12 @@ namespace cryptidDemo {
 
         private void headshotButton_Click(object sender, EventArgs e) {
             headshotDialog.DefaultExt = "*.jpg";
-            headshotDialog.DefaultExt = "Image Files|*.jpg";
+            headshotDialog.Filter = "Image Files|*.jpg";
+            headshotDialog.FileName = "";
             if (headshotDialog.ShowDialog() == DialogResult.OK) {
                 headshotBox.ImageLocation = headshotDialog.FileName;
+                _c.Image = Image.FromFile(headshotBox.ImageLocation);
             }
-            _c.Image = Image.FromFile(headshotBox.ImageLocation);
         }
 
         private void firstName_TextChanged(object sender, EventArgs e) {
@@ -114,6 +115,11 @@ namespace cryptidDemo {
         }
 
         private void generateButton_Click(object sender, EventArgs e) {
+            if (!_c.IsComplete()) {
+                MessageBox.Show("Cannot generate an and ID for an incomplete candidate.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
             byte[] data = CandidateDelegate.Pack(_c, password.Text, PrivateKey);
             Candidate unpacked = CandidateDelegate.Unpack(data, password.Text, PrivateKey);
 
@@ -143,7 +149,7 @@ namespace cryptidDemo {
                 Enabled = true;
             } else {
                 //TODO: Allow to choose fingerprint image?
-                MessageBox.Show("You are not connected to a fingerprint scanner!");
+                MessageBox.Show("You are not connected to a fingerprint scanner!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -158,7 +164,7 @@ namespace cryptidDemo {
 
         private void save_Click(object sender, EventArgs e) {
             if (output == null) {
-                MessageBox.Show("Cannot save ID if none has been generated!");
+                MessageBox.Show("Cannot save ID if none has been generated!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
@@ -175,8 +181,8 @@ namespace cryptidDemo {
         }
 
         private void genCard_Click(object sender, EventArgs e) {
-            if (_c == null) {
-                MessageBox.Show("Cannot generate card if no ID has been generated!");
+            if (_c == null || _c.IsComplete()) {
+                MessageBox.Show("Cannot generate card if no ID has been generated or the candidate is incomplete!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
@@ -192,13 +198,14 @@ namespace cryptidDemo {
 
         private void loadCryptidIdButton_Click(object sender, EventArgs e) {
             if (string.IsNullOrEmpty(password.Text)) {
-                MessageBox.Show("You must enter the password associated with this ID.");
+                MessageBox.Show("You must enter the password associated with this ID.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
                 
 
             headshotDialog.DefaultExt = "*.cid";
-            headshotDialog.DefaultExt = "Cryptid ID File (*.cid)|*.cid";
+            headshotDialog.Filter = "Cryptid ID File (*.cid)|*.cid";
+            headshotDialog.FileName = "";
             if (headshotDialog.ShowDialog() == DialogResult.OK) {
                 byte[] packed = File.ReadAllBytes(headshotDialog.FileName);
                 output = packed;
