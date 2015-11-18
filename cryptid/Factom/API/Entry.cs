@@ -36,16 +36,6 @@ namespace Cryptid.Factom.API
             return entry; 
         }
 
-        public byte[] ChainIdOfFirstEntry(EntryData entry) {
-            List<byte> byteList = new List<byte>();
-            foreach (var ext in entry.ExtIDs) {
-                byteList.AddRange(SHA256.Create().ComputeHash(ext));
-            }
-            byte[] b = byteList.ToArray();
-            var chainInfo = SHA256.Create().ComputeHash(b);
-            return chainInfo;
-        }
-
         /// <summary>
         /// Takes in an entry chain hash and returns Key MR of the first entry.
         /// </summary>
@@ -178,7 +168,7 @@ namespace Cryptid.Factom.API
                 throw new Exception("Entry Commit Failed. Message: " + resp.ErrorMessage);
             }
             Console.WriteLine("CommitEntry Resp = " + resp.StatusCode + "|" + resp.StatusCode);
-            return ChainIdOfFirstEntry(entry);
+            return Entries.ChainIdOfFirstEntry(entry);
         }
 
         private class Reveal {
