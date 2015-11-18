@@ -123,6 +123,7 @@ namespace cryptidDemo {
             fpTemplateOutput.Text = BitConverter.ToString(unpacked.Fingerprint.AsIsoTemplate);
 
             output = data;
+            _c.Uid = unpacked.Uid;
         }
 
         private void fingerprintButton_Click(object sender, EventArgs e) {
@@ -171,7 +172,7 @@ namespace cryptidDemo {
         }
 
         private void genCard_Click(object sender, EventArgs e) {
-            if (output == null) return;
+            if (_c == null) return;
 
             cidSaveDialog.FileName = _c.Dcs + "-" + _c.Dad + "-" + _c.Dac + ".pdf";
             cidSaveDialog.Filter = "PDF File (*.pdf)|*.pdf";
@@ -180,6 +181,15 @@ namespace cryptidDemo {
                 CardGenerator cg = new CardGenerator(_c, cidSaveDialog.FileName);
                 //TODO: THIS IS FOR DEBUG ONLY -- second param should NOT be UID but chain id
                 cg.Generate(cidSaveDialog.FileName, _c.Uid);
+            }
+        }
+
+        private void loadCryptidIdButton_Click(object sender, EventArgs e) {
+            headshotDialog.DefaultExt = "*.cid";
+            headshotDialog.DefaultExt = "Cryptid ID File (*.cid)|*.cid";
+            if (headshotDialog.ShowDialog() == DialogResult.OK) {
+                byte[] packed = File.ReadAllBytes(headshotDialog.FileName);
+                _c = CandidateDelegate.Unpack(packed, password.Text, PrivateKey);
             }
         }
     }
