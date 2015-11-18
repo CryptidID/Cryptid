@@ -127,6 +127,7 @@ namespace Cryptid.Utils {
             byte[] h2 = new byte[h1.Length + data.Length];
             h1.CopyTo(h2, 0);
             data.CopyTo(h2, h1.Length);
+
             byte[] h3 = SHA256.Create().ComputeHash(h2);
             return h3;
         }
