@@ -85,7 +85,7 @@ namespace cryptid {
                 Image mask = qr.GetImage();
                 mask.MakeMask();
                 img.ImageMask = mask;
-                img.SetAbsolutePosition((2755f / 4050f) * size.Width, (450f / 2550f) * size.Height);
+                img.SetAbsolutePosition((2780f / 4050f) * size.Width, (450f / 2550f) * size.Height);
                 pdfContentByte.AddImage(img);
 
                 // Add headshot
