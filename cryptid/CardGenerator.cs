@@ -58,7 +58,8 @@ namespace cryptid {
                     } else if (key.Contains("ADDR_2")) {
                         form.SetField(key, _cardCandidate.Dai + ", " + _cardCandidate.Daj + " " + _cardCandidate.Dcg + " " + _cardCandidate.Dak);
                     } else if (key.Contains("CRC")) {
-                        form.SetField(key, Arrays.ByteArrayToHex(BitConverter.GetBytes(Crypto.Crc16.ComputeChecksum(_cardCandidate.Uid))));
+                        //TODO: NEED CRC32
+                        //form.SetField(key, Arrays.ByteArrayToHex(BitConverter.GetBytes(Crypto.Crc16.ComputeChecksum(_cardCandidate.Uid))));
                     }
                 }
 

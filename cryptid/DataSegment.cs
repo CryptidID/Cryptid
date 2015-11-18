@@ -14,14 +14,24 @@ namespace cryptid {
     /// </summary>
     class DataSegment {
         /// <summary>
+        /// The minimum length of a Factom header
+        /// </summary>
+        public const int ConstantHeaderLength = 33;
+
+        /// <summary>
+        /// The default MaxSegmentLength
+        /// </summary>
+        public const int DefaultMaxSegmentLength = 10240 - ConstantHeaderLength;
+
+        /// <summary>
         /// The max length of a data segment
         /// </summary>
-        private const int MaxSegmentLength = 10240;
+        private readonly int MaxSegmentLength;
         
         /// <summary>
         /// The maximum amount of real data that can be stored in this segment
         /// </summary>
-        private static readonly int MaxDataLength = MaxSegmentLength - DataSegmentPrefix.Length - (sizeof(ushort) * 2);
+        private readonly int MaxDataLength;
 
         /// <summary>
         /// The record identier for this record
@@ -31,30 +41,38 @@ namespace cryptid {
         /// <summary>
         /// The data in this segment
         /// </summary>
-        private byte[] Data { get; set; }
+        public byte[] Data { get; private set; }
 
 
         /// <summary>
         /// The number of the current segment in the sequence
         /// </summary>
-        private ushort CurrentSegment { get; set; }
+        public ushort CurrentSegment { get; private set; }
 
         /// <summary>
         /// The amount of segments in the sequence
         /// </summary>
-        private ushort MaxSegments { get; set; }
+        public ushort MaxSegments { get; private  set; }
 
         /// <summary>
         /// Create a new DataSegment
         /// </summary>
         /// <param name="currSegment">The index of the current segment</param>
         /// <param name="maxSegments">The number of segments in this segments sequence</param>
-        public DataSegment(byte[] data, ushort currSegment, ushort maxSegments) {
+        public DataSegment(byte[] data, ushort currSegment, ushort maxSegments, int maxSegmentLength = DefaultMaxSegmentLength) {
             if(data.Length > MaxDataLength) throw new Exception("Attempted to pack " + data.Length + " bytes in a segment that can only hold " + MaxDataLength);
 
             CurrentSegment = currSegment;
             MaxSegments = maxSegments;
             Data = data;
+
+            MaxSegmentLength = maxSegmentLength;
+            MaxDataLength = GetMaxDataLength(maxSegmentLength);
+        }
+
+
+        public static int GetMaxDataLength(int maxSegmentLength ) {
+            return maxSegmentLength - (DataSegmentPrefix.Length - (sizeof (ushort)*2));
         }
 
         /// <summary>
@@ -87,13 +105,22 @@ namespace cryptid {
         /// </summary>
         /// <param name="data">The data to segmentize</param>
         /// <returns>A list of DataSegments for the data</returns>
-        public static List<DataSegment> Segmentize(byte[] data) {
+        public static List<DataSegment> Segmentize(byte[] data, int maxSegmentLength = DefaultMaxSegmentLength, int firstSegmentLength = DefaultMaxSegmentLength) {
             List<DataSegment> segments = new List<DataSegment>();
-            var slices = data.Slices(MaxDataLength);
 
-            ushort i = 0;
+            IEnumerable<byte[]> slices;
+            if (data.Length >= firstSegmentLength) {
+                slices = Arrays.CopyOfRange(data, firstSegmentLength, data.Length).Slices(GetMaxDataLength(maxSegmentLength));
+                segments.Add(new DataSegment(Arrays.CopyOfRange(data, 0, firstSegmentLength), 0, (ushort) (slices.Count() + 1)));
+            }
+            else {
+                segments.Add(new DataSegment(data, 0, 1));
+                return segments;
+            }
+
+            ushort i = 1;
             foreach(byte[] segmentData in slices) {
-                segments.Add(new DataSegment(segmentData, i++, (ushort) slices.Count()));
+                segments.Add(new DataSegment(segmentData, i++, (ushort) (slices.Count() + 1)));
             }
 
             return segments;

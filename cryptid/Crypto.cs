@@ -10,7 +10,7 @@ namespace cryptid {
     public static class Crypto {
         private const int RSA_KEY_SIZE = 4096;
 
-        private static readonly byte[] CRYPTID_SALT = {
+        public static readonly byte[] CRYPTID_SALT = {
             0x1c, 0x9f, 0x1d, 0x8a, 0x11, 0x98, 0xfe, 0x3f, 0xf7, 0xb7, 0x9a, 0xf1,
             0x0f, 0xf3, 0x30, 0xf0, 0x05, 0x49, 0x87, 0x9c, 0x92, 0x70, 0xe2, 0x9c, 0x6c, 0x88, 0xff, 0x2b, 0xfd, 0x13,
             0xe1, 0x87, 0xfe, 0xa2, 0x2b, 0xe1, 0x59, 0xf5, 0xc0, 0x39, 0x3b, 0xcc, 0x34, 0x52, 0xf9, 0x0f, 0x85, 0x3e,
@@ -34,6 +34,8 @@ namespace cryptid {
             0xd2, 0x22, 0x75, 0xa4, 0xe8, 0x13, 0xba, 0x16, 0xe1, 0xf9, 0xb6, 0x69, 0x01, 0xb4, 0x05, 0xa2, 0xc2, 0x4b,
             0xc9, 0x72
         };
+
+        public static readonly byte[] CRYPTID_SALT_HASH = SHA256.Create().ComputeHash(Crypto.CRYPTID_SALT);
 
         internal static byte[] AES_Encrypt(byte[] data, string password) {
             var passwordBytes = Encoding.UTF8.GetBytes(password);
@@ -131,36 +133,8 @@ namespace cryptid {
             return false;
         }
 
-        public static class Crc16 {
-            const ushort polynomial = 0xA001;
-            static readonly ushort[] table = new ushort[256];
-
-            public static ushort ComputeChecksum(byte[] bytes) {
-                ushort crc = 0;
-                for (int i = 0; i < bytes.Length; ++i) {
-                    byte index = (byte)(crc ^ bytes[i]);
-                    crc = (ushort)((crc >> 8) ^ table[index]);
-                }
-                return crc;
-            }
-
-            static Crc16() {
-                ushort value;
-                ushort temp;
-                for (ushort i = 0; i < table.Length; ++i) {
-                    value = 0;
-                    temp = i;
-                    for (byte j = 0; j < 8; ++j) {
-                        if (((value ^ temp) & 0x0001) != 0) {
-                            value = (ushort)((value >> 1) ^ polynomial);
-                        } else {
-                            value >>= 1;
-                        }
-                        temp >>= 1;
-                    }
-                    table[i] = value;
-                }
-            }
+        public static byte[] SHA256d(byte[] toHash) {
+            return SHA256.Create().ComputeHash(SHA256.Create().ComputeHash(toHash));
         }
     }
 }

@@ -21,22 +21,42 @@ namespace Cryptid.Factom.API
         private const String ServerHost = "localhost";
         private const int ServerPort = 8088;
         private const int ServerPortMD = 8089;
-        private const string ZeroHash = "0000000000000000000000000000000000000000000000000000000000000000";
+        private static readonly byte[] ZeroHash = Strings.DecodeHexIntoBytes("0000000000000000000000000000000000000000000000000000000000000000");
+       
 
         private RestClient client = new RestClient("http://" + ServerHost + ":" + ServerPort + "/v1/");
         private RestClient clientMD= new RestClient("http://" + ServerHost + ":" + ServerPortMD + "/v1/");
+
+        public EntryData NewEntry(byte[] content, byte[][] extIds, string chainId) {
+            EntryData entry = new EntryData();
+            entry.Content = content;
+            entry.ExtIDs = extIds;
+            return entry; 
+        }
+
+        public byte[] ChainIdOfFirstEntry(EntryData entry) {
+            List<byte> byteList = new List<byte>();
+            foreach (var ext in entry.ExtIDs) {
+                byteList.AddRange(SHA256.Create().ComputeHash(ext));
+            }
+            byte[] b = byteList.ToArray();
+            var chainInfo = SHA256.Create().ComputeHash(b);
+            return chainInfo;
+        }
+
         /// <summary>
         /// Takes in an entry chain hash and returns Key MR of the first entry.
         /// </summary>
         /// <param name="hash">ChainID</param>
         /// <returns>KeyMR of first entry (last in list)</returns>
-        public ChainHeadData GetChainHead(String hash) {
+        public ChainHeadData GetChainHead(byte[] hash) {
+            var hashString = Arrays.ByteArrayToHex(hash);
             var req = new RestRequest("/chain-head/{hash}", Method.GET);
-            req.AddUrlSegment("hash", hash);
+            req.AddUrlSegment("hash", hashString);
             IRestResponse resp = client.Execute(req);
 
-            ChainHeadData chainHead = JsonConvert.DeserializeObject<ChainHeadData>(resp.Content);
-            return chainHead;
+            DataStructs.ChainHeadDataStringFormat chainHead = JsonConvert.DeserializeObject<DataStructs.ChainHeadDataStringFormat>(resp.Content);
+            return DataStructs.ConvertStringFormatToByteFormat(chainHead);
         }
 
         /// <summary>
@@ -48,18 +68,25 @@ namespace Cryptid.Factom.API
             return GetEntryBlockByKeyMR(chainHead.ChainHead);
         }
 
+
+
         /// <summary>
         /// Returns an EntryBlockData
         /// </summary>
         /// <param name="hash">String of KeyMr</param>
         /// <returns>EntryBlockData</returns>
-        public EntryBlockData GetEntryBlockByKeyMR(string keyMR) {
+        public EntryBlockData GetEntryBlockByKeyMR(byte[] keyMR) {
             var req = new RestRequest("/entry-block-by-keymr/{hash}", Method.GET);
-            req.AddUrlSegment("hash", keyMR);
+            var keyMRString = Arrays.ByteArrayToHex(keyMR);
+            req.AddUrlSegment("hash", keyMRString);
 
             IRestResponse resp = client.Execute(req);
-            EntryBlockData entryBlock = JsonConvert.DeserializeObject<EntryBlockData>(resp.Content);
-            return entryBlock;
+            if (resp.Content == "EBlock not found") {
+                throw new Exception("EBlock not Found, Zerohash looked up");
+            }
+            DataStructs.EntryBlockDataStringFormat entryBlock = JsonConvert.DeserializeObject<DataStructs.EntryBlockDataStringFormat>(resp.Content);
+
+            return DataStructs.ConvertStringFormatToByteFormat(entryBlock);
         }
 
         /// <summary>
@@ -76,14 +103,13 @@ namespace Cryptid.Factom.API
         /// </summary>
         /// <param name="entryHash">Entryhash of entry</param>
         /// <returns></returns>
-        public EntryData GetEntryData(string entryHash) {
+        public EntryData GetEntryData(byte[] entryHash) {
             var req = new RestRequest("/entry-by-hash/{hash}", Method.GET);
-            req.AddUrlSegment("hash", entryHash);
+            req.AddUrlSegment("hash", Arrays.ByteArrayToHex(entryHash));
 
             IRestResponse resp = client.Execute(req);
-            EntryData entryType = JsonConvert.DeserializeObject<EntryData>(resp.Content);
-            ;
-            return entryType;
+            DataStructs.EntryDataStringFormat entryType = JsonConvert.DeserializeObject<DataStructs.EntryDataStringFormat>(resp.Content);
+            return DataStructs.ConvertStringFormatToByteFormat(entryType);
         }
 
         /// <summary>
@@ -96,7 +122,7 @@ namespace Cryptid.Factom.API
             EntryBlockData blockPointer = block;
             List<EntryBlockData.EntryData> dataList = new List<EntryBlockData.EntryData>();
 
-            while (blockPointer.Header.PrevKeyMr != ZeroHash) {
+            while (!Bytes.Equality(blockPointer.Header.PrevKeyMr, ZeroHash)) {
                 dataList.AddRange(blockPointer.EntryList); // Add all entries in current MR
                 blockPointer = GetEntryBlockByKeyMR(blockPointer.Header.PrevKeyMr);
             }
@@ -109,7 +135,7 @@ namespace Cryptid.Factom.API
         /// </summary>
         /// <param name="chainHeadID">ChainID as string</param>
         /// <returns></returns>
-        public List<EntryBlockData.EntryData> GetAllChainEntries(string chainHeadID) {
+        public List<EntryBlockData.EntryData> GetAllChainEntries(byte[] chainHeadID) {
             ChainHeadData chainHead = GetChainHead(chainHeadID);
             return GetAllChainEntries(chainHead);
         }
@@ -118,7 +144,7 @@ namespace Cryptid.Factom.API
             public string Message { get; set; }
         }
 
-        public bool CommitEntry(EntryData entry, string name) {
+        public byte[] CommitEntry(EntryData entry, string name) {
             List<byte> byteList = new List<byte>();
 
             // 1 byte version
@@ -137,19 +163,19 @@ namespace Cryptid.Factom.API
             WallerCommit com = new WallerCommit();
             com.Message = Arrays.ByteArrayToHex(byteList.ToArray()); //Hex encoded string on bytelist
 
-           var json = JsonConvert.SerializeObject(com);
+            var json = JsonConvert.SerializeObject(com);
 
-           Console.WriteLine("CE Json = " + json);
-           var byteJson = Encoding.ASCII.GetBytes(json);
-           Console.WriteLine("Byte to json = " + Encoding.ASCII.GetString(byteJson));
-           var req = new RestRequest("/commit-entry/{name}", Method.POST);
-           req.RequestFormat = DataFormat.Json;
-           req.AddParameter("application/json", json, ParameterType.RequestBody);
-           req.AddUrlSegment("name", name);
-           IRestResponse resp = clientMD.Execute(req);
-           Console.WriteLine("CommitEntry Resp = " + resp.StatusCode + "|" + resp.StatusCode);
-           Console.WriteLine("REQ=" + req.RootElement + req.Resource);
-           return true; // TODO: This, true for success, false=failed
+            Console.WriteLine("CE Json = " + json);
+            var byteJson = Encoding.ASCII.GetBytes(json);
+            Console.WriteLine("Byte to json = " + Encoding.ASCII.GetString(byteJson));
+            var req = new RestRequest("/commit-entry/{name}", Method.POST);
+            req.RequestFormat = DataFormat.Json;
+            req.AddParameter("application/json", json, ParameterType.RequestBody);
+            req.AddUrlSegment("name", name);
+            IRestResponse resp = clientMD.Execute(req);
+            Console.WriteLine("CommitEntry Resp = " + resp.StatusCode + "|" + resp.StatusCode);
+            Console.WriteLine("REQ=" + req.RootElement + req.Resource);
+            return ChainIdOfFirstEntry(entry); // TODO: This, true for success, false=failed
         }
 
         private class Reveal {
