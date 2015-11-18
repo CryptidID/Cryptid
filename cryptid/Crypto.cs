@@ -166,7 +166,9 @@ namespace cryptid {
                 return hashBuffer;
             }
 
-            public override int HashSize { get { return 32; } }
+            public override int HashSize {
+                get { return 32; }
+            }
 
             public static UInt32 Compute(byte[] buffer) {
                 return Compute(DefaultSeed, buffer);
@@ -186,7 +188,7 @@ namespace cryptid {
 
                 var createTable = new UInt32[256];
                 for (var i = 0; i < 256; i++) {
-                    var entry = (UInt32)i;
+                    var entry = (UInt32) i;
                     for (var j = 0; j < 8; j++)
                         if ((entry & 1) == 1)
                             entry = (entry >> 1) ^ polynomial;
@@ -216,10 +218,10 @@ namespace cryptid {
 
                 return result;
             }
-=======
+        }
+
         public static byte[] SHA256d(byte[] toHash) {
             return SHA256.Create().ComputeHash(SHA256.Create().ComputeHash(toHash));
->>>>>>> 3d9c3d67af5e0d194981fc70689ea05313411e9a
         }
     }
 }
