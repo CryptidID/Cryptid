@@ -155,9 +155,7 @@ namespace CryptidDemo {
                 Enabled = true;
             }
             else {
-                //TODO: Allow to choose fingerprint image?
-                MessageBox.Show("You are not connected to a fingerprint scanner!", Resources.ERROR, MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
+                MessageBox.Show("You are not connected to a fingerprint scanner!", Resources.ERROR, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

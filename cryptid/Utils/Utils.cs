@@ -117,7 +117,6 @@ namespace Cryptid.Utils {
 
     public static class Times {
         public static byte[] MilliTime() {
-            // TODO: Make private
             var unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
             // 6 Byte millisec unix time
             var unixMilliLong = (long) (DateTime.UtcNow - unixEpoch).TotalMilliseconds;
@@ -129,8 +128,7 @@ namespace Cryptid.Utils {
 
     public static class Entries {
         public static byte[] HashEntry(DataStructs.EntryData entry) {
-            //TODO: Make private, public for tests
-            var data = MarshalBinary(entry); // TODO: Check for error
+            var data = MarshalBinary(entry);
             var h1 = SHA512.Create().ComputeHash(data);
             var h2 = new byte[h1.Length + data.Length];
             h1.CopyTo(h2, 0);
@@ -150,7 +148,6 @@ namespace Cryptid.Utils {
         }
 
         public static byte[] MarshalBinary(DataStructs.EntryData e) {
-            //TODO: Make private
             var entryBStruct = new List<byte>();
             var idsSize = MarshalExtIDsSize(e);
 
