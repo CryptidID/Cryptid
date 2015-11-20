@@ -6,8 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Windows.Forms;
-using cryptid;
-using cryptid.Scanners;
+using Cryptid.Scanners;
 using Cryptid;
 using Cryptid.Utils;
 using CryptidDemo.Properties;
@@ -16,7 +15,7 @@ using Keys = Cryptid.Utils.Keys;
 
 #endregion
 
-namespace cryptidDemo {
+namespace CryptidDemo {
     public partial class GeneratorForm : Form {
         private readonly FpsConnectForm _connectDialog = new FpsConnectForm();
         private readonly RSAParameters _privateKey = Keys.PrivateKey("private.xml");

@@ -15,7 +15,7 @@ using Image = iTextSharp.text.Image;
 
 #endregion
 
-namespace cryptid {
+namespace Cryptid {
     public class CardGenerator {
         private readonly Candidate _cardCandidate;
         private readonly string _pdfTemplateFile;

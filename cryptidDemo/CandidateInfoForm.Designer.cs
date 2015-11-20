@@ -1,4 +1,4 @@
-﻿namespace cryptidDemo {
+﻿namespace CryptidDemo {
     partial class CandidateInfoForm {
         /// <summary>
         /// Required designer variable.

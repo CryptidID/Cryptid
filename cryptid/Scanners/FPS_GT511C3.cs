@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 
 #endregion
 
-namespace cryptid.Scanners {
+namespace Cryptid.Scanners {
     // ReSharper disable once InconsistentNaming
     public static unsafe class FPS_GT511C3 {
         private static Bitmap GetImageFromBytes(byte[] data, int width, int height) {

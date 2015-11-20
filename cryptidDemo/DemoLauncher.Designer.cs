@@ -1,4 +1,4 @@
-﻿namespace cryptidDemo {
+﻿namespace CryptidDemo {
     partial class DemoLauncher {
         /// <summary>
         /// Required designer variable.

@@ -10,7 +10,7 @@ using Keys = Cryptid.Utils.Keys;
 
 #endregion
 
-namespace cryptidDemo {
+namespace CryptidDemo {
     public partial class CandidateInfoForm : Form {
         private readonly RSAParameters _publicKey = Keys.PublicKey("public.xml");
 

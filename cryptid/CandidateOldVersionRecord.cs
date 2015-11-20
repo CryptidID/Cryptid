@@ -7,7 +7,7 @@ using Cryptid.Utils;
 
 #endregion
 
-namespace cryptid {
+namespace Cryptid {
     /// <summary>
     ///     Old Version Record for use when updating candidates to new chains.
     /// </summary>

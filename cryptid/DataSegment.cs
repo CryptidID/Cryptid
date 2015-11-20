@@ -8,7 +8,7 @@ using Cryptid.Utils;
 
 #endregion
 
-namespace cryptid {
+namespace Cryptid {
     /// <summary>
     ///     Segments data into segments of a given size
     /// </summary>

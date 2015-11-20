@@ -4,12 +4,12 @@ using System;
 using System.Drawing;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using cryptid.Scanners;
+using Cryptid.Scanners;
 using Cryptid.Utils;
 
 #endregion
 
-namespace cryptidDemo {
+namespace CryptidDemo {
     public partial class ScanFingerForm : Form {
         private State _currState;
 
