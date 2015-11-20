@@ -65,7 +65,6 @@ namespace CryptidDemo {
                 Enabled = true;
             }
             else {
-                //TODO: Allow to choose fingerprint image?
                 MessageBox.Show(Resources.FPS_NOT_CONNECTED_ERROR);
             }
 
