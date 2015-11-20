@@ -1,8 +1,12 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Cryptid.Utils;
+
+#endregion
 
 namespace cryptid {
     /// <summary>
@@ -15,7 +19,7 @@ namespace cryptid {
         public const int ConstantHeaderLength = 33;
 
         /// <summary>
-        ///     The default MaxSegmentLength
+        ///     The default _maxSegmentLength
         /// </summary>
         public const int DefaultMaxSegmentLength = 10240 - ConstantHeaderLength;
 
@@ -27,30 +31,32 @@ namespace cryptid {
         /// <summary>
         ///     The maximum amount of real data that can be stored in this segment
         /// </summary>
-        private readonly int MaxDataLength;
+        private readonly int _maxDataLength;
 
         /// <summary>
         ///     The max length of a data segment
         /// </summary>
-        private readonly int MaxSegmentLength;
+        private readonly int _maxSegmentLength;
 
         /// <summary>
         ///     Create a new DataSegment
         /// </summary>
+        /// <param name="data">The data to store in this segment</param>
         /// <param name="currSegment">The index of the current segment</param>
         /// <param name="maxSegments">The number of segments in this segments sequence</param>
+        /// <param name="maxSegmentLength">The maximum data length for each segment</param>
         public DataSegment(byte[] data, ushort currSegment, ushort maxSegments,
             int maxSegmentLength = DefaultMaxSegmentLength) {
-            if (data.Length > MaxDataLength)
+            if (data.Length > _maxDataLength)
                 throw new Exception("Attempted to pack " + data.Length + " bytes in a segment that can only hold " +
-                                    MaxDataLength);
+                                    _maxDataLength);
 
             CurrentSegment = currSegment;
             MaxSegments = maxSegments;
             Data = data;
 
-            MaxSegmentLength = maxSegmentLength;
-            MaxDataLength = GetMaxDataLength(maxSegmentLength);
+            _maxSegmentLength = maxSegmentLength;
+            _maxDataLength = GetMaxDataLength(maxSegmentLength);
         }
 
         /// <summary>
@@ -108,6 +114,8 @@ namespace cryptid {
         ///     Packs variable length data into a list of segments
         /// </summary>
         /// <param name="data">The data to segmentize</param>
+        /// <param name="maxSegmentLength">The maximum length of each segment</param>
+        /// <param name="firstSegmentLength">The maximum length of the first segment (defaults to DefaultMaxSegmentLength)</param>
         /// <returns>A list of DataSegments for the data</returns>
         public static List<DataSegment> Segmentize(byte[] data, int maxSegmentLength = DefaultMaxSegmentLength,
             int firstSegmentLength = DefaultMaxSegmentLength) {

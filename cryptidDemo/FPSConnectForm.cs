@@ -1,24 +1,29 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using cryptid.Scanners;
+using CryptidDemo.Properties;
+
+#endregion
 
 namespace cryptidDemo {
-    public partial class FPSConnectForm : Form {
-        private static readonly int[] _baudrates = {9600, 19200, 38400, 57600, 115200};
+    public partial class FpsConnectForm : Form {
+        private static readonly int[] Baudrates = {9600, 19200, 38400, 57600, 115200};
 
-        public FPSConnectForm() {
+        public FpsConnectForm() {
             InitializeComponent();
         }
 
         public int Port { get; private set; } = 1;
-        public int Baud { get; private set; } = _baudrates[0];
+        public int Baud { get; private set; } = Baudrates[0];
         public bool IsConnected { get; private set; }
 
         private void FPSConnectForm_Load(object sender, EventArgs e) {
             DialogResult = DialogResult.None;
-            baudrates.DataSource = _baudrates;
+            baudrates.DataSource = Baudrates;
             ports.DataSource = Enum.GetValues(typeof (SerialPorts)).Cast<SerialPorts>();
 
             ports.SelectedIndex = baudrates.SelectedIndex = 0;
@@ -44,17 +49,17 @@ namespace cryptidDemo {
                 DialogResult = DialogResult.OK;
                 IsConnected = true;
                 connectBg.BackColor = Color.Green;
-                connectText.Text = "Connected";
+                connectText.Text = Resources.FPS_CONNECTED;
             }
             else {
                 DialogResult = DialogResult.None;
                 IsConnected = false;
                 connectBg.BackColor = Color.Red;
-                connectText.Text = "Disconnected";
+                connectText.Text = Resources.FPS_DISCONNECTED;
                 FPS_GT511C3.Close();
 
-                MessageBox.Show("Got connect error #" + status +
-                                ".\nYou may need to manually reset the device and try again.");
+                MessageBox.Show(
+                    $"Got connect error #{status}.\nYou may need to manually reset the device and try again.");
             }
             connectButton.Enabled = true;
             connectProgress.Visible = false;
@@ -66,16 +71,16 @@ namespace cryptidDemo {
         }
 
         private enum SerialPorts {
-            COM1 = 1,
-            COM2 = 2,
-            COM3 = 3,
-            COM4 = 4,
-            COM5 = 5,
-            COM6 = 6,
-            COM7 = 7,
-            COM8 = 8,
-            COM9 = 9,
-            COM10 = 10
+            Com1 = 1,
+            Com2 = 2,
+            Com3 = 3,
+            Com4 = 4,
+            Com5 = 5,
+            Com6 = 6,
+            Com7 = 7,
+            Com8 = 8,
+            Com9 = 9,
+            Com10 = 10
         }
     }
 }

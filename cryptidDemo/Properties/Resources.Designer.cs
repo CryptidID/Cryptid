@@ -8,9 +8,10 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace cryptidDemo.Properties {
-
-
+namespace CryptidDemo.Properties {
+    using System;
+    
+    
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -22,29 +23,29 @@ namespace cryptidDemo.Properties {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
-
+        
         private static global::System.Resources.ResourceManager resourceMan;
-
+        
         private static global::System.Globalization.CultureInfo resourceCulture;
-
+        
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         internal Resources() {
         }
-
+        
         /// <summary>
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
-                if ((resourceMan == null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("cryptidDemo.Properties.Resources", typeof(Resources).Assembly);
+                if (object.ReferenceEquals(resourceMan, null)) {
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("CryptidDemo.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
             }
         }
-
+        
         /// <summary>
         ///   Overrides the current thread's CurrentUICulture property for all
         ///   resource lookups using this strongly typed resource class.
@@ -56,6 +57,132 @@ namespace cryptidDemo.Properties {
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Auth likelyhood: .
+        /// </summary>
+        internal static string AUTH_LIKLEYHOOD_MESSAGE {
+            get {
+                return ResourceManager.GetString("AUTH_LIKLEYHOOD_MESSAGE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot save ID if none has been generated!.
+        /// </summary>
+        internal static string CANNOT_SAVE_IF_NOT_GENERATED_ERROR {
+            get {
+                return ResourceManager.GetString("CANNOT_SAVE_IF_NOT_GENERATED_ERROR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot generate card if no ID has been generated or the candidate is incomplete!.
+        /// </summary>
+        internal static string CANNOT_SAVE_IF_NOT_GENERATED_OR_INCOMPLETE {
+            get {
+                return ResourceManager.GetString("CANNOT_SAVE_IF_NOT_GENERATED_OR_INCOMPLETE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cryptid ID File (*.cid)|*.cid.
+        /// </summary>
+        internal static string CRYPTID_ID_FILTER {
+            get {
+                return ResourceManager.GetString("CRYPTID_ID_FILTER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error.
+        /// </summary>
+        internal static string ERROR {
+            get {
+                return ResourceManager.GetString("ERROR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Connected.
+        /// </summary>
+        internal static string FPS_CONNECTED {
+            get {
+                return ResourceManager.GetString("FPS_CONNECTED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Disconnected.
+        /// </summary>
+        internal static string FPS_DISCONNECTED {
+            get {
+                return ResourceManager.GetString("FPS_DISCONNECTED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You are not connected to a fingerprint scanner!.
+        /// </summary>
+        internal static string FPS_NOT_CONNECTED_ERROR {
+            get {
+                return ResourceManager.GetString("FPS_NOT_CONNECTED_ERROR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Image Files|*.jpg.
+        /// </summary>
+        internal static string JPG_FILTER {
+            get {
+                return ResourceManager.GetString("JPG_FILTER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You must enter the password associated with this ID..
+        /// </summary>
+        internal static string MUST_ENTER_PASSWORD_MESSAGE {
+            get {
+                return ResourceManager.GetString("MUST_ENTER_PASSWORD_MESSAGE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot generate an and ID for an incomplete candidate..
+        /// </summary>
+        internal static string NOT_GENERATE_INCOMPLETE_ID_ERROR {
+            get {
+                return ResourceManager.GetString("NOT_GENERATE_INCOMPLETE_ID_ERROR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Couldn&apos;t verify provided data..
+        /// </summary>
+        internal static string NOT_VERIFY_ID_ERROR {
+            get {
+                return ResourceManager.GetString("NOT_VERIFY_ID_ERROR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Password cannot be empty!..
+        /// </summary>
+        internal static string PASSWORD_EMPTY_ERROR {
+            get {
+                return ResourceManager.GetString("PASSWORD_EMPTY_ERROR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to PDF File (*.pdf)|*.pdf.
+        /// </summary>
+        internal static string PDF_FILTER {
+            get {
+                return ResourceManager.GetString("PDF_FILTER", resourceCulture);
             }
         }
     }

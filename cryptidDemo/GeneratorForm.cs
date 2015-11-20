@@ -1,4 +1,6 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -8,17 +10,19 @@ using cryptid;
 using cryptid.Scanners;
 using Cryptid;
 using Cryptid.Utils;
+using CryptidDemo.Properties;
 using SourceAFIS.Simple;
 using Keys = Cryptid.Utils.Keys;
 
+#endregion
+
 namespace cryptidDemo {
-    //TODO: Auto generate template images/save
     public partial class GeneratorForm : Form {
-        private readonly RSAParameters PrivateKey = Keys.PrivateKey("private.xml");
+        private readonly FpsConnectForm _connectDialog = new FpsConnectForm();
+        private readonly RSAParameters _privateKey = Keys.PrivateKey("private.xml");
 
         private Candidate _c = new Candidate();
-        private readonly FPSConnectForm connectDialog = new FPSConnectForm();
-        private byte[] output;
+        private byte[] _output;
 
         public GeneratorForm() {
             InitializeComponent();
@@ -27,9 +31,9 @@ namespace cryptidDemo {
         private void Form1_Load(object sender, EventArgs e) {
             Enabled = false;
 
-            var dr = connectDialog.ShowDialog(this);
+            var dr = _connectDialog.ShowDialog(this);
             if (dr != DialogResult.OK) fingerprintButton.Enabled = false;
-            connectDialog.Close();
+            _connectDialog.Close();
             Enabled = true;
 
             eye.DataSource = Enum.GetValues(typeof (Candidate.EyeColor)).Cast<Candidate.EyeColor>();
@@ -44,7 +48,7 @@ namespace cryptidDemo {
 
         private void headshotButton_Click(object sender, EventArgs e) {
             headshotDialog.DefaultExt = "*.jpg";
-            headshotDialog.Filter = "Image Files|*.jpg";
+            headshotDialog.Filter = Resources.JPG_FILTER;
             headshotDialog.FileName = "";
             if (headshotDialog.ShowDialog() == DialogResult.OK) {
                 headshotBox.ImageLocation = headshotDialog.FileName;
@@ -112,32 +116,33 @@ namespace cryptidDemo {
 
         private void generateButton_Click(object sender, EventArgs e) {
             if (!_c.IsComplete()) {
-                MessageBox.Show("Cannot generate an and ID for an incomplete candidate.", "Error", MessageBoxButtons.OK,
+                MessageBox.Show(Resources.NOT_GENERATE_INCOMPLETE_ID_ERROR, Resources.ERROR, MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(password.Text)) {
-                MessageBox.Show("Password cannot be empty!.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(Resources.PASSWORD_EMPTY_ERROR, Resources.ERROR, MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
                 return;
             }
 
-            var data = CandidateDelegate.Pack(_c, password.Text, PrivateKey);
-            var unpacked = CandidateDelegate.Unpack(data, password.Text, PrivateKey);
+            var data = CandidateDelegate.Pack(_c, password.Text, _privateKey);
+            var unpacked = CandidateDelegate.Unpack(data, password.Text, _privateKey);
 
             rawOutput.Text = BitConverter.ToString(data);
             uidOutput.Text = BitConverter.ToString(unpacked.Uid);
             sigOutput.Text = BitConverter.ToString(Arrays.CopyOfRange(data, data.Length - 512, data.Length));
             fpTemplateOutput.Text = BitConverter.ToString(unpacked.Fingerprint.AsIsoTemplate);
 
-            output = data;
+            _output = data;
             _c.Uid = unpacked.Uid;
         }
 
         private void fingerprintButton_Click(object sender, EventArgs e) {
             _c.Fingerprint = new Fingerprint();
 
-            if (connectDialog.IsConnected) {
+            if (_connectDialog.IsConnected) {
                 Enabled = false;
 
                 var scanForm = new ScanFingerForm();
@@ -152,7 +157,7 @@ namespace cryptidDemo {
             }
             else {
                 //TODO: Allow to choose fingerprint image?
-                MessageBox.Show("You are not connected to a fingerprint scanner!", "Error", MessageBoxButtons.OK,
+                MessageBox.Show("You are not connected to a fingerprint scanner!", Resources.ERROR, MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
             }
         }
@@ -160,73 +165,76 @@ namespace cryptidDemo {
         private void password_TextChanged(object sender, EventArgs e) {
         }
 
+#pragma warning disable 108,114
         public virtual void Dispose() {
+#pragma warning restore 108,114
             FPS_GT511C3.Close();
             Dispose(true);
         }
 
         private void save_Click(object sender, EventArgs e) {
-            if (output == null) {
-                MessageBox.Show("Cannot save ID if none has been generated!", "Error", MessageBoxButtons.OK,
+            if (_output == null) {
+                MessageBox.Show(Resources.CANNOT_SAVE_IF_NOT_GENERATED_ERROR, Resources.ERROR, MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
                 return;
             }
 
             cidSaveDialog.FileName = _c.Dcs + "-" + _c.Dad + "-" + _c.Dac + ".cid";
-            cidSaveDialog.Filter = "Cryptid ID File (*.cid)|*.cid";
+            cidSaveDialog.Filter = Resources.CRYPTID_ID_FILTER;
 
             if (cidSaveDialog.ShowDialog() == DialogResult.OK) {
-                File.WriteAllBytes(cidSaveDialog.FileName, output);
+                File.WriteAllBytes(cidSaveDialog.FileName, _output);
             }
         }
 
         private void uploadBlockchain_Click(object sender, EventArgs e) {
             if (!_c.IsComplete()) {
-                MessageBox.Show("Cannot generate an and ID for an incomplete candidate.", "Error", MessageBoxButtons.OK,
+                MessageBox.Show(Resources.NOT_GENERATE_INCOMPLETE_ID_ERROR, Resources.ERROR, MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(password.Text)) {
-                MessageBox.Show("Password cannot be empty!.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(Resources.PASSWORD_EMPTY_ERROR, Resources.ERROR, MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
                 return;
             }
 
 
-            chainId.Text = Convert.ToBase64String(CandidateDelegate.EnrollCandidate(_c, password.Text, PrivateKey));
+            chainId.Text = Convert.ToBase64String(CandidateDelegate.EnrollCandidate(_c, password.Text, _privateKey));
         }
 
         private void genCard_Click(object sender, EventArgs e) {
             if (_c == null || !_c.IsComplete()) {
-                MessageBox.Show("Cannot generate card if no ID has been generated or the candidate is incomplete!",
-                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(Resources.CANNOT_SAVE_IF_NOT_GENERATED_OR_INCOMPLETE,
+                    Resources.ERROR, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
             cidSaveDialog.FileName = _c.Dcs + "-" + _c.Dad + "-" + _c.Dac + ".pdf";
-            cidSaveDialog.Filter = "PDF File (*.pdf)|*.pdf";
+            cidSaveDialog.Filter = Resources.PDF_FILTER;
 
             if (cidSaveDialog.ShowDialog() == DialogResult.OK) {
-                var cg = new CardGenerator(_c, cidSaveDialog.FileName);
+                var cg = new CardGenerator(_c, "cryptid-id-template.pdf");
                 cg.Generate(cidSaveDialog.FileName, Convert.FromBase64String(chainId.Text));
             }
         }
 
         private void loadCryptidIdButton_Click(object sender, EventArgs e) {
             if (string.IsNullOrEmpty(password.Text)) {
-                MessageBox.Show("You must enter the password associated with this ID.", "Error", MessageBoxButtons.OK,
+                MessageBox.Show(Resources.MUST_ENTER_PASSWORD_MESSAGE, Resources.ERROR, MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
                 return;
             }
 
 
             headshotDialog.DefaultExt = "*.cid";
-            headshotDialog.Filter = "Cryptid ID File (*.cid)|*.cid";
+            headshotDialog.Filter = Resources.CRYPTID_ID_FILTER;
             headshotDialog.FileName = "";
             if (headshotDialog.ShowDialog() == DialogResult.OK) {
                 var packed = File.ReadAllBytes(headshotDialog.FileName);
-                output = packed;
-                var c = CandidateDelegate.Unpack(packed, password.Text, PrivateKey);
+                _output = packed;
+                var c = CandidateDelegate.Unpack(packed, password.Text, _privateKey);
 
                 lastName.Text = c.Dcs;
                 firstName.Text = c.Dac;
@@ -240,7 +248,7 @@ namespace cryptidDemo {
                 address.Text = c.Dag;
                 city.Text = c.Dai;
                 state.Text = c.Daj;
-                zipcode.Text = c.Dak.ANSIFormat;
+                zipcode.Text = c.Dak.AnsiFormat;
                 country.Text = c.Dcg;
                 headshotBox.Image = c.Image;
 

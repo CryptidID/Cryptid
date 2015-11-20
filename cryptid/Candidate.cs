@@ -1,4 +1,7 @@
-﻿using System;
+﻿#region
+
+using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
@@ -7,9 +10,11 @@ using MsgPack;
 using MsgPack.Serialization;
 using SourceAFIS.Simple;
 
+#endregion
+
 namespace Cryptid {
     public static class Extensions {
-        public static string ANSIFormat(this Candidate.EyeColor ec) {
+        public static string AnsiFormat(this Candidate.EyeColor ec) {
             string output = null;
             var type = ec.GetType();
             var fi = type.GetField(ec.ToString());
@@ -47,8 +52,8 @@ namespace Cryptid {
             Female = 2
         }
 
-        private const int MAP_COUNT = 15;
-        private const string DATE_FORMAT = "MM/dd/yyyy";
+        private const int MapCount = 15;
+        private const string DateFormat = "MM/dd/yyyy";
 
         public byte[] Uid { get; set; }
 
@@ -70,7 +75,7 @@ namespace Cryptid {
 
         public void PackToMessage(Packer packer, PackingOptions options) {
             // pack the header for the amount of items in the map
-            packer.PackMapHeader(MAP_COUNT);
+            packer.PackMapHeader(MapCount);
 
             packer.Pack("DCS");
             packer.Pack(Dcs);
@@ -82,19 +87,19 @@ namespace Cryptid {
             packer.Pack(Dad);
 
             packer.Pack("DBD");
-            packer.Pack(Dbd.ToString(DATE_FORMAT, CultureInfo.InvariantCulture));
+            packer.Pack(Dbd.ToString(DateFormat, CultureInfo.InvariantCulture));
 
             packer.Pack("DBB");
-            packer.Pack(Dbb.ToString(DATE_FORMAT, CultureInfo.InvariantCulture));
+            packer.Pack(Dbb.ToString(DateFormat, CultureInfo.InvariantCulture));
 
             packer.Pack("DBC");
             packer.Pack((int) Dbc);
 
             packer.Pack("DAY");
-            packer.Pack(Day.ANSIFormat());
+            packer.Pack(Day.AnsiFormat());
 
             packer.Pack("DAU");
-            packer.Pack(Dau.ANSIFormat);
+            packer.Pack(Dau.AnsiFormat);
 
             packer.Pack("DAG");
             packer.Pack(Dag);
@@ -106,7 +111,7 @@ namespace Cryptid {
             packer.Pack(Daj);
 
             packer.Pack("DAK");
-            packer.Pack(Dak.ANSIFormat);
+            packer.Pack(Dak.AnsiFormat);
 
             packer.Pack("DCG");
             packer.Pack(Dcg);
@@ -133,10 +138,10 @@ namespace Cryptid {
 
             if (!unpacker.IsMapHeader) throw SerializationExceptions.NewIsNotMapHeader();
 
-            if (UnpackHelpers.GetItemsCount(unpacker) != MAP_COUNT)
-                throw SerializationExceptions.NewUnexpectedArrayLength(MAP_COUNT, UnpackHelpers.GetItemsCount(unpacker));
+            if (UnpackHelpers.GetItemsCount(unpacker) != MapCount)
+                throw SerializationExceptions.NewUnexpectedArrayLength(MapCount, UnpackHelpers.GetItemsCount(unpacker));
 
-            for (var i = 0; i < MAP_COUNT; i++) {
+            for (var i = 0; i < MapCount; i++) {
                 string key;
 
                 if (!unpacker.ReadString(out key)) throw SerializationExceptions.NewUnexpectedEndOfStream();
@@ -179,8 +184,7 @@ namespace Cryptid {
                     }
                     case "DAU": {
                         if (!unpacker.ReadString(out dau)) throw SerializationExceptions.NewMissingProperty("dau");
-                        Dau = new Height();
-                        Dau.ANSIFormat = dau;
+                        Dau = new Height {AnsiFormat = dau};
                         break;
                     }
                     case "DAG": {
@@ -200,8 +204,7 @@ namespace Cryptid {
                     }
                     case "DAK": {
                         if (!unpacker.ReadString(out dak)) throw SerializationExceptions.NewMissingProperty("dak");
-                        Dak = new PostalCode();
-                        Dak.ANSIFormat = dak;
+                        Dak = new PostalCode {AnsiFormat = dak};
                         break;
                     }
                     case "DCG": {
@@ -217,8 +220,7 @@ namespace Cryptid {
                     }
                     case "ZAB": {
                         if (!unpacker.Read()) throw SerializationExceptions.NewMissingProperty("zab");
-                        Fingerprint = new Fingerprint();
-                        Fingerprint.AsIsoTemplate = unpacker.LastReadData.AsBinary();
+                        Fingerprint = new Fingerprint {AsIsoTemplate = unpacker.LastReadData.AsBinary()};
                         break;
                     }
                 }
@@ -238,6 +240,7 @@ namespace Cryptid {
             return serializer.Unpack(new MemoryStream(b));
         }
 
+        [SuppressMessage("ReSharper", "ConditionIsAlwaysTrueOrFalse")]
         public bool IsComplete() {
             if (string.IsNullOrWhiteSpace(Dcs)) return false;
             if (string.IsNullOrWhiteSpace(Dac)) return false;
@@ -259,7 +262,7 @@ namespace Cryptid {
                 var fi = type.GetField(ec.ToString());
                 var attrs = fi.GetCustomAttributes(typeof (StringValue), false) as StringValue[];
                 if (attrs != null && attrs.Length > 0) val = attrs[0].Value;
-                if (val.Equals(s)) return ec;
+                if (val != null && val.Equals(s)) return ec;
             }
             return EyeColor.Unknown;
         }
@@ -276,13 +279,13 @@ namespace Cryptid {
             public int Feet { get; set; }
             public int Inches { get; set; }
 
-            public string ANSIFormat {
+            public string AnsiFormat {
                 set {
-                    if (!value.Contains(" ")) throw new ArgumentException("value is not in ANSI format!");
+                    if (!value.Contains(" ")) throw new ArgumentException("Value is not in ANSI format!");
                     value = value.Split(' ')[0];
 
-                    var inches = -1;
-                    if (!int.TryParse(value, out inches)) throw new ArgumentException("value is not in ANSI format!");
+                    int inches;
+                    if (!int.TryParse(value, out inches)) throw new ArgumentException("Value is not in ANSI format!");
                     Feet = inches/12;
                     Inches = inches - Feet*12;
                 }
@@ -297,15 +300,15 @@ namespace Cryptid {
             }
 
             public PostalCode(string postalCode) {
-                ANSIFormat = postalCode;
+                AnsiFormat = postalCode;
             }
 
-            public string ANSIFormat {
+            public string AnsiFormat {
                 get { return _postCode; }
                 set {
                     if (value.Length > 9)
-                        throw new ArgumentOutOfRangeException("Postal code must be 9 characters or less.");
-                    if (value == null) throw new ArgumentNullException("value");
+                        throw new ArgumentOutOfRangeException(@"Postal code must be 9 characters or less.");
+                    if (value == null) throw new ArgumentNullException(nameof(value));
                     _postCode = value.PadRight(9, '0');
                 }
             }

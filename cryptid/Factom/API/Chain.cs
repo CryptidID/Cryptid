@@ -1,20 +1,23 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Security.Cryptography;
-using System.Text;
 using Cryptid.Utils;
 using Newtonsoft.Json;
 using RestSharp;
+
+#endregion
 
 namespace cryptid.Factom.API {
     public class Chain {
         private const string ServerHost = "localhost";
         private const int ServerPort = 8088;
-        private const int ServerPortMD = 8089;
+        private const int ServerPortMd = 8089;
 
-        private readonly RestClient client = new RestClient("http://" + ServerHost + ":" + ServerPort + "/v1/");
-        private readonly RestClient clientMD = new RestClient("http://" + ServerHost + ":" + ServerPortMD + "/v1/");
+        private readonly RestClient _client = new RestClient("http://" + ServerHost + ":" + ServerPort + "/v1/");
+        private readonly RestClient _clientMd = new RestClient("http://" + ServerHost + ":" + ServerPortMd + "/v1/");
 
         /// <summary>
         ///     Returns a chaintype object
@@ -22,8 +25,7 @@ namespace cryptid.Factom.API {
         /// <param name="entry"></param>
         /// <returns></returns>
         public ChainType NewChain(DataStructs.EntryData entry) {
-            var c = new ChainType();
-            c.FirstEntry = entry;
+            var c = new ChainType {FirstEntry = entry};
             var chainHash = new List<byte>();
             if (entry.ExtIDs != null) {
                 foreach (var extId in entry.ExtIDs) {
@@ -32,7 +34,7 @@ namespace cryptid.Factom.API {
                 }
             }
             c.ChainId = SHA256.Create().ComputeHash(chainHash.ToArray());
-            c.FirstEntry.ChainID = c.ChainId;
+            c.FirstEntry.ChainId = c.ChainId;
             return c;
         }
 
@@ -41,7 +43,7 @@ namespace cryptid.Factom.API {
         /// </summary>
         /// <param name="c">ChainType</param>
         /// <param name="name">Name of Entry  Credit wallet</param>
-        /// <returns>ChainID</returns>
+        /// <returns>ChainId</returns>
         public byte[] CommitChain(ChainType c, string name) {
             var byteList = new List<byte>();
 
@@ -53,14 +55,14 @@ namespace cryptid.Factom.API {
 
             var entry = c.FirstEntry;
 
-            // 32 Byte ChainID Hash
+            // 32 Byte ChainId Hash
             //byte[] chainIDHash = Encoding.ASCII.GetBytes(c.ChainId);
-            var chainIDHash = c.ChainId;
-            chainIDHash = SHA256.Create().ComputeHash(chainIDHash);
-            chainIDHash = SHA256.Create().ComputeHash(chainIDHash);
-            byteList.AddRange(chainIDHash);
+            var chainIdHash = c.ChainId;
+            chainIdHash = SHA256.Create().ComputeHash(chainIdHash);
+            chainIdHash = SHA256.Create().ComputeHash(chainIdHash);
+            byteList.AddRange(chainIdHash);
 
-            // 32 byte Weld; sha256(sha256(EntryHash + ChainID))
+            // 32 byte Weld; sha256(sha256(EntryHash + ChainId))
             var cid = c.ChainId;
             var s = Entries.HashEntry(c.FirstEntry);
             var weld = new byte[cid.Length + s.Length];
@@ -77,8 +79,7 @@ namespace cryptid.Factom.API {
             var cost = (sbyte) (Entries.EntryCost(entry) + 10); // TODO: check errors
             byteList.Add(BitConverter.GetBytes(cost)[0]);
 
-            var com = new WalletCommit();
-            com.Message = Arrays.ByteArrayToHex(byteList.ToArray());
+            var com = new WalletCommit {Message = Arrays.ByteArrayToHex(byteList.ToArray())};
 
             var json = JsonConvert.SerializeObject(com);
 
@@ -86,7 +87,7 @@ namespace cryptid.Factom.API {
             req.RequestFormat = DataFormat.Json;
             req.AddParameter("application/json", json, ParameterType.RequestBody);
             req.AddUrlSegment("name", name);
-            var resp = clientMD.Execute(req);
+            var resp = _clientMd.Execute(req);
 
             Console.WriteLine("CommitChain Resp = " + resp.StatusCode); // TODO: Remove
             Console.WriteLine("Message= " + com.Message); // TODO: Remove
@@ -108,12 +109,11 @@ namespace cryptid.Factom.API {
             r.Entry = Arrays.ByteArrayToHex(b);
 
             var json = JsonConvert.SerializeObject(r);
-            var byteJson = Encoding.ASCII.GetBytes(json);
 
             var req = new RestRequest("/reveal-chain/", Method.POST);
             req.RequestFormat = DataFormat.Json;
             req.AddParameter("application/json", json, ParameterType.RequestBody);
-            var resp = client.Execute(req);
+            var resp = _client.Execute(req);
             Console.WriteLine("RevealChain Resp = " + resp.StatusCode); //TODO: Remove
 
             if (resp.StatusCode != HttpStatusCode.OK) {

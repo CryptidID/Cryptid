@@ -1,4 +1,6 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,6 +9,8 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Windows.Forms;
 using cryptid.Factom.API;
+
+#endregion
 
 namespace Cryptid.Utils {
     public static class Keys {
@@ -88,9 +92,8 @@ namespace Cryptid.Utils {
         }
 
         public static bool Equality(byte[] a1, byte[] b1) {
-            int i;
             if (a1.Length == b1.Length) {
-                i = 0;
+                var i = 0;
                 while (i < a1.Length && (a1[i] == b1[i])) //Earlier it was a1[i]!=b1[i]
                 {
                     i++;
@@ -114,11 +117,10 @@ namespace Cryptid.Utils {
 
     public static class Times {
         public static byte[] MilliTime() {
-// TODO Make private
-            var byteList = new List<byte>();
-            var UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            // TODO: Make private
+            var unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
             // 6 Byte millisec unix time
-            var unixMilliLong = (long) (DateTime.UtcNow - UnixEpoch).TotalMilliseconds;
+            var unixMilliLong = (long) (DateTime.UtcNow - unixEpoch).TotalMilliseconds;
             var unixBytes = Bytes.CheckEndian(BitConverter.GetBytes(unixMilliLong));
             unixBytes = Arrays.CopyOfRange(unixBytes, 2, unixBytes.Length);
             return unixBytes;
@@ -159,7 +161,7 @@ namespace Cryptid.Utils {
             byte version = 0;
             entryBStruct.Add(version);
             // 32 byte chainid
-            var chain = e.ChainID;
+            var chain = e.ChainId;
             entryBStruct.AddRange(chain);
             // Ext Ids Size
             entryBStruct.AddRange(idsSize);
@@ -179,14 +181,14 @@ namespace Cryptid.Utils {
 
         private static byte[] MarshalExtIDsBinary(DataStructs.EntryData e) {
             var byteList = new List<byte>();
-            foreach (var exID in e.ExtIDs) {
+            foreach (var exId in e.ExtIDs) {
                 // 2 byte size of ExtID
-                var extLen = Convert.ToInt16(exID.Length);
+                var extLen = Convert.ToInt16(exId.Length);
                 var bytes = BitConverter.GetBytes(extLen);
                 bytes = Bytes.CheckEndian(bytes);
                 byteList.AddRange(bytes);
-                var extIDStr = exID;
-                byteList.AddRange(extIDStr);
+                var extIdStr = exId;
+                byteList.AddRange(extIdStr);
             }
             return byteList.ToArray();
         }
@@ -222,7 +224,7 @@ namespace Cryptid.Utils {
             var len = entryBinary.Length - 35;
             if (len > 10240) {
                 //Error, cannot be larger than 10kb
-                throw new ArgumentException("Parameter cannot exceed 10kb of content", "entry");
+                throw new ArgumentException("Parameter cannot exceed 10kb of content", nameof(entry));
             }
             var r = len%1024;
             var n = (sbyte) (len/1024); // Capacity of Entry Payment
@@ -331,14 +333,12 @@ namespace Cryptid.Utils {
             this Control @this,
             Expression<Func<TResult>> property,
             TResult value) {
-            var propertyInfo = (property.Body as MemberExpression).Member
+            var propertyInfo = (property.Body as MemberExpression)?.Member
                 as PropertyInfo;
 
-            if (propertyInfo == null ||
-                !@this.GetType().IsSubclassOf(propertyInfo.ReflectedType) ||
-                @this.GetType().GetProperty(
-                    propertyInfo.Name,
-                    propertyInfo.PropertyType) == null) {
+            if (propertyInfo?.ReflectedType != null &&
+                (propertyInfo == null || !@this.GetType().IsSubclassOf(propertyInfo.ReflectedType) ||
+                 @this.GetType().GetProperty(propertyInfo.Name, propertyInfo.PropertyType) == null)) {
                 throw new ArgumentException(
                     "The lambda expression 'property' must reference a valid property on this Control.");
             }

@@ -1,5 +1,8 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -9,6 +12,8 @@ using cryptid.Factom.API;
 using Cryptid.Factom.API;
 using Cryptid.Utils;
 using SourceAFIS.Simple;
+
+#endregion
 
 namespace Cryptid {
     public static class CandidateDelegate {
@@ -23,7 +28,8 @@ namespace Cryptid {
         /// <returns>An array of ExtIDs</returns>
         public static byte[][] GenerateExtIDs(byte[] packedCandidate) {
             return new[] {
-                Crypto.SHA256d(packedCandidate), Crypto.CRYPTID_SALT_HASH, Encoding.UTF8.GetBytes(Strings.RandomString(32))
+                Crypto.Sha256D(packedCandidate), Crypto.CryptidSaltHash,
+                Encoding.UTF8.GetBytes(Strings.RandomString(32))
             };
         }
 
@@ -61,7 +67,8 @@ namespace Cryptid {
                 }
                 else {
                     //new entry
-                    factomEntry.ChainID = factomChain.ChainId;
+                    Debug.Assert(factomChain != null, "factomChain != null");
+                    factomEntry.ChainId = factomChain.ChainId;
                     entryApi.CommitEntry(factomEntry, FactomWallet);
                     Thread.Sleep(10100);
                     entryApi.RevealEntry(factomEntry);
@@ -80,6 +87,7 @@ namespace Cryptid {
         /// </summary>
         /// <param name="newCandidate">The updated candidate information</param>
         /// <param name="password">The password provided by the candidate</param>
+        /// <param name="fp">The fingerprint to verify against</param>
         /// <param name="privKey">The private key to pack the data with</param>
         /// <param name="chainToUpdate">The chain ID of the chain to be updated</param>
         /// <returns>The chain ID pointing to the updated candidate</returns>
@@ -106,7 +114,6 @@ namespace Cryptid {
             entryApi.RevealEntry(newRecordEntry);
 
             return newChainId;
-            ;
         }
 
         /// <summary>
@@ -141,7 +148,7 @@ namespace Cryptid {
         /// <summary>
         /// </summary>
         /// <param name="chainId"></param>
-        /// <param name="publicKey">The public key to verify the data with</param>
+        /// <param name="pubKey">The public key to verify the data with</param>
         /// <returns></returns>
         public static List<CandidateOldVersionRecord> GetOldVersionRecords(byte[] chainId, RSAParameters pubKey) {
             var entryApi = new Entry();
@@ -158,7 +165,7 @@ namespace Cryptid {
         /// <summary>
         /// </summary>
         /// <param name="chainId"></param>
-        /// <param name="publicKey">The public key to verify the data with</param>
+        /// <param name="pubKey">The public key to verify the data with</param>
         /// <returns></returns>
         public static List<CandidateUpdatedRecord> GetCandidateUpdatedRecords(byte[] chainId, RSAParameters pubKey) {
             var entryApi = new Entry();
@@ -176,6 +183,7 @@ namespace Cryptid {
         ///     Get all the chains used by a candidate (Follows OldVersionRecords and UpdatedRecords)
         /// </summary>
         /// <param name="chainId">The id of a chain owned by the candidate</param>
+        /// <param name="pubKey">The public key to verify the data with</param>
         /// <returns>A list of all the chains owned by a candidate</returns>
         public static List<byte[]> GetCandidateChainHistory(byte chainId, RSAParameters pubKey) {
             var toSort = new List<IRecord>();

@@ -1,14 +1,19 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Windows.Forms;
 using Cryptid;
+using CryptidDemo.Properties;
 using SourceAFIS.Simple;
 using Keys = Cryptid.Utils.Keys;
 
+#endregion
+
 namespace cryptidDemo {
     public partial class AuthForm : Form {
-        private readonly RSAParameters PublicKey = Keys.PublicKey("public.xml");
+        private readonly RSAParameters _publicKey = Keys.PublicKey("public.xml");
 
         public AuthForm() {
             InitializeComponent();
@@ -19,7 +24,7 @@ namespace cryptidDemo {
 
         private void button1_Click(object sender, EventArgs e) {
             openCidDialog.DefaultExt = "*.cid";
-            openCidDialog.Filter = "Cryptid ID File (*.cid)|*.cid";
+            openCidDialog.Filter = Resources.CRYPTID_ID_FILTER;
             if (openCidDialog.ShowDialog() == DialogResult.OK) {
                 PackedData = File.ReadAllBytes(openCidDialog.FileName);
                 cidLocation.Text = openCidDialog.FileName;
@@ -37,8 +42,7 @@ namespace cryptidDemo {
         }
 
         private void button3_Click(object sender, EventArgs e) {
-            var connectDialog = new FPSConnectForm();
-            ;
+            var connectDialog = new FpsConnectForm();
 
             Enabled = false;
             var connectDr = connectDialog.ShowDialog(this);
@@ -62,19 +66,20 @@ namespace cryptidDemo {
             }
             else {
                 //TODO: Allow to choose fingerprint image?
-                MessageBox.Show("You are not connected to a fingerprint scanner!");
+                MessageBox.Show(Resources.FPS_NOT_CONNECTED_ERROR);
             }
 
             float authLikelyhood;
             try {
                 authLikelyhood =
-                    CandidateDelegate.VerifyFingerprint(CandidateDelegate.Unpack(PackedData, Password, PublicKey), f);
+                    CandidateDelegate.VerifyFingerprint(CandidateDelegate.Unpack(PackedData, Password, _publicKey), f);
             }
+                // ReSharper disable once UnusedVariable
             catch (CryptographicException ex) {
-                MessageBox.Show("Couldn't verify provided data.");
+                MessageBox.Show(Resources.NOT_VERIFY_ID_ERROR);
                 return;
             }
-            MessageBox.Show("Auth likelyhood: " + authLikelyhood.ToString("R"));
+            MessageBox.Show(Resources.AUTH_LIKLEYHOOD_MESSAGE + authLikelyhood.ToString("R"));
         }
 
         private void AuthForm_Load(object sender, EventArgs e) {

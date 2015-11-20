@@ -1,17 +1,21 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using cryptid.Factom.API;
+using Cryptid.Factom.API;
 using Cryptid.Utils;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Cryptid.Factom.API.Tests {
+#endregion
+
+namespace CryptidTests.Factom.API {
     [TestClass]
     public class EntryTests {
         [TestMethod]
         public void DecodeHexIntoBytesTest() {
-            var api = new Entry();
             var inputs = new[] {
                 "",
                 "0",
@@ -49,8 +53,6 @@ namespace Cryptid.Factom.API.Tests {
             var val = Strings.DecodeHexIntoBytes("475fbcef5e3a4e1621ed9a6fda5840c1d654715e55a8f5e514af0fb879ce0aec");
 
             var chainHead = api.GetChainHead(val);
-            var entryBlock = api.GetEntryBlockByKeyMR(chainHead);
-            var entry = api.GetEntryData(entryBlock.EntryList[0]);
             var entries = api.GetAllChainEntries(chainHead);
             foreach (var entryElement in entries) {
                 Console.WriteLine("Hash" + entryElement.EntryHash + "\n Data:" + api.GetEntryData(entryElement));
@@ -59,10 +61,11 @@ namespace Cryptid.Factom.API.Tests {
 
         [TestMethod]
         public void MarshalBinaryTest() {
-            var api = new Entry();
-            var e = new DataStructs.EntryData();
-            e.Content = Encoding.UTF8.GetBytes("Each directory listed in the Go path must have a prescribed structure:");
-            e.ChainID = Strings.DecodeHexIntoBytes("00511c298668bc5032a64b76f8ede6f119add1a64482c8602966152c0b936c77");
+            var e = new DataStructs.EntryData {
+                Content =
+                    Encoding.UTF8.GetBytes("Each directory listed in the Go path must have a prescribed structure:"),
+                ChainId = Strings.DecodeHexIntoBytes("00511c298668bc5032a64b76f8ede6f119add1a64482c8602966152c0b936c77")
+            };
             var b = Entries.MarshalBinary(e);
             //Console.WriteLine("Entry");
             var s = "[";
@@ -78,7 +81,7 @@ namespace Cryptid.Factom.API.Tests {
                 "[0 0 81 28 41 134 104 188 80 50 166 75 118 248 237 230 241 25 173 209 166 68 130 200 96 41 102 21 44 11 147 108 119 0 0 69 97 99 104 32 100 105 114 101 99 116 111 114 121 32 108 105 115 116 101 100 32 105 110 32 116 104 101 32 71 111 32 112 97 116 104 32 109 117 115 116 32 104 97 118 101 32 97 32 112 114 101 115 99 114 105 98 101 100 32 115 116 114 117 99 116 117 114 101 58]";
             Assert.AreEqual(s, expected);
             //var arr = new byte[2][] { Strings.DecodeHexIntoBytes("a136bf2a5b81a671d3f0c168f4"), Strings.DecodeHexIntoBytes("b35f223db2dced312581d22c46ba4117702d03") };
-            var arr = new byte[2][] {
+            var arr = new[] {
                 Encoding.UTF8.GetBytes("a136bf2a5b81a671d3f0c168f4"),
                 Encoding.UTF8.GetBytes("b35f223db2dced312581d22c46ba4117702d03")
             };
@@ -103,10 +106,11 @@ namespace Cryptid.Factom.API.Tests {
 
         [TestMethod]
         public void HashEntryTest() {
-            var api = new Entry();
-            var e = new DataStructs.EntryData();
-            e.Content = Encoding.UTF8.GetBytes("Each directory listed in the Go path must have a prescribed structure:");
-            e.ChainID = Strings.DecodeHexIntoBytes("00511c298668bc5032a64b76f8ede6f119add1a64482c8602966152c0b936c77");
+            var e = new DataStructs.EntryData {
+                Content =
+                    Encoding.UTF8.GetBytes("Each directory listed in the Go path must have a prescribed structure:"),
+                ChainId = Strings.DecodeHexIntoBytes("00511c298668bc5032a64b76f8ede6f119add1a64482c8602966152c0b936c77")
+            };
             var arr = new byte[2][] {
                 Encoding.UTF8.GetBytes("a136bf2a5b81a671d3f0c168f4"),
                 Encoding.UTF8.GetBytes("b35f223db2dced312581d22c46ba4117702d03")
@@ -127,10 +131,11 @@ namespace Cryptid.Factom.API.Tests {
 
         [TestMethod]
         public void EntryCostTest() {
-            var api = new Entry();
-            var e = new DataStructs.EntryData();
-            e.Content = Encoding.UTF8.GetBytes("Each directory listed in the Go path must have a prescribed structure:");
-            e.ChainID = Strings.DecodeHexIntoBytes("00511c298668bc5032a64b76f8ede6f119add1a64482c8602966152c0b936c77");
+            var e = new DataStructs.EntryData {
+                Content =
+                    Encoding.UTF8.GetBytes("Each directory listed in the Go path must have a prescribed structure:"),
+                ChainId = Strings.DecodeHexIntoBytes("00511c298668bc5032a64b76f8ede6f119add1a64482c8602966152c0b936c77")
+            };
             var arr = new byte[2][] {
                 Strings.DecodeHexIntoBytes("a136bf2a5b81a671d3f0c168f4"),
                 Strings.DecodeHexIntoBytes("b35f223db2dced312581d22c46ba4117702d03")
@@ -175,8 +180,8 @@ namespace Cryptid.Factom.API.Tests {
 //            System.Threading.Thread.Sleep(11000);
 //            chainApi.RevealChain(chain);
 //
-//            Console.WriteLine("ChainID=" + chain.ChainId);
-//            Console.WriteLine("ChainID=" + chain.FirstEntry.ChainID);
+//            Console.WriteLine("ChainId=" + chain.ChainId);
+//            Console.WriteLine("ChainId=" + chain.FirstEntry.ChainId);
         }
 
         [TestMethod]
@@ -184,14 +189,14 @@ namespace Cryptid.Factom.API.Tests {
             // Costs money to test
 //            EntryData entry = new EntryData();
 //            entry.Content = "Cryptid Entry!";
-//            entry.ChainID = "5319D50D6D1DFCF4AEBB00E8DA812AC1D256C0B3E765B0240B51A708701F1985";
+//            entry.ChainId = "5319D50D6D1DFCF4AEBB00E8DA812AC1D256C0B3E765B0240B51A708701F1985";
 //            Entry entryApi = new Entry();
 //            Chain chainApi = new Chain();
 //            entryApi.CommitEntry(entry, "CCNEntryCreds");
 //            System.Threading.Thread.Sleep(11000);
 //            entryApi.RevealEntry(entry);
 //
-//            Console.WriteLine("ChainID=" + entry.ChainID);
+//            Console.WriteLine("ChainId=" + entry.ChainId);
         }
     }
 }
