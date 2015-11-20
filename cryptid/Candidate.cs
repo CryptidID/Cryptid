@@ -2,7 +2,6 @@
 using System.Drawing;
 using System.Globalization;
 using System.IO;
-using System.Runtime.Serialization;
 using Cryptid.Utils;
 using MsgPack;
 using MsgPack.Serialization;
@@ -69,19 +68,6 @@ namespace Cryptid {
         public Image Image { get; set; }
         public Fingerprint Fingerprint { get; set; }
 
-        public byte[] Serialize() {
-            using (MemoryStream ms = new MemoryStream()) {
-                var serializer = MessagePackSerializer.Get<Candidate>();
-                serializer.Pack(ms, this);
-                return ms.ToArray();
-            }
-        }
-
-        public static Candidate Deserialize(byte[] b) {
-            var serializer = MessagePackSerializer.Get<Candidate>();
-            return serializer.Unpack(new MemoryStream(b));
-        }
-
         public void PackToMessage(Packer packer, PackingOptions options) {
             // pack the header for the amount of items in the map
             packer.PackMapHeader(MAP_COUNT);
@@ -134,8 +120,8 @@ namespace Cryptid {
             packer.Pack("ZAB");
 
             if (Fingerprint.Image != null) {
-                AfisEngine afis = new AfisEngine();
-                Person p = new Person(Fingerprint);
+                var afis = new AfisEngine();
+                var p = new Person(Fingerprint);
                 afis.Extract(p);
             }
             if (Fingerprint.AsIsoTemplate != null) packer.Pack(Fingerprint.AsIsoTemplate);
@@ -239,6 +225,19 @@ namespace Cryptid {
             }
         }
 
+        public byte[] Serialize() {
+            using (var ms = new MemoryStream()) {
+                var serializer = MessagePackSerializer.Get<Candidate>();
+                serializer.Pack(ms, this);
+                return ms.ToArray();
+            }
+        }
+
+        public static Candidate Deserialize(byte[] b) {
+            var serializer = MessagePackSerializer.Get<Candidate>();
+            return serializer.Unpack(new MemoryStream(b));
+        }
+
         public bool IsComplete() {
             if (string.IsNullOrWhiteSpace(Dcs)) return false;
             if (string.IsNullOrWhiteSpace(Dac)) return false;
@@ -285,9 +284,9 @@ namespace Cryptid {
                     var inches = -1;
                     if (!int.TryParse(value, out inches)) throw new ArgumentException("value is not in ANSI format!");
                     Feet = inches/12;
-                    Inches = inches - (Feet*12);
+                    Inches = inches - Feet*12;
                 }
-                get { return (((Feet*12) + Inches).ToString().PadLeft(3, '0') + " IN"); }
+                get { return (Feet*12 + Inches).ToString().PadLeft(3, '0') + " IN"; }
             }
         }
 

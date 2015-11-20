@@ -18,8 +18,8 @@ struct FP_BITMAP
 
 	FP_BITMAP(int cx, int cy)
 	{
-		bmfHdr.bfType = ((WORD)('M' << 8) | 'B');  // "BM"
-		bmfHdr.bfSize = sizeof(FP_BITMAP) + cx*cy;
+		bmfHdr.bfType = ((WORD)('M' << 8) | 'B'); // "BM"
+		bmfHdr.bfSize = sizeof(FP_BITMAP) + cx * cy;
 		bmfHdr.bfReserved1 = 0;
 		bmfHdr.bfReserved2 = 0;
 		bmfHdr.bfOffBits = sizeof(FP_BITMAP);
@@ -30,14 +30,15 @@ struct FP_BITMAP
 		bmInfo.bmiHeader.biPlanes = 1;
 		bmInfo.bmiHeader.biBitCount = 8;
 		bmInfo.bmiHeader.biCompression = 0;
-		bmInfo.bmiHeader.biSizeImage = cx*cy;
+		bmInfo.bmiHeader.biSizeImage = cx * cy;
 		bmInfo.bmiHeader.biXPelsPerMeter = 0;
 		bmInfo.bmiHeader.biYPelsPerMeter = 0;
 		bmInfo.bmiHeader.biClrUsed = 0;
 		bmInfo.bmiHeader.biClrImportant = 0;
 
-		RGBQUAD *pals = bmInfo.bmiColors;
-		for (int i = 0; i < 256; i++) {
+		RGBQUAD* pals = bmInfo.bmiColors;
+		for (int i = 0; i < 256; i++)
+		{
 			pals[i].rgbBlue = i;
 			pals[i].rgbGreen = i;
 			pals[i].rgbRed = i;
@@ -55,9 +56,9 @@ void fp_bmp_draw(HDC hdc, const FP_BITMAP* fp_bmp, void* p, int x, int y, int cx
 	SetStretchBltMode(hdc, COLORONCOLOR);
 
 	StretchDIBits(hdc, x, y, cx, cy,
-		0, 0, fp_bmp->bmInfo.bmiHeader.biWidth, abs(fp_bmp->bmInfo.bmiHeader.biHeight),
-		p, &fp_bmp->bmInfo,
-		DIB_RGB_COLORS, SRCCOPY);
+	              0, 0, fp_bmp->bmInfo.bmiHeader.biWidth, abs(fp_bmp->bmInfo.bmiHeader.biHeight),
+	              p, &fp_bmp->bmInfo,
+	              DIB_RGB_COLORS, SRCCOPY);
 }
 
 BOOL fp_bmp_save(LPCTSTR szFilePath, FP_BITMAP* fp_bmp, void* p)
@@ -76,18 +77,19 @@ BOOL fp_bmp_save(LPCTSTR szFilePath, FP_BITMAP* fp_bmp, void* p)
 
 	int i;
 	for (i = h - 1; i >= 0; i--)
-		f.Write((BYTE*)p + i*w, w);
+		f.Write((BYTE*)p + i * w, w);
 
 	f.Close();
 
 	return TRUE;
 }
 
-char* readFileBytes(const char *name) {
-	FILE *fl = fopen(name, "r");
+char* readFileBytes(const char* name)
+{
+	FILE* fl = fopen(name, "r");
 	fseek(fl, 0, SEEK_END);
 	long len = ftell(fl);
-	char *ret = (char*) malloc(len);
+	char* ret = (char*) malloc(len);
 	fseek(fl, 0, SEEK_SET);
 	fread(ret, 1, len, fl);
 	fclose(fl);
@@ -101,7 +103,8 @@ extern "C"
 		return oem_close();
 	}
 
-	__declspec(dllexport) int usb_internal_check(void) {
+	__declspec(dllexport) int usb_internal_check(void)
+	{
 		return oem_usb_internal_check();
 	}
 
@@ -193,39 +196,51 @@ extern "C"
 		return oem_add_template(nPos);
 	}
 
-	__declspec(dllexport) int get_database_end(void) {
+	__declspec(dllexport) int get_database_end(void)
+	{
 		return oem_get_database_end();
 	}
 
-	__declspec(dllexport) int get_database_start(void) {
+	__declspec(dllexport) int get_database_start(void)
+	{
 		return oem_get_database_start();
 	}
 
 	__declspec(dllexport) int open(int port, int baud)
 	{
-		if (port == 0) {
-			if (!comm_open_usb()) {
+		if (port == 0)
+		{
+			if (!comm_open_usb())
+			{
 				return -1;
 			}
-		} else {
-			if (!comm_open_serial(port, 9600)) {
+		}
+		else
+		{
+			if (!comm_open_serial(port, 9600))
+			{
 				return -10;
 			}
-			if (oem_change_baudrate(baud) < 0) {
+			if (oem_change_baudrate(baud) < 0)
+			{
 				return -11;
 			}
-			if (!comm_open_serial(port, baud)) {
+			if (!comm_open_serial(port, baud))
+			{
 				return -12;
 			}
 		}
 
-		if (oem_open() < 0) {
+		if (oem_open() < 0)
+		{
 			return -3;
-		} if (gwLastAck == NACK_INFO) {
+		}
+		if (gwLastAck == NACK_INFO)
+		{
 			return -4;
 		}
 
 		return 1;
 	}
-
 }
+
