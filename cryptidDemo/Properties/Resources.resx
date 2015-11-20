@@ -114,4 +114,46 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="CRYPTID_ID_FILTER" xml:space="preserve">
+    <value>Cryptid ID File (*.cid)|*.cid</value>
+  </data>
+  <data name="FPS_NOT_CONNECTED_ERROR" xml:space="preserve">
+    <value>You are not connected to a fingerprint scanner!</value>
+  </data>
+  <data name="NOT_VERIFY_ID_ERROR" xml:space="preserve">
+    <value>Couldn't verify provided data.</value>
+  </data>
+  <data name="AUTH_LIKLEYHOOD_MESSAGE" xml:space="preserve">
+    <value>Auth likelyhood: </value>
+  </data>
+  <data name="FPS_CONNECTED" xml:space="preserve">
+    <value>Connected</value>
+  </data>
+  <data name="FPS_DISCONNECTED" xml:space="preserve">
+    <value>Disconnected</value>
+  </data>
+  <data name="JPG_FILTER" xml:space="preserve">
+    <value>Image Files|*.jpg</value>
+  </data>
+  <data name="NOT_GENERATE_INCOMPLETE_ID_ERROR" xml:space="preserve">
+    <value>Cannot generate an and ID for an incomplete candidate.</value>
+  </data>
+  <data name="ERROR" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="PASSWORD_EMPTY_ERROR" xml:space="preserve">
+    <value>Password cannot be empty!.</value>
+  </data>
+  <data name="CANNOT_SAVE_IF_NOT_GENERATED_ERROR" xml:space="preserve">
+    <value>Cannot save ID if none has been generated!</value>
+  </data>
+  <data name="CANNOT_SAVE_IF_NOT_GENERATED_OR_INCOMPLETE" xml:space="preserve">
+    <value>Cannot generate card if no ID has been generated or the candidate is incomplete!</value>
+  </data>
+  <data name="PDF_FILTER" xml:space="preserve">
+    <value>PDF File (*.pdf)|*.pdf</value>
+  </data>
+  <data name="MUST_ENTER_PASSWORD_MESSAGE" xml:space="preserve">
+    <value>You must enter the password associated with this ID.</value>
+  </data>
 </root>

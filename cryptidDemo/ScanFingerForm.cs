@@ -1,9 +1,13 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Drawing;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using cryptid.Scanners;
 using Cryptid.Utils;
+
+#endregion
 
 namespace cryptidDemo {
     public partial class ScanFingerForm : Form {
@@ -25,14 +29,14 @@ namespace cryptidDemo {
 
         private void ScanFingerForm_Load(object sender, EventArgs e) {
             var t = Task.Factory.StartNew(() => {
-                CurrentState = State.FINGER_NOT_PRESSED;
+                CurrentState = State.FingerNotPressed;
                 FPS_GT511C3.SetCmosLed(true);
                 while (FPS_GT511C3.IsPressingFinger() != 0) Task.Delay(1000);
-                CurrentState = State.FINGER_PRESSED;
-                CurrentState = State.TRANSFERING_DATA;
+                CurrentState = State.FingerPressed;
+                CurrentState = State.TransferingData;
                 Fingerprint = FPS_GT511C3.GetRawImage();
                 FPS_GT511C3.SetCmosLed(false);
-                CurrentState = State.TRANSFER_COMPLETE;
+                CurrentState = State.TransferComplete;
                 DialogResult = DialogResult.OK;
                 SafeClose();
             });
@@ -40,20 +44,20 @@ namespace cryptidDemo {
         }
 
         private void OnStateChange(State s) {
-            switch (CurrentState) {
-                case State.FINGER_NOT_PRESSED:
+            switch (s) {
+                case State.FingerNotPressed:
                     BackColor = Color.Red;
                     stateText.SetPropertyThreadSafe(() => stateText.Text, "Place Finger on Sensor");
                     break;
-                case State.FINGER_PRESSED:
+                case State.FingerPressed:
                     BackColor = Color.Blue;
                     stateText.SetPropertyThreadSafe(() => stateText.Text, "Begining Transfer");
                     break;
-                case State.TRANSFERING_DATA:
+                case State.TransferingData:
                     BackColor = Color.Green;
                     stateText.SetPropertyThreadSafe(() => stateText.Text, "Transfering Data...");
                     break;
-                case State.TRANSFER_COMPLETE:
+                case State.TransferComplete:
                     BackColor = Color.Green;
                     stateText.SetPropertyThreadSafe(() => stateText.Text, "Transfering Complete");
                     break;
@@ -69,10 +73,10 @@ namespace cryptidDemo {
         }
 
         private enum State {
-            FINGER_NOT_PRESSED,
-            FINGER_PRESSED,
-            TRANSFERING_DATA,
-            TRANSFER_COMPLETE
+            FingerNotPressed,
+            FingerPressed,
+            TransferingData,
+            TransferComplete
         }
     }
 }

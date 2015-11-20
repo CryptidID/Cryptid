@@ -1,22 +1,26 @@
-﻿using Cryptid.Utils;
+﻿#region
+
+using Cryptid.Utils;
+
+#endregion
 
 namespace cryptid.Factom.API {
     public class DataStructs {
         public static EntryBlockData ConvertStringFormatToByteFormat(EntryBlockDataStringFormat blockStringFormat) {
-            var block = new EntryBlockData();
-            block.Header = new EntryBlockData.HeaderData();
+            var block = new EntryBlockData {Header = new EntryBlockData.HeaderData()};
 
             var len = blockStringFormat.EntryList.Length;
             block.EntryList = new EntryBlockData.EntryData[len];
 
             for (var i = 0; i < len; i++) {
-                block.EntryList[i] = new EntryBlockData.EntryData();
-                block.EntryList[i].EntryHash = Strings.DecodeHexIntoBytes(blockStringFormat.EntryList[i].EntryHash);
-                block.EntryList[i].Timestamp = blockStringFormat.EntryList[i].Timestamp;
+                block.EntryList[i] = new EntryBlockData.EntryData {
+                    EntryHash = Strings.DecodeHexIntoBytes(blockStringFormat.EntryList[i].EntryHash),
+                    Timestamp = blockStringFormat.EntryList[i].Timestamp
+                };
             }
 
             block.Header.BlockSequenceNumber = blockStringFormat.Header.BlockSequenceNumber;
-            block.Header.ChainID = Strings.DecodeHexIntoBytes(blockStringFormat.Header.ChainID);
+            block.Header.ChainId = Strings.DecodeHexIntoBytes(blockStringFormat.Header.ChainId);
             block.Header.PrevKeyMr = Strings.DecodeHexIntoBytes(blockStringFormat.Header.PrevKeyMr);
             block.Header.Timestamp = blockStringFormat.Header.Timestamp;
 
@@ -24,9 +28,10 @@ namespace cryptid.Factom.API {
         }
 
         public static EntryData ConvertStringFormatToByteFormat(EntryDataStringFormat entryStringFormat) {
-            var entry = new EntryData();
-            entry.ChainID = Strings.DecodeHexIntoBytes(entryStringFormat.ChainID);
-            entry.Content = Strings.DecodeHexIntoBytes(entryStringFormat.Content);
+            var entry = new EntryData {
+                ChainId = Strings.DecodeHexIntoBytes(entryStringFormat.ChainId),
+                Content = Strings.DecodeHexIntoBytes(entryStringFormat.Content)
+            };
 
             var len = entryStringFormat.ExtIDs.Length;
             entry.ExtIDs = new byte[len][];
@@ -37,8 +42,7 @@ namespace cryptid.Factom.API {
         }
 
         public static ChainHeadData ConvertStringFormatToByteFormat(ChainHeadDataStringFormat chainStringFormat) {
-            var chain = new ChainHeadData();
-            chain.ChainHead = Strings.DecodeHexIntoBytes(chainStringFormat.ChainHead);
+            var chain = new ChainHeadData {ChainHead = Strings.DecodeHexIntoBytes(chainStringFormat.ChainHead)};
             return chain;
         }
 
@@ -48,13 +52,14 @@ namespace cryptid.Factom.API {
             blockStringFormat.EntryList = new EntryBlockDataStringFormat.EntryData[len];
 
             for (var i = 0; i < len; i++) {
-                blockStringFormat.EntryList[i] = new EntryBlockDataStringFormat.EntryData();
-                blockStringFormat.EntryList[i].EntryHash = Arrays.ByteArrayToHex(block.EntryList[i].EntryHash);
-                blockStringFormat.EntryList[i].Timestamp = block.EntryList[i].Timestamp;
+                blockStringFormat.EntryList[i] = new EntryBlockDataStringFormat.EntryData {
+                    EntryHash = Arrays.ByteArrayToHex(block.EntryList[i].EntryHash),
+                    Timestamp = block.EntryList[i].Timestamp
+                };
             }
 
             blockStringFormat.Header.BlockSequenceNumber = block.Header.BlockSequenceNumber;
-            blockStringFormat.Header.ChainID = Arrays.ByteArrayToHex(block.Header.ChainID);
+            blockStringFormat.Header.ChainId = Arrays.ByteArrayToHex(block.Header.ChainId);
             blockStringFormat.Header.PrevKeyMr = Arrays.ByteArrayToHex(block.Header.PrevKeyMr);
             blockStringFormat.Header.Timestamp = block.Header.Timestamp;
 
@@ -63,7 +68,7 @@ namespace cryptid.Factom.API {
 
         public class EntryData {
             // Hex Bytes
-            public byte[] ChainID { get; set; }
+            public byte[] ChainId { get; set; }
             // UTF8 Encoding
             public byte[] Content { get; set; }
             public byte[][] ExtIDs { get; set; }
@@ -77,7 +82,7 @@ namespace cryptid.Factom.API {
             public class HeaderData {
                 public int BlockSequenceNumber { get; set; }
                 // Hex Bytes
-                public byte[] ChainID { get; set; }
+                public byte[] ChainId { get; set; }
                 // Hex Bytes
                 public byte[] PrevKeyMr { get; set; }
                 public int Timestamp { get; set; }
@@ -101,7 +106,7 @@ namespace cryptid.Factom.API {
         //                             \\
 
         public class EntryDataStringFormat {
-            public string ChainID { get; set; }
+            public string ChainId { get; set; }
             public string Content { get; set; }
             public string[] ExtIDs { get; set; }
         }
@@ -112,7 +117,7 @@ namespace cryptid.Factom.API {
 
             public class HeaderData {
                 public int BlockSequenceNumber { get; set; }
-                public string ChainID { get; set; }
+                public string ChainId { get; set; }
                 public string PrevKeyMr { get; set; }
                 public int Timestamp { get; set; }
             }

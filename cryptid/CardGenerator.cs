@@ -1,4 +1,6 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -10,6 +12,8 @@ using CSRectangle = System.Drawing.Rectangle;
 using CSImage = System.Drawing.Image;
 using CSImaging = System.Drawing.Imaging;
 using Image = iTextSharp.text.Image;
+
+#endregion
 
 namespace cryptid {
     public class CardGenerator {
@@ -24,7 +28,7 @@ namespace cryptid {
         public void Generate(string outputFile, byte[] chainId) {
             if (_cardCandidate.Uid == null) throw new Exception("A UID is required to generate a new card!");
 
-            var reader = new PdfReader("cryptid-id-template.pdf");
+            var reader = new PdfReader(_pdfTemplateFile);
 
             using (var stamper = new PdfStamper(reader, new FileStream(outputFile, FileMode.Create))) {
                 var form = stamper.AcroFields;
@@ -45,10 +49,10 @@ namespace cryptid {
                         form.SetField(key, _cardCandidate.Dbc == Candidate.Sex.Male ? "M" : "F");
                     }
                     else if (key.Contains("EYE")) {
-                        form.SetField(key, _cardCandidate.Day.ANSIFormat());
+                        form.SetField(key, _cardCandidate.Day.AnsiFormat());
                     }
                     else if (key.Contains("HT")) {
-                        form.SetField(key, _cardCandidate.Dau.ANSIFormat.TrimStart('0'));
+                        form.SetField(key, _cardCandidate.Dau.AnsiFormat.TrimStart('0'));
                     }
                     else if (key.Contains("DOB")) {
                         form.SetField(key, _cardCandidate.Dbb.ToString("MM/dd/yyyy"));
@@ -62,7 +66,7 @@ namespace cryptid {
                     else if (key.Contains("ADDR_2")) {
                         form.SetField(key,
                             _cardCandidate.Dai + ", " + _cardCandidate.Daj + " " + _cardCandidate.Dcg + " " +
-                            _cardCandidate.Dak.ANSIFormat.TrimEnd('0'));
+                            _cardCandidate.Dak.AnsiFormat.TrimEnd('0'));
                     }
                     else if (key.Contains("CRC")) {
                         form.SetField(key, Arrays.ByteArrayToHex(new Crypto.Crc32().ComputeHash(_cardCandidate.Uid)));
@@ -108,7 +112,7 @@ namespace cryptid {
         }
 
         private Bitmap TrimBitmap(Bitmap source) {
-            var srcRect = default(CSRectangle);
+            CSRectangle srcRect;
             CSImaging.BitmapData data = null;
             try {
                 data = source.LockBits(new CSRectangle(0, 0, source.Width, source.Height),

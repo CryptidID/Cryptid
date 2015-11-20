@@ -1,7 +1,11 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Linq;
 using System.Security.Cryptography;
 using Cryptid.Utils;
+
+#endregion
 
 namespace cryptid {
     /// <summary>
