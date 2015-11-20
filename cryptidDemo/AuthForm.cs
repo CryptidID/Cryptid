@@ -1,24 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using System.IO;
 using System.Security.Cryptography;
+using System.Windows.Forms;
 using Cryptid;
 using SourceAFIS.Simple;
+using Keys = Cryptid.Utils.Keys;
 
 namespace cryptidDemo {
     public partial class AuthForm : Form {
+        private readonly RSAParameters PublicKey = Keys.PublicKey("public.xml");
+
         public AuthForm() {
             InitializeComponent();
         }
-
-        private readonly RSAParameters PublicKey = Cryptid.Utils.Keys.PublicKey("public.xml");
 
         public byte[] PackedData { get; set; }
         public string Password { get; set; }
@@ -37,42 +31,46 @@ namespace cryptidDemo {
         }
 
         private void showInfoButton_Click(object sender, EventArgs e) {
-            CandidateInfoForm info = new CandidateInfoForm();
+            var info = new CandidateInfoForm();
             info.Show();
             info.LoadCandidateInfo(PackedData, Password);
         }
 
         private void button3_Click(object sender, EventArgs e) {
-            FPSConnectForm connectDialog = new FPSConnectForm();;
+            var connectDialog = new FPSConnectForm();
+            ;
 
             Enabled = false;
-            DialogResult connectDr = connectDialog.ShowDialog(this);
+            var connectDr = connectDialog.ShowDialog(this);
             if (connectDr != DialogResult.OK) button3.Enabled = false;
             connectDialog.Close();
             Enabled = true;
 
-            Fingerprint f = new Fingerprint();
+            var f = new Fingerprint();
 
             if (connectDialog.IsConnected) {
                 Enabled = false;
 
-                ScanFingerForm scanForm = new ScanFingerForm();
-                DialogResult dr = scanForm.ShowDialog(this);
+                var scanForm = new ScanFingerForm();
+                var dr = scanForm.ShowDialog(this);
                 if (dr == DialogResult.OK) {
                     f.AsBitmap = scanForm.Fingerprint;
                 }
                 scanForm.Dispose();
 
                 Enabled = true;
-            } else {
+            }
+            else {
                 //TODO: Allow to choose fingerprint image?
                 MessageBox.Show("You are not connected to a fingerprint scanner!");
             }
 
             float authLikelyhood;
             try {
-                authLikelyhood = CandidateDelegate.VerifyFingerprint(CandidateDelegate.Unpack(PackedData, Password, PublicKey), f);
-            } catch (CryptographicException ex) {
+                authLikelyhood =
+                    CandidateDelegate.VerifyFingerprint(CandidateDelegate.Unpack(PackedData, Password, PublicKey), f);
+            }
+            catch (CryptographicException ex) {
                 MessageBox.Show("Couldn't verify provided data.");
                 return;
             }
@@ -80,7 +78,6 @@ namespace cryptidDemo {
         }
 
         private void AuthForm_Load(object sender, EventArgs e) {
-
         }
     }
 }

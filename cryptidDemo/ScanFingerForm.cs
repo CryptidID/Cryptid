@@ -1,12 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using cryptid.Scanners;
@@ -14,14 +7,12 @@ using Cryptid.Utils;
 
 namespace cryptidDemo {
     public partial class ScanFingerForm : Form {
-        private enum State {
-            FINGER_NOT_PRESSED,
-            FINGER_PRESSED,
-            TRANSFERING_DATA,
-            TRANSFER_COMPLETE
+        private State _currState;
+
+        public ScanFingerForm() {
+            InitializeComponent();
         }
 
-        private State _currState; 
         private State CurrentState {
             get { return _currState; }
             set {
@@ -32,12 +23,8 @@ namespace cryptidDemo {
 
         public Bitmap Fingerprint { get; set; }
 
-        public ScanFingerForm() {
-            InitializeComponent();
-        }
-
         private void ScanFingerForm_Load(object sender, EventArgs e) {
-            Task t = Task.Factory.StartNew(() => {
+            var t = Task.Factory.StartNew(() => {
                 CurrentState = State.FINGER_NOT_PRESSED;
                 FPS_GT511C3.SetCmosLed(true);
                 while (FPS_GT511C3.IsPressingFinger() != 0) Task.Delay(1000);
@@ -50,8 +37,6 @@ namespace cryptidDemo {
                 SafeClose();
             });
             t.Start();
-
-            
         }
 
         private void OnStateChange(State s) {
@@ -81,6 +66,13 @@ namespace cryptidDemo {
                 return;
             }
             Close();
+        }
+
+        private enum State {
+            FINGER_NOT_PRESSED,
+            FINGER_PRESSED,
+            TRANSFERING_DATA,
+            TRANSFER_COMPLETE
         }
     }
 }

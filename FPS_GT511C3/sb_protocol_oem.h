@@ -10,14 +10,15 @@
 #define STX4				0xA5	//Header2
 
 // Structure Of Cmd and Ack Packets 
-typedef struct {		
-	BYTE 	Head1;		
-	BYTE 	Head2;		
-	WORD	wDevId;
-	int		nParam;
-	WORD	wCmd;// or nAck
-	WORD 	wChkSum;
-} SB_OEM_PKT;			
+typedef struct
+{
+	BYTE Head1;
+	BYTE Head2;
+	WORD wDevId;
+	int nParam;
+	WORD wCmd;// or nAck
+	WORD wChkSum;
+} SB_OEM_PKT;
 
 #define SB_OEM_PKT_SIZE			12
 #define SB_OEM_HEADER_SIZE		2
@@ -31,10 +32,11 @@ typedef struct {
 #define PKT_CHK_SUM_ERR	PKT_ERR_START+4
 #define PKT_PARAM_ERR	PKT_ERR_START+5
 
-int oemp_CheckCmdAckPkt( WORD wDevID, SB_OEM_PKT* pPkt );
-int oemp_SendCmdOrAck( WORD wDevID, WORD wCmdOrAck, int nParam );
-int oemp_ReceiveCmdOrAck( WORD wDevID, WORD* pwCmdOrAck, int* pnParam );
-int oemp_SendData( WORD wDevID, BYTE* pBuf, int nSize );
-int oemp_ReceiveData( WORD wDevID, BYTE* pBuf, int nSize );
+int oemp_CheckCmdAckPkt(WORD wDevID, SB_OEM_PKT* pPkt);
+int oemp_SendCmdOrAck(WORD wDevID, WORD wCmdOrAck, int nParam);
+int oemp_ReceiveCmdOrAck(WORD wDevID, WORD* pwCmdOrAck, int* pnParam);
+int oemp_SendData(WORD wDevID, BYTE* pBuf, int nSize);
+int oemp_ReceiveData(WORD wDevID, BYTE* pBuf, int nSize);
 
 #endif /*__SB_PROTOCOL_OEM_H__*/
+

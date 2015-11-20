@@ -138,11 +138,11 @@ namespace Cryptid.Utils {
         }
 
         public static byte[] ChainIdOfFirstEntry(DataStructs.EntryData entry) {
-            List<byte> byteList = new List<byte>();
+            var byteList = new List<byte>();
             foreach (var ext in entry.ExtIDs) {
                 byteList.AddRange(SHA256.Create().ComputeHash(ext));
             }
-            byte[] b = byteList.ToArray();
+            var b = byteList.ToArray();
             var chainInfo = SHA256.Create().ComputeHash(b);
             return chainInfo;
         }
@@ -238,6 +238,13 @@ namespace Cryptid.Utils {
     }
 
     public static class Strings {
+        private static readonly byte[,] ByteLookup = {
+            // low nibble
+            {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f},
+            // high nibble
+            {0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x70, 0x80, 0x90, 0xa0, 0xb0, 0xc0, 0xd0, 0xe0, 0xf0}
+        };
+
         public static string RandomString(int length) {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             var random = new Random();
@@ -317,13 +324,6 @@ namespace Cryptid.Utils {
                     throw new FormatException("Unrecognized hex char " + c);
             }
         }
-
-        private static readonly byte[,] ByteLookup = {
-            // low nibble
-            {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f},
-            // high nibble
-            {0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x70, 0x80, 0x90, 0xa0, 0xb0, 0xc0, 0xd0, 0xe0, 0xf0}
-        };
     }
 
     public static class ControlExtensions {
