@@ -5,7 +5,7 @@ using System.Windows.Forms;
 
 #endregion
 
-namespace cryptidDemo {
+namespace CryptidDemo {
     internal static class Program {
         /// <summary>
         ///     The main entry point for the application.

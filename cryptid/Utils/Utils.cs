@@ -8,7 +8,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Windows.Forms;
-using cryptid.Factom.API;
+using Cryptid.Factom.API;
 
 #endregion
 

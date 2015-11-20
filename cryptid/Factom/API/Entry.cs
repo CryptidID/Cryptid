@@ -3,7 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
-using cryptid.Factom.API;
+using Cryptid.Factom.API;
 using Cryptid.Utils;
 using Newtonsoft.Json;
 using RestSharp;

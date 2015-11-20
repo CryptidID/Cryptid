@@ -1,4 +1,4 @@
-﻿namespace cryptidDemo {
+﻿namespace CryptidDemo {
     partial class FpsConnectForm {
         /// <summary>
         /// Required designer variable.

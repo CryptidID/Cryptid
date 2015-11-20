@@ -4,7 +4,7 @@ using Cryptid.Utils;
 
 #endregion
 
-namespace cryptid.Factom.API {
+namespace Cryptid.Factom.API {
     public class DataStructs {
         public static EntryBlockData ConvertStringFormatToByteFormat(EntryBlockDataStringFormat blockStringFormat) {
             var block = new EntryBlockData {Header = new EntryBlockData.HeaderData()};

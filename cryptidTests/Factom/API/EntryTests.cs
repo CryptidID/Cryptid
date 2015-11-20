@@ -4,7 +4,6 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using cryptid.Factom.API;
 using Cryptid.Factom.API;
 using Cryptid.Utils;
 using Microsoft.VisualStudio.TestTools.UnitTesting;

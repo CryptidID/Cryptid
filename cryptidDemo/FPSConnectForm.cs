@@ -4,12 +4,12 @@ using System;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using cryptid.Scanners;
+using Cryptid.Scanners;
 using CryptidDemo.Properties;
 
 #endregion
 
-namespace cryptidDemo {
+namespace CryptidDemo {
     public partial class FpsConnectForm : Form {
         private static readonly int[] Baudrates = {9600, 19200, 38400, 57600, 115200};
 

@@ -5,7 +5,7 @@ using System.Windows.Forms;
 
 #endregion
 
-namespace cryptidDemo {
+namespace CryptidDemo {
     public partial class DemoLauncher : Form {
         public DemoLauncher() {
             InitializeComponent();

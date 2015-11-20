@@ -1,4 +1,4 @@
-﻿namespace cryptidDemo {
+﻿namespace CryptidDemo {
     partial class GeneratorForm {
         /// <summary>
         /// Required designer variable.

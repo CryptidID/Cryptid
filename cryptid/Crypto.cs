@@ -8,7 +8,7 @@ using System.Text;
 
 #endregion
 
-namespace cryptid {
+namespace Cryptid {
     public static class Crypto {
         private const int RsaKeySize = 4096;
 

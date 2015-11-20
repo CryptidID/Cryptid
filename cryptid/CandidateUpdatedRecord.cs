@@ -7,7 +7,7 @@ using Cryptid.Utils;
 
 #endregion
 
-namespace cryptid {
+namespace Cryptid {
     public interface IRecord {
     }
 

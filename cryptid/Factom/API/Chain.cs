@@ -10,7 +10,7 @@ using RestSharp;
 
 #endregion
 
-namespace cryptid.Factom.API {
+namespace Cryptid.Factom.API {
     public class Chain {
         private const string ServerHost = "localhost";
         private const int ServerPort = 8088;
