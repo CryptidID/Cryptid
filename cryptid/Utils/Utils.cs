@@ -91,6 +91,12 @@ namespace Cryptid.Utils {
             return bytes;
         }
 
+        /// <summary>
+        /// Checks if two byte arrays are equal
+        /// </summary>
+        /// <param name="a1">Byte[] to be compared</param>
+        /// <param name="b1">Byte[] to be compared</param>
+        /// <returns>True if equal</returns>
         public static bool Equality(byte[] a1, byte[] b1) {
             if (a1.Length == b1.Length) {
                 var i = 0;
@@ -102,7 +108,6 @@ namespace Cryptid.Utils {
                     return true;
                 }
             }
-
             return false;
         }
 
@@ -127,6 +132,11 @@ namespace Cryptid.Utils {
     }
 
     public static class Entries {
+        /// <summary>
+        /// Gets a hash of an entry
+        /// </summary>
+        /// <param name="entry">EntryData to be hashed</param>
+        /// <returns>Hash of entry</returns>
         public static byte[] HashEntry(DataStructs.EntryData entry) {
             var data = MarshalBinary(entry);
             var h1 = SHA512.Create().ComputeHash(data);
@@ -137,6 +147,11 @@ namespace Cryptid.Utils {
             return h3;
         }
 
+        /// <summary>
+        /// Passing the first entry of a Chain will get the chainId of that entry. Needs the ExtIDs to do this successfully
+        /// </summary>
+        /// <param name="entry">Entry object</param>
+        /// <returns>ChainID</returns>
         public static byte[] ChainIdOfFirstEntry(DataStructs.EntryData entry) {
             var byteList = new List<byte>();
             foreach (var ext in entry.ExtIDs) {
@@ -147,6 +162,11 @@ namespace Cryptid.Utils {
             return chainInfo;
         }
 
+        /// <summary>
+        /// Marshals an entry into a byte[] to be sent to restAPI
+        /// </summary>
+        /// <param name="e">Entry to be marshaled</param>
+        /// <returns>Marshaled entry</returns>
         public static byte[] MarshalBinary(DataStructs.EntryData e) {
             var entryBStruct = new List<byte>();
             var idsSize = MarshalExtIDsSize(e);
@@ -176,6 +196,11 @@ namespace Cryptid.Utils {
             return entryBStruct.ToArray();
         }
 
+        /// <summary>
+        /// Helper function of MarshalBinary
+        /// </summary>
+        /// <param name="e"></param>
+        /// <returns></returns>
         private static byte[] MarshalExtIDsBinary(DataStructs.EntryData e) {
             var byteList = new List<byte>();
             foreach (var exId in e.ExtIDs) {
@@ -190,6 +215,11 @@ namespace Cryptid.Utils {
             return byteList.ToArray();
         }
 
+        /// <summary>
+        /// Helper function of MarshalBinary
+        /// </summary>
+        /// <param name="e"></param>
+        /// <returns></returns>
         private static byte[] MarshalExtIDsSize(DataStructs.EntryData e) {
             if (e.ExtIDs == null) {
                 short extLen = 0;
@@ -212,7 +242,7 @@ namespace Cryptid.Utils {
         }
 
         /// <summary>
-        ///     Caculates the cost of an entry
+        /// Caculates the cost of an entry
         /// </summary>
         /// <param name="entry"></param>
         /// <returns></returns>
@@ -252,7 +282,7 @@ namespace Cryptid.Utils {
         }
 
         /// <summary>
-        ///     Converts string hex into byte[]
+        /// Converts string hex into byte[]
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
@@ -271,7 +301,7 @@ namespace Cryptid.Utils {
         }
 
         /// <summary>
-        ///     If hex string has "-", this method removes them
+        ///  If hex string has "-", this method removes them
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
@@ -279,6 +309,11 @@ namespace Cryptid.Utils {
             return s.Replace("-", "");
         }
 
+        /// <summary>
+        /// Helper function of Hex functions
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
         private static int HexToInt(char c) {
             switch (c) {
                 case '0':
