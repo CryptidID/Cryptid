@@ -23,12 +23,11 @@ namespace CryptidRest.Controllers {
             try {
                 using (var ms = new MemoryStream(Convert.FromBase64String(fpImageBase64))) {
                     var b = new Bitmap(ms);
-                    var f = new Fingerprint {AsBitmap = b};
+                    var f = new Fingerprint { AsBitmap = b };
                     return CandidateDelegate.FullVerifyFromChain(Convert.FromBase64String(chainIdBase64), password, f,
                         Keys.PublicKey(PublicKeyPath));
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 var resp = new HttpResponseMessage(HttpStatusCode.InternalServerError) {
                     Content = new StringContent(e.Message),
                     ReasonPhrase = "Internal Error Occured"
@@ -43,8 +42,7 @@ namespace CryptidRest.Controllers {
             try {
                 var packed = CandidateDelegate.GetPackedCandidate(Convert.FromBase64String(chainIdBase64));
                 return CandidateDelegate.Unpack(packed, password, Keys.PublicKey(PublicKeyPath));
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 var resp = new HttpResponseMessage(HttpStatusCode.InternalServerError) {
                     Content = new StringContent(e.Message),
                     ReasonPhrase = "Internal Error Occured"
@@ -59,8 +57,7 @@ namespace CryptidRest.Controllers {
             try {
                 return CandidateDelegate.Unpack(Convert.FromBase64String(packedBase64), password,
                     Keys.PublicKey(PublicKeyPath));
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 var resp = new HttpResponseMessage(HttpStatusCode.InternalServerError) {
                     Content = new StringContent(e.Message),
                     ReasonPhrase = "Internal Error Occured"
@@ -75,8 +72,7 @@ namespace CryptidRest.Controllers {
             try {
                 return CandidateDelegate.VerifySignature(Convert.FromBase64String(packedBase64),
                     Keys.PublicKey(PublicKeyPath));
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 var resp = new HttpResponseMessage(HttpStatusCode.InternalServerError) {
                     Content = new StringContent(e.Message),
                     ReasonPhrase = "Internal Error Occured"
