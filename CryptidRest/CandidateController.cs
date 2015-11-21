@@ -15,7 +15,7 @@ using SourceAFIS.Simple;
 namespace CryptidRest.Controllers {
     [RoutePrefix("api/candidate")]
     public class CandidateController : ApiController {
-        private static readonly string PublicKeyPath = "public.xml";
+        private const string PublicKeyPath = "public.xml";
 
         [Route("FullVerifyFromChain/{chainIdBase64}/{password}/{fpImageBase64}")]
         [HttpPost]
