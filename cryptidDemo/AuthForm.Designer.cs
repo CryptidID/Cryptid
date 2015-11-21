@@ -1,4 +1,4 @@
-﻿namespace cryptidDemo {
+﻿namespace CryptidDemo {
     partial class AuthForm {
         /// <summary>
         /// Required designer variable.

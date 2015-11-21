@@ -3,11 +3,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cryptid", "cryptid\cryptid.csproj", "{DC90B6F3-FDB0-4766-AFA9-C89C82A4605F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cryptid", "cryptid\Cryptid.csproj", "{DC90B6F3-FDB0-4766-AFA9-C89C82A4605F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cryptidTests", "cryptidTests\cryptidTests.csproj", "{A86C3F9E-3082-41B0-9F04-4B45D47CAE54}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptidTests", "cryptidTests\CryptidTests.csproj", "{A86C3F9E-3082-41B0-9F04-4B45D47CAE54}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cryptidDemo", "cryptidDemo\cryptidDemo.csproj", "{6AC7F569-99CC-45C7-B427-BCFD9657746B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptidDemo", "cryptidDemo\CryptidDemo.csproj", "{6AC7F569-99CC-45C7-B427-BCFD9657746B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{00B581F5-19BC-4A88-A113-20C68ABA5264} = {00B581F5-19BC-4A88-A113-20C68ABA5264}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FPS_GT511C3", "FPS_GT511C3\FPS_GT511C3.vcxproj", "{00B581F5-19BC-4A88-A113-20C68ABA5264}"
 EndProject
@@ -58,11 +61,13 @@ Global
 		{6AC7F569-99CC-45C7-B427-BCFD9657746B}.Release|x86.ActiveCfg = Release|Any CPU
 		{6AC7F569-99CC-45C7-B427-BCFD9657746B}.Release|x86.Build.0 = Release|Any CPU
 		{00B581F5-19BC-4A88-A113-20C68ABA5264}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{00B581F5-19BC-4A88-A113-20C68ABA5264}.Debug|Any CPU.Build.0 = Debug|Win32
 		{00B581F5-19BC-4A88-A113-20C68ABA5264}.Debug|x64.ActiveCfg = Debug|x64
 		{00B581F5-19BC-4A88-A113-20C68ABA5264}.Debug|x64.Build.0 = Debug|x64
 		{00B581F5-19BC-4A88-A113-20C68ABA5264}.Debug|x86.ActiveCfg = Debug|Win32
 		{00B581F5-19BC-4A88-A113-20C68ABA5264}.Debug|x86.Build.0 = Debug|Win32
 		{00B581F5-19BC-4A88-A113-20C68ABA5264}.Release|Any CPU.ActiveCfg = Release|Win32
+		{00B581F5-19BC-4A88-A113-20C68ABA5264}.Release|Any CPU.Build.0 = Release|Win32
 		{00B581F5-19BC-4A88-A113-20C68ABA5264}.Release|x64.ActiveCfg = Release|x64
 		{00B581F5-19BC-4A88-A113-20C68ABA5264}.Release|x64.Build.0 = Release|x64
 		{00B581F5-19BC-4A88-A113-20C68ABA5264}.Release|x86.ActiveCfg = Release|Win32

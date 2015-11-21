@@ -1,5 +1,5 @@
-﻿namespace cryptidDemo {
-    partial class FPSConnectForm {
+﻿namespace CryptidDemo {
+    partial class FpsConnectForm {
         /// <summary>
         /// Required designer variable.
         /// </summary>
@@ -125,7 +125,7 @@
             this.connectProgress.Value = 1;
             this.connectProgress.Visible = false;
             // 
-            // FPSConnectForm
+            // FpsConnectForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -138,7 +138,7 @@
             this.Controls.Add(this.ports);
             this.Controls.Add(this.baudrates);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-            this.Name = "FPSConnectForm";
+            this.Name = "FpsConnectForm";
             this.Text = "Connect To Fingerprint Scanner";
             this.TopMost = true;
             this.Load += new System.EventHandler(this.FPSConnectForm_Load);

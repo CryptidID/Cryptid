@@ -1,20 +1,18 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
+using System.Diagnostics;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using cryptid;
-using cryptid.Factom.API;
+using System.Threading;
+using Cryptid;
 using Cryptid.Factom.API;
 using Cryptid.Utils;
-using iTextSharp.text;
-using SourceAFIS;
 using SourceAFIS.Simple;
-using ChainHeadData = cryptid.Factom.API.DataStructs.ChainHeadData;
-using EntryBlockData = cryptid.Factom.API.DataStructs.EntryBlockData;
-using EntryData = cryptid.Factom.API.DataStructs.EntryData;
+
+#endregion
 
 namespace Cryptid {
     public static class CandidateDelegate {
@@ -23,46 +21,55 @@ namespace Cryptid {
         private const int ExtIDsLength = 102; //2 byte header per ExtID + 2 sha256 hash + 32 byte random string
 
         /// <summary>
-        /// Generates the ExtIDs for a packed candidate
+        ///     Generates the ExtIDs for a packed candidate
         /// </summary>
         /// <param name="packedCandidate">The packed candidate to generate for</param>
         /// <returns>An array of ExtIDs</returns>
         public static byte[][] GenerateExtIDs(byte[] packedCandidate) {
-            return new[] { Crypto.SHA256d(packedCandidate), Crypto.CRYPTID_SALT_HASH, Encoding.UTF8.GetBytes(Strings.RandomString(32)) };
-        } 
+            return new[] {
+                Crypto.Sha256D(packedCandidate), Crypto.CryptidSaltHash,
+                Encoding.UTF8.GetBytes(Strings.RandomString(32))
+            };
+        }
 
         /// <summary>
-        /// Enroll a candidate a to Factom. A new chain is created and the candidate data is packed and split into entries for that chain.
-        /// This operation is irreversable.
+        ///     Enroll a candidate a to Factom. A new chain is created and the candidate data is packed and split into entries for
+        ///     that chain.
+        ///     This operation is irreversable.
         /// </summary>
         /// <param name="c">The candidate to enroll</param>
         /// <param name="password">The password provided by the candidate</param>
         /// <param name="privKey">The private key to pack the data with</param>
         /// <returns>The chain ID of the enrolled candidate</returns>
         public static byte[] EnrollCandidate(Candidate c, string password, RSAParameters privKey) {
-            byte[] packed = Pack(c, password, privKey);
+            var packed = Pack(c, password, privKey);
+            var hexPacked = Encoding.UTF8.GetBytes(Convert.ToBase64String(packed));
 
-            Entry entryApi = new Entry();
-            Chain chainApi = new Chain();
+            var entryApi = new Entry();
+            var chainApi = new Chain();
 
             Chain.ChainType factomChain = null;
 
-            foreach (DataSegment segment in DataSegment.Segmentize(packed, firstSegmentLength: DataSegment.DefaultMaxSegmentLength - ExtIDsLength)) {
-                byte[] dataToUpload = segment.Pack();
+            foreach (
+                var segment in
+                    DataSegment.Segmentize(hexPacked,
+                        firstSegmentLength: DataSegment.DefaultMaxSegmentLength - ExtIDsLength)) {
+                var dataToUpload = segment.Pack();
                 var factomEntry = entryApi.NewEntry(dataToUpload, null, null);
                 if (segment.CurrentSegment == 0) {
                     //New chain
                     factomEntry.ExtIDs = GenerateExtIDs(packed);
-                    factomChain = chainApi.NewChain(factomEntry);               
+                    factomChain = chainApi.NewChain(factomEntry);
                     chainApi.CommitChain(factomChain, FactomWallet); // Wallet Name
-                    System.Threading.Thread.Sleep(10100);
+                    Thread.Sleep(10100);
                     chainApi.RevealChain(factomChain);
                 }
                 else {
                     //new entry
-                    factomEntry.ChainID = factomChain.ChainId;
+                    Debug.Assert(factomChain != null, "factomChain != null");
+                    factomEntry.ChainId = factomChain.ChainId;
                     entryApi.CommitEntry(factomEntry, FactomWallet);
-                    System.Threading.Thread.Sleep(10100);
+                    Thread.Sleep(10100);
                     entryApi.RevealEntry(factomEntry);
                 }
             }
@@ -71,42 +78,45 @@ namespace Cryptid {
         }
 
         /// <summary>
-        /// - Verifies that we are allowed to update this chain
-        /// - Enrolls a new candidate chain with a CandidateOldVersionRecord referencing the old chain
-        /// - Adds a OldVersionRecord to the old chain referencing the new chain
-        /// - Adds a ChainUpdateRecord to the chain requesting update, forwarding it to the new chain.
-        /// This operation is irreversable.
+        ///     - Verifies that we are allowed to update this chain
+        ///     - Enrolls a new candidate chain with a CandidateOldVersionRecord referencing the old chain
+        ///     - Adds a OldVersionRecord to the old chain referencing the new chain
+        ///     - Adds a ChainUpdateRecord to the chain requesting update, forwarding it to the new chain.
+        ///     This operation is irreversable.
         /// </summary>
         /// <param name="newCandidate">The updated candidate information</param>
         /// <param name="password">The password provided by the candidate</param>
+        /// <param name="fp">The fingerprint to verify against</param>
         /// <param name="privKey">The private key to pack the data with</param>
         /// <param name="chainToUpdate">The chain ID of the chain to be updated</param>
         /// <returns>The chain ID pointing to the updated candidate</returns>
-        public static byte[] UpdateCandidate(Candidate newCandidate, string password, Fingerprint fp, RSAParameters privKey, byte[] chainToUpdate) {
-            if (FullVerifyFromChain(chainToUpdate, password, fp, privKey) < 50f) throw new Exception("Access confidence to low to update candidate.");
-            
-            byte[] newChainId = EnrollCandidate(newCandidate, password, privKey);
+        public static byte[] UpdateCandidate(Candidate newCandidate, string password, Fingerprint fp,
+            RSAParameters privKey, byte[] chainToUpdate) {
+            if (FullVerifyFromChain(chainToUpdate, password, fp, privKey) < 50f)
+                throw new Exception("Access confidence to low to update candidate.");
 
-            CandidateOldVersionRecord ovr = new CandidateOldVersionRecord(chainToUpdate, newChainId);
-            CandidateUpdatedRecord cur = new CandidateUpdatedRecord(chainToUpdate, newChainId);
+            var newChainId = EnrollCandidate(newCandidate, password, privKey);
 
-            Entry entryApi = new Entry();
-            EntryData oldRecordEntry = entryApi.NewEntry(ovr.Pack(privKey), null, Arrays.ByteArrayToHex(newChainId));
-            EntryData newRecordEntry = entryApi.NewEntry(cur.Pack(privKey), null, Arrays.ByteArrayToHex(chainToUpdate));
+            var ovr = new CandidateOldVersionRecord(chainToUpdate, newChainId);
+            var cur = new CandidateUpdatedRecord(chainToUpdate, newChainId);
+
+            var entryApi = new Entry();
+            var oldRecordEntry = entryApi.NewEntry(ovr.Pack(privKey), null, Arrays.ByteArrayToHex(newChainId));
+            var newRecordEntry = entryApi.NewEntry(cur.Pack(privKey), null, Arrays.ByteArrayToHex(chainToUpdate));
 
             entryApi.CommitEntry(oldRecordEntry, FactomWallet);
             entryApi.CommitEntry(newRecordEntry, FactomWallet);
 
-            System.Threading.Thread.Sleep(10100);
+            Thread.Sleep(10100);
 
             entryApi.RevealEntry(oldRecordEntry);
             entryApi.RevealEntry(newRecordEntry);
 
-            return newChainId;;
+            return newChainId;
         }
 
         /// <summary>
-        /// Fully verify a user from a chain. Full verify includes fingerprint, password and signature check
+        ///     Fully verify a user from a chain. Full verify includes fingerprint, password and signature check
         /// </summary>
         /// <param name="chainId">The id of the chain to verify</param>
         /// <param name="password">The candidates password</param>
@@ -119,66 +129,67 @@ namespace Cryptid {
         }
 
         /// <summary>
-        /// Gets the candidates packed bytes from the specified chain
+        ///     Gets the candidates packed bytes from the specified chain
         /// </summary>
         /// <param name="chainId">The id of the chain to get the candidate data from</param>
         /// <returns>The packed candidate data</returns>
         public static byte[] GetPackedCandidate(byte[] chainId) {
-            Entry entryApi = new Entry();
+            var entryApi = new Entry();
             var entries = entryApi.GetAllChainEntries(chainId);
             var entriesData = entries.Select(e => entryApi.GetEntryData(e).Content).ToList();
-            List<DataSegment> segments = new List<DataSegment>();
-            foreach (byte[] data in entriesData) {
-                if(Bytes.StartsWith(data, DataSegment.DataSegmentPrefix)) segments.Add(DataSegment.Unpack(data));
+            var segments = new List<DataSegment>();
+            foreach (var data in entriesData) {
+                if (Bytes.StartsWith(data, DataSegment.DataSegmentPrefix)) segments.Add(DataSegment.Unpack(data));
             }
             return DataSegment.Desegmentize(segments);
         }
 
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="chainId"></param>
-        /// <param name="publicKey">The public key to verify the data with</param>
+        /// <param name="pubKey">The public key to verify the data with</param>
         /// <returns></returns>
         public static List<CandidateOldVersionRecord> GetOldVersionRecords(byte[] chainId, RSAParameters pubKey) {
-            Entry entryApi = new Entry();
+            var entryApi = new Entry();
             var entries = entryApi.GetAllChainEntries(chainId);
             var entriesData = entries.Select(e => entryApi.GetEntryData(e).Content).ToList();
-            List<CandidateOldVersionRecord> records = new List<CandidateOldVersionRecord>();
-            foreach (byte[] data in entriesData) {
-                if (Bytes.StartsWith(data, CandidateOldVersionRecord.CandidateOldVersionPrefix)) records.Add(CandidateOldVersionRecord.Unpack(data, pubKey));
+            var records = new List<CandidateOldVersionRecord>();
+            foreach (var data in entriesData) {
+                if (Bytes.StartsWith(data, CandidateOldVersionRecord.CandidateOldVersionPrefix))
+                    records.Add(CandidateOldVersionRecord.Unpack(data, pubKey));
             }
             return records;
         }
 
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="chainId"></param>
-        /// <param name="publicKey">The public key to verify the data with</param>
+        /// <param name="pubKey">The public key to verify the data with</param>
         /// <returns></returns>
         public static List<CandidateUpdatedRecord> GetCandidateUpdatedRecords(byte[] chainId, RSAParameters pubKey) {
-            Entry entryApi = new Entry();
+            var entryApi = new Entry();
             var entries = entryApi.GetAllChainEntries(chainId);
             var entriesData = entries.Select(e => entryApi.GetEntryData(e).Content).ToList();
-            List<CandidateUpdatedRecord> records = new List<CandidateUpdatedRecord>();
-            foreach (byte[] data in entriesData) {
-                if (Bytes.StartsWith(data, CandidateUpdatedRecord.UpdatedRecordPrefix)) records.Add(CandidateUpdatedRecord.Unpack(data, pubKey));
+            var records = new List<CandidateUpdatedRecord>();
+            foreach (var data in entriesData) {
+                if (Bytes.StartsWith(data, CandidateUpdatedRecord.UpdatedRecordPrefix))
+                    records.Add(CandidateUpdatedRecord.Unpack(data, pubKey));
             }
             return records;
         }
 
         /// <summary>
-        /// Get all the chains used by a candidate (Follows OldVersionRecords and UpdatedRecords)
+        ///     Get all the chains used by a candidate (Follows OldVersionRecords and UpdatedRecords)
         /// </summary>
         /// <param name="chainId">The id of a chain owned by the candidate</param>
+        /// <param name="pubKey">The public key to verify the data with</param>
         /// <returns>A list of all the chains owned by a candidate</returns>
         public static List<byte[]> GetCandidateChainHistory(byte chainId, RSAParameters pubKey) {
-            List<IRecord> toSort = new List<IRecord>();
-            List<byte[]> ret = new List<byte[]>();
+            var toSort = new List<IRecord>();
+            var ret = new List<byte[]>();
 
             while (toSort.Count > 0) {
-                IRecord curr = toSort[0];
+                var curr = toSort[0];
                 if (curr is CandidateUpdatedRecord) {
                     var cur = (CandidateUpdatedRecord) curr;
                     if (!ret.Any(x => x.SequenceEqual(cur.PreviousChain))) {
@@ -192,7 +203,8 @@ namespace Cryptid {
                         toSort.AddRange(GetCandidateUpdatedRecords(cur.CurrentChain, pubKey));
                         toSort.AddRange(GetOldVersionRecords(cur.CurrentChain, pubKey));
                     }
-                } else if (curr is CandidateOldVersionRecord) {
+                }
+                else if (curr is CandidateOldVersionRecord) {
                     var ovr = (CandidateOldVersionRecord) curr;
                     if (!ret.Any(x => x.SequenceEqual(ovr.NextChain))) {
                         ret.Add(ovr.NextChain);
@@ -213,7 +225,7 @@ namespace Cryptid {
         }
 
         /// <summary>
-        /// Pack a candidate object into storable data
+        ///     Pack a candidate object into storable data
         /// </summary>
         /// <param name="c">The candidate object to pack</param>
         /// <param name="password">The password provided by the candidate</param>
@@ -239,7 +251,7 @@ namespace Cryptid {
         }
 
         /// <summary>
-        /// Unpack a candidate object from storable data
+        ///     Unpack a candidate object from storable data
         /// </summary>
         /// <param name="packed">The packed candidate data</param>
         /// <param name="password">The password provided by the candidate</param>
@@ -266,7 +278,7 @@ namespace Cryptid {
         }
 
         /// <summary>
-        /// Verify the signature of packed candidate data
+        ///     Verify the signature of packed candidate data
         /// </summary>
         /// <param name="packed">The packed candidate data</param>
         /// <param name="pubKey">The public key to verify with</param>
@@ -278,18 +290,18 @@ namespace Cryptid {
         }
 
         /// <summary>
-        /// Verify a candidates fingerprint
+        ///     Verify a candidates fingerprint
         /// </summary>
         /// <param name="c">The candidate to compare against</param>
         /// <param name="fp">The provided fingerprint</param>
         /// <returns>A float from 0 to 100 which represents the strength of the fingerprint match. Higher is better.</returns>
         public static float VerifyFingerprint(Candidate c, Fingerprint fp) {
-            AfisEngine afis = new AfisEngine();
+            var afis = new AfisEngine();
 
-            Person test = new Person(fp);
+            var test = new Person(fp);
             afis.Extract(test);
 
-            Person candidate = new Person(c.Fingerprint);
+            var candidate = new Person(c.Fingerprint);
 
             return afis.Verify(candidate, test);
         }

@@ -1,22 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Runtime.Serialization.Json;
+﻿#region
+
+using System;
 using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Cryptid;
+using CryptidDemo.Properties;
 using Newtonsoft.Json;
+using Keys = Cryptid.Utils.Keys;
 
-namespace cryptidDemo {
+#endregion
+
+namespace CryptidDemo {
     public partial class CandidateInfoForm : Form {
-
-        private readonly RSAParameters PublicKey = Cryptid.Utils.Keys.PublicKey("public.xml");
+        private readonly RSAParameters _publicKey = Keys.PublicKey("public.xml");
 
         private Candidate _c;
 
@@ -25,14 +21,15 @@ namespace cryptidDemo {
         }
 
         private void CandidateInfoForm_Load(object sender, EventArgs e) {
-
         }
 
         public void LoadCandidateInfo(byte[] packed, string pasword) {
             try {
-                _c = CandidateDelegate.Unpack(packed, pasword, PublicKey);
-            } catch (Exception ex) {
-                MessageBox.Show("Couldn't verify provided data.");
+                _c = CandidateDelegate.Unpack(packed, pasword, _publicKey);
+            }
+                // ReSharper disable once UnusedVariable
+            catch (Exception ex) {
+                MessageBox.Show(Resources.NOT_VERIFY_ID_ERROR);
                 Close();
                 return;
             }

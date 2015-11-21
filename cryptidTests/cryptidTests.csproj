@@ -6,8 +6,8 @@
     <ProjectGuid>{A86C3F9E-3082-41B0-9F04-4B45D47CAE54}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>cryptidTests</RootNamespace>
-    <AssemblyName>cryptidTests</AssemblyName>
+    <RootNamespace>CryptidTests</RootNamespace>
+    <AssemblyName>CryptidTests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -33,6 +33,9 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>favicon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="MsgPack, Version=0.6.0.0, Culture=neutral, PublicKeyToken=a2625990d5dc0167, processorArchitecture=MSIL">
@@ -71,9 +74,9 @@
     <Compile Include="CandidateTest.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\cryptid\cryptid.csproj">
+    <ProjectReference Include="..\cryptid\Cryptid.csproj">
       <Project>{DC90B6F3-FDB0-4766-AFA9-C89C82A4605F}</Project>
-      <Name>cryptid</Name>
+      <Name>Cryptid</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -81,6 +84,7 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <Content Include="favicon.ico" />
     <Content Include="testdata\fingerprint-test.bmp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
