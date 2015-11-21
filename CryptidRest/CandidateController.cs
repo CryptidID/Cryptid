@@ -5,8 +5,6 @@ using System.Drawing;
 using System.IO;
 using System.Net;
 using System.Net.Http;
-using System.Web;
-using System.Web.Hosting;
 using System.Web.Http;
 using Cryptid;
 using Cryptid.Utils;
@@ -17,7 +15,7 @@ using SourceAFIS.Simple;
 namespace CryptidRest.Controllers {
     [RoutePrefix("api/candidate")]
     public class CandidateController : ApiController {
-        private static readonly string PublicKeyPath = HostingEnvironment.MapPath("~/App_Data/public.xml");
+        private static readonly string PublicKeyPath = "public.xml";
 
         [Route("FullVerifyFromChain/{chainIdBase64}/{password}/{fpImageBase64}")]
         [HttpPost]
