@@ -2,6 +2,7 @@
 
 using System;
 using System.Text;
+using cryptid.Factom.API;
 using Cryptid.Factom.API;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
