@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using Cryptid.Utils;
 
 #endregion
 
@@ -39,13 +40,13 @@ namespace Cryptid {
 
         public static readonly byte[] CryptidSaltHash = SHA256.Create().ComputeHash(CryptidSalt);
 
-        internal static byte[] AES_Encrypt(byte[] data, string password) {
+        public static byte[] AES_Encrypt(byte[] data, string password) {
             var passwordBytes = Encoding.UTF8.GetBytes(password);
             passwordBytes = SHA256.Create().ComputeHash(passwordBytes);
             return AES_Encrypt(data, passwordBytes);
         }
 
-        internal static byte[] AES_Decrypt(byte[] data, string password) {
+        public static byte[] AES_Decrypt(byte[] data, string password) {
             var passwordBytes = Encoding.UTF8.GetBytes(password);
             passwordBytes = SHA256.Create().ComputeHash(passwordBytes);
             return AES_Decrypt(data, passwordBytes);
