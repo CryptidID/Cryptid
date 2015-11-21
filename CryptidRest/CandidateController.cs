@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Cryptid;
 using Cryptid.Utils;
+using Newtonsoft.Json;
 using SourceAFIS.Simple;
 
 #endregion
@@ -15,6 +16,14 @@ using SourceAFIS.Simple;
 namespace CryptidRest.Controllers {
     [RoutePrefix("api/candidate")]
     public class CandidateController : ApiController {
+        private class ApiError {
+            public ApiError(string msg) {
+                Error = msg;
+            }
+
+            public string Error { get; set; }
+        }
+
         private static readonly string PublicKeyPath = "public.xml";
 
         [Route("FullVerifyFromChain/{chainIdBase64}/{password}/{fpImageBase64}")]
@@ -29,7 +38,7 @@ namespace CryptidRest.Controllers {
                 }
             } catch (Exception e) {
                 var resp = new HttpResponseMessage(HttpStatusCode.InternalServerError) {
-                    Content = new StringContent(e.Message),
+                    Content = new StringContent(JsonConvert.SerializeObject(new ApiError(e.Message))),
                     ReasonPhrase = "Internal Error Occured"
                 };
                 throw new HttpResponseException(resp);
@@ -44,7 +53,7 @@ namespace CryptidRest.Controllers {
                 return CandidateDelegate.Unpack(packed, password, Keys.PublicKey(PublicKeyPath));
             } catch (Exception e) {
                 var resp = new HttpResponseMessage(HttpStatusCode.InternalServerError) {
-                    Content = new StringContent(e.Message),
+                    Content = new StringContent(JsonConvert.SerializeObject(new ApiError(e.Message))),
                     ReasonPhrase = "Internal Error Occured"
                 };
                 throw new HttpResponseException(resp);
@@ -59,7 +68,7 @@ namespace CryptidRest.Controllers {
                     Keys.PublicKey(PublicKeyPath));
             } catch (Exception e) {
                 var resp = new HttpResponseMessage(HttpStatusCode.InternalServerError) {
-                    Content = new StringContent(e.Message),
+                    Content = new StringContent(JsonConvert.SerializeObject(new ApiError(e.Message))),
                     ReasonPhrase = "Internal Error Occured"
                 };
                 throw new HttpResponseException(resp);
@@ -74,7 +83,7 @@ namespace CryptidRest.Controllers {
                     Keys.PublicKey(PublicKeyPath));
             } catch (Exception e) {
                 var resp = new HttpResponseMessage(HttpStatusCode.InternalServerError) {
-                    Content = new StringContent(e.Message),
+                    Content = new StringContent(JsonConvert.SerializeObject(new ApiError(e.Message))),
                     ReasonPhrase = "Internal Error Occured"
                 };
                 throw new HttpResponseException(resp);
