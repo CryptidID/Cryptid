@@ -59,6 +59,8 @@
             this.sigOutput = new System.Windows.Forms.TextBox();
             this.tabPage4 = new System.Windows.Forms.TabPage();
             this.fpTemplateOutput = new System.Windows.Forms.TextBox();
+            this.tabPage6 = new System.Windows.Forms.TabPage();
+            this.chainId = new System.Windows.Forms.TextBox();
             this.tabPage5 = new System.Windows.Forms.TabPage();
             this.loadBlockChain = new System.Windows.Forms.Button();
             this.loadCryptidIdButton = new System.Windows.Forms.Button();
@@ -76,8 +78,6 @@
             this.label15 = new System.Windows.Forms.Label();
             this.password = new System.Windows.Forms.TextBox();
             this.cidSaveDialog = new System.Windows.Forms.SaveFileDialog();
-            this.tabPage6 = new System.Windows.Forms.TabPage();
-            this.chainId = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.headshotBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.feet)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.inches)).BeginInit();
@@ -86,9 +86,9 @@
             this.tabPage2.SuspendLayout();
             this.tabPage3.SuspendLayout();
             this.tabPage4.SuspendLayout();
+            this.tabPage6.SuspendLayout();
             this.tabPage5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.fpBox)).BeginInit();
-            this.tabPage6.SuspendLayout();
             this.SuspendLayout();
             // 
             // headshotBox
@@ -410,6 +410,24 @@
             this.fpTemplateOutput.Size = new System.Drawing.Size(513, 280);
             this.fpTemplateOutput.TabIndex = 1;
             // 
+            // tabPage6
+            // 
+            this.tabPage6.Controls.Add(this.chainId);
+            this.tabPage6.Location = new System.Drawing.Point(4, 22);
+            this.tabPage6.Name = "tabPage6";
+            this.tabPage6.Size = new System.Drawing.Size(525, 288);
+            this.tabPage6.TabIndex = 5;
+            this.tabPage6.Text = "Chain ID";
+            this.tabPage6.UseVisualStyleBackColor = true;
+            // 
+            // chainId
+            // 
+            this.chainId.Location = new System.Drawing.Point(3, 3);
+            this.chainId.Multiline = true;
+            this.chainId.Name = "chainId";
+            this.chainId.Size = new System.Drawing.Size(519, 280);
+            this.chainId.TabIndex = 2;
+            // 
             // tabPage5
             // 
             this.tabPage5.Controls.Add(this.loadBlockChain);
@@ -432,6 +450,7 @@
             this.loadBlockChain.TabIndex = 4;
             this.loadBlockChain.Text = "Load From Blockchain";
             this.loadBlockChain.UseVisualStyleBackColor = true;
+            this.loadBlockChain.Click += new System.EventHandler(this.loadBlockChain_Click);
             // 
             // loadCryptidIdButton
             // 
@@ -569,24 +588,6 @@
             this.password.UseSystemPasswordChar = true;
             this.password.TextChanged += new System.EventHandler(this.password_TextChanged);
             // 
-            // tabPage6
-            // 
-            this.tabPage6.Controls.Add(this.chainId);
-            this.tabPage6.Location = new System.Drawing.Point(4, 22);
-            this.tabPage6.Name = "tabPage6";
-            this.tabPage6.Size = new System.Drawing.Size(525, 288);
-            this.tabPage6.TabIndex = 5;
-            this.tabPage6.Text = "Chain ID";
-            this.tabPage6.UseVisualStyleBackColor = true;
-            // 
-            // chainId
-            // 
-            this.chainId.Location = new System.Drawing.Point(3, 3);
-            this.chainId.Multiline = true;
-            this.chainId.Name = "chainId";
-            this.chainId.Size = new System.Drawing.Size(519, 280);
-            this.chainId.TabIndex = 2;
-            // 
             // GeneratorForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -645,10 +646,10 @@
             this.tabPage3.PerformLayout();
             this.tabPage4.ResumeLayout(false);
             this.tabPage4.PerformLayout();
-            this.tabPage5.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.fpBox)).EndInit();
             this.tabPage6.ResumeLayout(false);
             this.tabPage6.PerformLayout();
+            this.tabPage5.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.fpBox)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
