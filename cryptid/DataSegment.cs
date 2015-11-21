@@ -60,14 +60,14 @@ namespace cryptid {
         /// <param name="currSegment">The index of the current segment</param>
         /// <param name="maxSegments">The number of segments in this segments sequence</param>
         public DataSegment(byte[] data, ushort currSegment, ushort maxSegments, int maxSegmentLength = DefaultMaxSegmentLength) {
-            if(data.Length > MaxDataLength) throw new Exception("Attempted to pack " + data.Length + " bytes in a segment that can only hold " + MaxDataLength);
+            MaxSegmentLength = maxSegmentLength;
+            MaxDataLength = GetMaxDataLength(maxSegmentLength);
+
+            if (data.Length > MaxDataLength) throw new Exception("Attempted to pack " + data.Length + " bytes in a segment that can only hold " + MaxDataLength);
 
             CurrentSegment = currSegment;
             MaxSegments = maxSegments;
             Data = data;
-
-            MaxSegmentLength = maxSegmentLength;
-            MaxDataLength = GetMaxDataLength(maxSegmentLength);
         }
 
 

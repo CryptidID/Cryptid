@@ -46,6 +46,9 @@ namespace cryptid.Factom.API
             return c;
         }
 
+        /// <summary>
+        /// Used to send json object as POST data
+        /// </summary>
         private class WalletCommit  {
             public string Message { get; set; }
         }
@@ -53,9 +56,9 @@ namespace cryptid.Factom.API
         /// <summary>
         /// First method to add a chain to factom.
         /// </summary>
-        /// <param name="c">ChainType</param>
+        /// <param name="c">Chain to be added</param>
         /// <param name="name">Name of Entry  Credit wallet</param>
-        /// <returns>ChainID</returns>
+        /// <returns>ChainID of chain added</returns>
         public byte[] CommitChain(ChainType c, string name) {
             List<byte> byteList = new List<byte>();
 
@@ -110,6 +113,9 @@ namespace cryptid.Factom.API
             return Entries.ChainIdOfFirstEntry(c.FirstEntry);
         }
 
+        /// <summary>
+        /// Used to serialize json as POST data
+        /// </summary>
         private class Reveal {
             public string Entry { get; set; }
         }
@@ -117,8 +123,8 @@ namespace cryptid.Factom.API
         /// <summary>
         /// Second step in committing a new chain. Only run this if CommitChain was successful.
         /// </summary>
-        /// <param name="c">ChainType</param>
-        /// <returns></returns>
+        /// <param name="c">Chain to be added</param>
+        /// <returns>Boolean true/false for success/failure</returns>
         public bool RevealChain(ChainType c) {
             Reveal r = new Reveal();
             var b = Entries.MarshalBinary(c.FirstEntry);
