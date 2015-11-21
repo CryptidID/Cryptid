@@ -7,6 +7,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
+using cryptid.Factom.API;
 using Cryptid;
 using Cryptid.Factom.API;
 using Cryptid.Utils;

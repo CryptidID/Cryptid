@@ -5,6 +5,7 @@ using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Cryptid.Factom.API;
 using Cryptid.Utils;
 using Newtonsoft.Json;
 using RestSharp;
@@ -42,7 +43,7 @@ namespace cryptid.Factom.API
                 }
             }
             c.ChainId = SHA256.Create().ComputeHash(chainHash.ToArray());
-            c.FirstEntry.ChainID = c.ChainId;
+            c.FirstEntry.ChainId = c.ChainId;
             return c;
         }
 
