@@ -1,20 +1,22 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Drawing;
-using System.IO;
 using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
 using Cryptid;
+using Cryptid.Utils;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SourceAFIS.Simple;
 
-namespace Cryptid.Tests {
+#endregion
+
+namespace CryptidTests {
     [TestClass]
     public class CandidateTest {
+        private const string Password = "-b{EC7R:mD+x+RFm";
 
-        private const String Password = "-b{EC7R:mD+x+RFm";
-
-        private readonly RSAParameters PrivateKey = Utils.Keys.PrivateKey("testdata/public.xml");
-        private readonly RSAParameters PublicKey = Utils.Keys.PublicKey("testdata/public.xml");
+        private readonly RSAParameters _privateKey = Keys.PrivateKey("testdata/public.xml");
+        private readonly RSAParameters _publicKey = Keys.PublicKey("testdata/public.xml");
 
         private Candidate TestCandidate {
             get {
@@ -56,9 +58,9 @@ namespace Cryptid.Tests {
         [DeploymentItem(@"testdata/private.xml", "testdata")]
         [DeploymentItem(@"testdata/public.xml", "testdata")]
         public void TestPackUnpack() {
-            Candidate c = TestCandidate;
-            byte[] packed = CandidateDelegate.Pack(c, Password, PrivateKey);
-            Assert.AreEqual(c.Dcs, CandidateDelegate.Unpack(packed, Password, PublicKey).Dcs);
+            var c = TestCandidate;
+            var packed = CandidateDelegate.Pack(c, Password, _privateKey);
+            Assert.AreEqual(c.Dcs, CandidateDelegate.Unpack(packed, Password, _publicKey).Dcs);
         }
     }
 }

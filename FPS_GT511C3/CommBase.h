@@ -7,13 +7,14 @@ inline void ui_polling()
 {
 	MSG msg;
 
-	while ( PeekMessage(&msg,NULL,0,0,PM_REMOVE)) 
+	while (PeekMessage(&msg,NULL, 0, 0,PM_REMOVE))
 	{
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
 }
-void debug_printf(char *fmt,...);
+
+void debug_printf(char* fmt,...);
 
 //////////////////////////////////////////////////////////////////////////
 extern double comm_percent;
@@ -29,26 +30,28 @@ void comm_close();
 /*     USB Communication Definitions                                    */
 /************************************************************************/
 //////////////////////////////////////////////////////////////////////////
-typedef struct _SCSI_PASS_THROUGH_DIRECT {
-	USHORT  Length;
-	UCHAR  ScsiStatus;
-	UCHAR  PathId;
-	UCHAR  TargetId;
-	UCHAR  Lun;
-	UCHAR  CdbLength;
-	UCHAR  SenseInfoLength;
-	UCHAR  DataIn;
-	ULONG  DataTransferLength;
-	ULONG  TimeOutValue;
-	PVOID  DataBuffer;
-	ULONG  SenseInfoOffset;
-	UCHAR  Cdb[16];
-}SCSI_PASS_THROUGH_DIRECT, *PSCSI_PASS_THROUGH_DIRECT;
+typedef struct _SCSI_PASS_THROUGH_DIRECT
+{
+	USHORT Length;
+	UCHAR ScsiStatus;
+	UCHAR PathId;
+	UCHAR TargetId;
+	UCHAR Lun;
+	UCHAR CdbLength;
+	UCHAR SenseInfoLength;
+	UCHAR DataIn;
+	ULONG DataTransferLength;
+	ULONG TimeOutValue;
+	PVOID DataBuffer;
+	ULONG SenseInfoOffset;
+	UCHAR Cdb[16];
+} SCSI_PASS_THROUGH_DIRECT, *PSCSI_PASS_THROUGH_DIRECT;
 
-typedef struct _SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER {
-    SCSI_PASS_THROUGH_DIRECT sptd;
-    ULONG             Filler;      // realign buffer to double word boundary
-    UCHAR             ucSenseBuf[32];
+typedef struct _SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER
+{
+	SCSI_PASS_THROUGH_DIRECT sptd;
+	ULONG Filler; // realign buffer to double word boundary
+	UCHAR ucSenseBuf[32];
 } SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER, *PSCSI_PASS_THROUGH_DIRECT_WITH_BUFFER;
 
 #define CDB10GENERIC_LENGTH                  10
@@ -63,19 +66,19 @@ class CCommUSB
 public:
 	CCommUSB();
 	virtual ~CCommUSB();
-	
+
 	BOOL Open();
 	void Close();
-	int SendData(BYTE *pBuf, int nSize, DWORD dwTimeOut);
-	int RecvData(BYTE *pBuf, int nSize, DWORD dwTimeOut);
-	
+	int SendData(BYTE* pBuf, int nSize, DWORD dwTimeOut);
+	int RecvData(BYTE* pBuf, int nSize, DWORD dwTimeOut);
+
 private:
-	BOOL	SCSI_Open();
-	void	SCSI_Close();
-	int		SCSI_Operation(BYTE *pBuf, int nSize, DWORD dwTimeOut, BOOL bRead);
-	int		OperationInternal(BYTE *pBuf, int nSize, DWORD dwTimeOut, BOOL bRead);
-	
-	HANDLE	m_hDevice;
+	BOOL SCSI_Open();
+	void SCSI_Close();
+	int SCSI_Operation(BYTE* pBuf, int nSize, DWORD dwTimeOut, BOOL bRead);
+	int OperationInternal(BYTE* pBuf, int nSize, DWORD dwTimeOut, BOOL bRead);
+
+	HANDLE m_hDevice;
 };
 
 enum
@@ -83,3 +86,4 @@ enum
 	COMM_MODE_SERIAL,
 	COMM_MODE_USB,
 };
+

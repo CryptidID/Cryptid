@@ -1,4 +1,4 @@
-﻿namespace cryptidDemo {
+﻿namespace CryptidDemo {
     partial class ScanFingerForm {
         /// <summary>
         /// Required designer variable.

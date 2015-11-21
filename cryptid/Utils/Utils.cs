@@ -1,4 +1,6 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -6,7 +8,9 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Windows.Forms;
-using cryptid.Factom.API;
+using Cryptid.Factom.API;
+
+#endregion
 
 namespace Cryptid.Utils {
     public static class Keys {
@@ -94,9 +98,8 @@ namespace Cryptid.Utils {
         /// <param name="b1">Byte[] to be compared</param>
         /// <returns>True if equal</returns>
         public static bool Equality(byte[] a1, byte[] b1) {
-            int i;
             if (a1.Length == b1.Length) {
-                i = 0;
+                var i = 0;
                 while (i < a1.Length && (a1[i] == b1[i])) //Earlier it was a1[i]!=b1[i]
                 {
                     i++;
@@ -120,11 +123,9 @@ namespace Cryptid.Utils {
 
     public static class Times {
         public static byte[] MilliTime() {
-// TODO Make private
-            var byteList = new List<byte>();
-            var UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            var unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
             // 6 Byte millisec unix time
-            var unixMilliLong = (long) (DateTime.UtcNow - UnixEpoch).TotalMilliseconds;
+            var unixMilliLong = (long) (DateTime.UtcNow - unixEpoch).TotalMilliseconds;
             var unixBytes = Bytes.CheckEndian(BitConverter.GetBytes(unixMilliLong));
             unixBytes = Arrays.CopyOfRange(unixBytes, 2, unixBytes.Length);
             return unixBytes;
@@ -133,8 +134,7 @@ namespace Cryptid.Utils {
 
     public static class Entries {
         public static byte[] HashEntry(DataStructs.EntryData entry) {
-            //TODO: Make private, public for tests
-            var data = MarshalBinary(entry); // TODO: Check for error
+            var data = MarshalBinary(entry);
             var h1 = SHA512.Create().ComputeHash(data);
             var h2 = new byte[h1.Length + data.Length];
             h1.CopyTo(h2, 0);
@@ -144,17 +144,16 @@ namespace Cryptid.Utils {
         }
 
         public static byte[] ChainIdOfFirstEntry(DataStructs.EntryData entry) {
-            List<byte> byteList = new List<byte>();
+            var byteList = new List<byte>();
             foreach (var ext in entry.ExtIDs) {
                 byteList.AddRange(SHA256.Create().ComputeHash(ext));
             }
-            byte[] b = byteList.ToArray();
+            var b = byteList.ToArray();
             var chainInfo = SHA256.Create().ComputeHash(b);
             return chainInfo;
         }
 
         public static byte[] MarshalBinary(DataStructs.EntryData e) {
-            //TODO: Make private
             var entryBStruct = new List<byte>();
             var idsSize = MarshalExtIDsSize(e);
 
@@ -165,7 +164,7 @@ namespace Cryptid.Utils {
             byte version = 0;
             entryBStruct.Add(version);
             // 32 byte chainid
-            var chain = e.ChainID;
+            var chain = e.ChainId;
             entryBStruct.AddRange(chain);
             // Ext Ids Size
             entryBStruct.AddRange(idsSize);
@@ -185,14 +184,14 @@ namespace Cryptid.Utils {
 
         private static byte[] MarshalExtIDsBinary(DataStructs.EntryData e) {
             var byteList = new List<byte>();
-            foreach (var exID in e.ExtIDs) {
+            foreach (var exId in e.ExtIDs) {
                 // 2 byte size of ExtID
-                var extLen = Convert.ToInt16(exID.Length);
+                var extLen = Convert.ToInt16(exId.Length);
                 var bytes = BitConverter.GetBytes(extLen);
                 bytes = Bytes.CheckEndian(bytes);
                 byteList.AddRange(bytes);
-                var extIDStr = exID;
-                byteList.AddRange(extIDStr);
+                var extIdStr = exId;
+                byteList.AddRange(extIdStr);
             }
             return byteList.ToArray();
         }
@@ -228,7 +227,7 @@ namespace Cryptid.Utils {
             var len = entryBinary.Length - 35;
             if (len > 10240) {
                 //Error, cannot be larger than 10kb
-                throw new ArgumentException("Parameter cannot exceed 10kb of content", "entry");
+                throw new ArgumentException("Parameter cannot exceed 10kb of content", nameof(entry));
             }
             var r = len%1024;
             var n = (sbyte) (len/1024); // Capacity of Entry Payment
@@ -244,6 +243,13 @@ namespace Cryptid.Utils {
     }
 
     public static class Strings {
+        private static readonly byte[,] ByteLookup = {
+            // low nibble
+            {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f},
+            // high nibble
+            {0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x70, 0x80, 0x90, 0xa0, 0xb0, 0xc0, 0xd0, 0xe0, 0xf0}
+        };
+
         public static string RandomString(int length) {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             var random = new Random();
@@ -323,13 +329,6 @@ namespace Cryptid.Utils {
                     throw new FormatException("Unrecognized hex char " + c);
             }
         }
-
-        private static readonly byte[,] ByteLookup = {
-            // low nibble
-            {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f},
-            // high nibble
-            {0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x70, 0x80, 0x90, 0xa0, 0xb0, 0xc0, 0xd0, 0xe0, 0xf0}
-        };
     }
 
     public static class ControlExtensions {
@@ -337,14 +336,12 @@ namespace Cryptid.Utils {
             this Control @this,
             Expression<Func<TResult>> property,
             TResult value) {
-            var propertyInfo = (property.Body as MemberExpression).Member
+            var propertyInfo = (property.Body as MemberExpression)?.Member
                 as PropertyInfo;
 
-            if (propertyInfo == null ||
-                !@this.GetType().IsSubclassOf(propertyInfo.ReflectedType) ||
-                @this.GetType().GetProperty(
-                    propertyInfo.Name,
-                    propertyInfo.PropertyType) == null) {
+            if (propertyInfo?.ReflectedType != null &&
+                (propertyInfo == null || !@this.GetType().IsSubclassOf(propertyInfo.ReflectedType) ||
+                 @this.GetType().GetProperty(propertyInfo.Name, propertyInfo.PropertyType) == null)) {
                 throw new ArgumentException(
                     "The lambda expression 'property' must reference a valid property on this Control.");
             }

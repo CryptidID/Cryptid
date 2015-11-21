@@ -1,27 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
+﻿#region
+
+using System;
 using System.Drawing;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using cryptid.Scanners;
+using Cryptid.Scanners;
 using Cryptid.Utils;
 
-namespace cryptidDemo {
+#endregion
+
+namespace CryptidDemo {
     public partial class ScanFingerForm : Form {
-        private enum State {
-            FINGER_NOT_PRESSED,
-            FINGER_PRESSED,
-            TRANSFERING_DATA,
-            TRANSFER_COMPLETE
+        private State _currState;
+
+        public ScanFingerForm() {
+            InitializeComponent();
         }
 
-        private State _currState; 
         private State CurrentState {
             get { return _currState; }
             set {
@@ -32,43 +27,37 @@ namespace cryptidDemo {
 
         public Bitmap Fingerprint { get; set; }
 
-        public ScanFingerForm() {
-            InitializeComponent();
-        }
-
         private void ScanFingerForm_Load(object sender, EventArgs e) {
-            Task t = Task.Factory.StartNew(() => {
-                CurrentState = State.FINGER_NOT_PRESSED;
+            var t = Task.Factory.StartNew(() => {
+                CurrentState = State.FingerNotPressed;
                 FPS_GT511C3.SetCmosLed(true);
                 while (FPS_GT511C3.IsPressingFinger() != 0) Task.Delay(1000);
-                CurrentState = State.FINGER_PRESSED;
-                CurrentState = State.TRANSFERING_DATA;
+                CurrentState = State.FingerPressed;
+                CurrentState = State.TransferingData;
                 Fingerprint = FPS_GT511C3.GetRawImage();
                 FPS_GT511C3.SetCmosLed(false);
-                CurrentState = State.TRANSFER_COMPLETE;
+                CurrentState = State.TransferComplete;
                 DialogResult = DialogResult.OK;
                 SafeClose();
             });
             t.Start();
-
-            
         }
 
         private void OnStateChange(State s) {
-            switch (CurrentState) {
-                case State.FINGER_NOT_PRESSED:
+            switch (s) {
+                case State.FingerNotPressed:
                     BackColor = Color.Red;
                     stateText.SetPropertyThreadSafe(() => stateText.Text, "Place Finger on Sensor");
                     break;
-                case State.FINGER_PRESSED:
+                case State.FingerPressed:
                     BackColor = Color.Blue;
                     stateText.SetPropertyThreadSafe(() => stateText.Text, "Begining Transfer");
                     break;
-                case State.TRANSFERING_DATA:
+                case State.TransferingData:
                     BackColor = Color.Green;
                     stateText.SetPropertyThreadSafe(() => stateText.Text, "Transfering Data...");
                     break;
-                case State.TRANSFER_COMPLETE:
+                case State.TransferComplete:
                     BackColor = Color.Green;
                     stateText.SetPropertyThreadSafe(() => stateText.Text, "Transfering Complete");
                     break;
@@ -81,6 +70,13 @@ namespace cryptidDemo {
                 return;
             }
             Close();
+        }
+
+        private enum State {
+            FingerNotPressed,
+            FingerPressed,
+            TransferingData,
+            TransferComplete
         }
     }
 }

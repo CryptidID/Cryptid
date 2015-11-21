@@ -7,8 +7,8 @@
     <ProjectGuid>{6AC7F569-99CC-45C7-B427-BCFD9657746B}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>cryptidDemo</RootNamespace>
-    <AssemblyName>cryptidDemo</AssemblyName>
+    <RootNamespace>CryptidDemo</RootNamespace>
+    <AssemblyName>CryptidDemo</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -31,6 +31,9 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>favicon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="MsgPack">
@@ -125,6 +128,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <EmbeddedResource Include="ScanFingerForm.resx">
       <DependentUpon>ScanFingerForm.cs</DependentUpon>
@@ -147,12 +151,13 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\cryptid\cryptid.csproj">
+    <ProjectReference Include="..\cryptid\Cryptid.csproj">
       <Project>{dc90b6f3-fdb0-4766-afa9-c89c82a4605f}</Project>
-      <Name>cryptid</Name>
+      <Name>Cryptid</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="favicon.ico" />
     <Content Include="fingerprint-test.bmp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

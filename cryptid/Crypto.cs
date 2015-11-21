@@ -1,16 +1,18 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace cryptid {
+#endregion
+
+namespace Cryptid {
     public static class Crypto {
-        private const int RSA_KEY_SIZE = 4096;
+        private const int RsaKeySize = 4096;
 
-        public static readonly byte[] CRYPTID_SALT = {
+        public static readonly byte[] CryptidSalt = {
             0x1c, 0x9f, 0x1d, 0x8a, 0x11, 0x98, 0xfe, 0x3f, 0xf7, 0xb7, 0x9a, 0xf1,
             0x0f, 0xf3, 0x30, 0xf0, 0x05, 0x49, 0x87, 0x9c, 0x92, 0x70, 0xe2, 0x9c, 0x6c, 0x88, 0xff, 0x2b, 0xfd, 0x13,
             0xe1, 0x87, 0xfe, 0xa2, 0x2b, 0xe1, 0x59, 0xf5, 0xc0, 0x39, 0x3b, 0xcc, 0x34, 0x52, 0xf9, 0x0f, 0x85, 0x3e,
@@ -35,7 +37,7 @@ namespace cryptid {
             0xc9, 0x72
         };
 
-        public static readonly byte[] CRYPTID_SALT_HASH = SHA256.Create().ComputeHash(Crypto.CRYPTID_SALT);
+        public static readonly byte[] CryptidSaltHash = SHA256.Create().ComputeHash(CryptidSalt);
 
         internal static byte[] AES_Encrypt(byte[] data, string password) {
             var passwordBytes = Encoding.UTF8.GetBytes(password);
@@ -50,47 +52,49 @@ namespace cryptid {
         }
 
         internal static byte[] AES_Encrypt(byte[] bytesToBeEncrypted, byte[] passwordBytes) {
-            byte[] encryptedBytes = null;
+            byte[] encryptedBytes;
 
             using (var ms = new MemoryStream()) {
-                using (var AES = new RijndaelManaged()) {
-                    AES.KeySize = 256;
-                    AES.BlockSize = 128;
+                using (var aes = new RijndaelManaged()) {
+                    aes.KeySize = 256;
+                    aes.BlockSize = 128;
 
-                    var key = new Rfc2898DeriveBytes(passwordBytes, CRYPTID_SALT, 1000);
-                    AES.Key = key.GetBytes(AES.KeySize/8);
-                    AES.IV = key.GetBytes(AES.BlockSize/8);
+                    var key = new Rfc2898DeriveBytes(passwordBytes, CryptidSalt, 1000);
+                    aes.Key = key.GetBytes(aes.KeySize/8);
+                    aes.IV = key.GetBytes(aes.BlockSize/8);
 
-                    AES.Mode = CipherMode.CBC;
+                    aes.Mode = CipherMode.CBC;
 
-                    using (var cs = new CryptoStream(ms, AES.CreateEncryptor(), CryptoStreamMode.Write)) {
+                    using (var cs = new CryptoStream(ms, aes.CreateEncryptor(), CryptoStreamMode.Write)) {
                         cs.Write(bytesToBeEncrypted, 0, bytesToBeEncrypted.Length);
                         cs.Close();
                     }
                     encryptedBytes = ms.ToArray();
                 }
+                ms.Close();
             }
 
             return encryptedBytes;
         }
 
         internal static byte[] AES_Decrypt(byte[] bytesToBeDecrypted, byte[] passwordBytes) {
-            byte[] decryptedBytes = null;
+            byte[] decryptedBytes;
 
             using (var ms = new MemoryStream()) {
-                using (var AES = new RijndaelManaged()) {
-                    AES.KeySize = 256;
-                    AES.BlockSize = 128;
+                using (var aes = new RijndaelManaged()) {
+                    aes.KeySize = 256;
+                    aes.BlockSize = 128;
 
-                    var key = new Rfc2898DeriveBytes(passwordBytes, CRYPTID_SALT, 1000);
-                    AES.Key = key.GetBytes(AES.KeySize/8);
-                    AES.IV = key.GetBytes(AES.BlockSize/8);
+                    var key = new Rfc2898DeriveBytes(passwordBytes, CryptidSalt, 1000);
+                    aes.Key = key.GetBytes(aes.KeySize/8);
+                    aes.IV = key.GetBytes(aes.BlockSize/8);
 
-                    AES.Mode = CipherMode.CBC;
+                    aes.Mode = CipherMode.CBC;
 
-                    using (var cs = new CryptoStream(ms, AES.CreateDecryptor(), CryptoStreamMode.Write)) {
+                    using (var cs = new CryptoStream(ms, aes.CreateDecryptor(), CryptoStreamMode.Write)) {
                         cs.Write(bytesToBeDecrypted, 0, bytesToBeDecrypted.Length);
                         cs.Close();
+                        ms.Close();
                     }
                     decryptedBytes = ms.ToArray();
                 }
@@ -133,62 +137,66 @@ namespace cryptid {
             return false;
         }
 
+        public static byte[] Sha256D(byte[] toHash) {
+            return SHA256.Create().ComputeHash(SHA256.Create().ComputeHash(toHash));
+        }
+
         public sealed class Crc32 : HashAlgorithm {
-            public const UInt32 DefaultPolynomial = 0xedb88320u;
-            public const UInt32 DefaultSeed = 0xffffffffu;
+            public const uint DefaultPolynomial = 0xedb88320u;
+            public const uint DefaultSeed = 0xffffffffu;
 
-            static UInt32[] defaultTable;
+            private static uint[] _defaultTable;
 
-            readonly UInt32 seed;
-            readonly UInt32[] table;
-            UInt32 hash;
+            private readonly uint _seed;
+            private readonly uint[] _table;
+            private uint _hash;
 
             public Crc32()
                 : this(DefaultPolynomial, DefaultSeed) {
             }
 
-            public Crc32(UInt32 polynomial, UInt32 seed) {
-                table = InitializeTable(polynomial);
-                this.seed = hash = seed;
-            }
-
-            public override void Initialize() {
-                hash = seed;
-            }
-
-            protected override void HashCore(byte[] array, int ibStart, int cbSize) {
-                hash = CalculateHash(table, hash, array, ibStart, cbSize);
-            }
-
-            protected override byte[] HashFinal() {
-                var hashBuffer = UInt32ToBigEndianBytes(~hash);
-                HashValue = hashBuffer;
-                return hashBuffer;
+            public Crc32(uint polynomial, uint seed) {
+                _table = InitializeTable(polynomial);
+                _seed = _hash = seed;
             }
 
             public override int HashSize {
                 get { return 32; }
             }
 
-            public static UInt32 Compute(byte[] buffer) {
+            public override void Initialize() {
+                _hash = _seed;
+            }
+
+            protected override void HashCore(byte[] array, int ibStart, int cbSize) {
+                _hash = CalculateHash(_table, _hash, array, ibStart, cbSize);
+            }
+
+            protected override byte[] HashFinal() {
+                var hashBuffer = UInt32ToBigEndianBytes(~_hash);
+                HashValue = hashBuffer;
+                return hashBuffer;
+            }
+
+            public static uint Compute(byte[] buffer) {
                 return Compute(DefaultSeed, buffer);
             }
 
-            public static UInt32 Compute(UInt32 seed, byte[] buffer) {
+            public static uint Compute(uint seed, byte[] buffer) {
                 return Compute(DefaultPolynomial, seed, buffer);
             }
 
-            public static UInt32 Compute(UInt32 polynomial, UInt32 seed, byte[] buffer) {
+            public static uint Compute(uint polynomial, uint seed, byte[] buffer) {
                 return ~CalculateHash(InitializeTable(polynomial), seed, buffer, 0, buffer.Length);
             }
 
-            static UInt32[] InitializeTable(UInt32 polynomial) {
-                if (polynomial == DefaultPolynomial && defaultTable != null)
-                    return defaultTable;
+            private static uint[] InitializeTable(uint polynomial) {
+                if (polynomial == DefaultPolynomial && _defaultTable != null)
+                    return _defaultTable;
 
-                var createTable = new UInt32[256];
+                var createTable = new uint[256];
                 for (var i = 0; i < 256; i++) {
-                    var entry = (UInt32) i;
+                    var entry = (uint) i;
                     for (var j = 0; j < 8; j++)
                         if ((entry & 1) == 1)
                             entry = (entry >> 1) ^ polynomial;
@@ -198,19 +206,19 @@ namespace cryptid {
                 }
 
                 if (polynomial == DefaultPolynomial)
-                    defaultTable = createTable;
+                    _defaultTable = createTable;
 
                 return createTable;
             }
 
-            static UInt32 CalculateHash(UInt32[] table, UInt32 seed, IList<byte> buffer, int start, int size) {
+            private static uint CalculateHash(uint[] table, uint seed, IList<byte> buffer, int start, int size) {
                 var crc = seed;
                 for (var i = start; i < size - start; i++)
                     crc = (crc >> 8) ^ table[buffer[i] ^ crc & 0xff];
                 return crc;
             }
 
-            static byte[] UInt32ToBigEndianBytes(UInt32 uint32) {
+            private static byte[] UInt32ToBigEndianBytes(uint uint32) {
                 var result = BitConverter.GetBytes(uint32);
 
                 if (BitConverter.IsLittleEndian)
@@ -218,10 +226,6 @@ namespace cryptid {
 
                 return result;
             }
-        }
-
-        public static byte[] SHA256d(byte[] toHash) {
-            return SHA256.Create().ComputeHash(SHA256.Create().ComputeHash(toHash));
         }
     }
 }
