@@ -87,6 +87,12 @@ namespace Cryptid.Utils {
             return bytes;
         }
 
+        /// <summary>
+        /// Checks if two byte arrays are equal
+        /// </summary>
+        /// <param name="a1">Byte[] to be compared</param>
+        /// <param name="b1">Byte[] to be compared</param>
+        /// <returns>True if equal</returns>
         public static bool Equality(byte[] a1, byte[] b1) {
             int i;
             if (a1.Length == b1.Length) {

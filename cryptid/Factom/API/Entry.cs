@@ -29,6 +29,13 @@ namespace Cryptid.Factom.API
         private RestClient client = new RestClient("http://" + ServerHost + ":" + ServerPort + "/v1/");
         private RestClient clientMD= new RestClient("http://" + ServerHost + ":" + ServerPortMD + "/v1/");
 
+        /// <summary>
+        /// Constructs a new EntryData object
+        /// </summary>
+        /// <param name="content">Content of Entry (message pack)</param>
+        /// <param name="extIds">Unique Ids used for first entry of chain to construct a unique chain ID</param>
+        /// <param name="chainId">ChainID</param>
+        /// <returns>EntryData object</returns>
         public EntryData NewEntry(byte[] content, byte[][] extIds, string chainId) {
             EntryData entry = new EntryData();
             entry.Content = content;
@@ -46,9 +53,13 @@ namespace Cryptid.Factom.API
             var req = new RestRequest("/chain-head/{hash}", Method.GET);
             req.AddUrlSegment("hash", hashString);
             IRestResponse resp = client.Execute(req);
-
-            DataStructs.ChainHeadDataStringFormat chainHead = JsonConvert.DeserializeObject<DataStructs.ChainHeadDataStringFormat>(resp.Content);
-            return DataStructs.ConvertStringFormatToByteFormat(chainHead);
+            try {
+                DataStructs.ChainHeadDataStringFormat chainHead = JsonConvert.DeserializeObject<DataStructs.ChainHeadDataStringFormat>(resp.Content);
+                return DataStructs.ConvertStringFormatToByteFormat(chainHead);
+            }
+            catch (Exception) {
+                throw new Exception("Error when serializing the chainhead. In GetChainHead: " + resp.Content );
+            }
         }
 
         /// <summary>
@@ -82,16 +93,16 @@ namespace Cryptid.Factom.API
         }
 
         /// <summary>
-        /// Returns the data in an entry hash in a easier to use format. ToString will convert the Content from hex into a string
+        /// Returns the data in an entry hash in a easier to use format. 
         /// </summary>
         /// <param name="hash">Entry hash as EntryBlockData.entry</param>
-        /// <returns></returns>
+        /// <returns>EntryData object</returns>
         public EntryData GetEntryData(EntryBlockData.EntryData entry) {
             return GetEntryData(entry.EntryHash);
         }
 
         /// <summary>
-        /// Returns the data in an entry hash in a easier to use format. ToString will convert the Content from hex into a string
+        /// Returns the data in an entry hash in a easier to use format. 
         /// </summary>
         /// <param name="entryHash">Entryhash of entry</param>
         /// <returns></returns>
@@ -108,7 +119,7 @@ namespace Cryptid.Factom.API
         /// Returns all the entries in an Entryblock. Type of entry has timestamp and entryhash value
         /// </summary>
         /// <param name="chainHead">ChainHeadData type</param>
-        /// <returns></returns>
+        /// <returns>List of all chain entries</returns>
         public List<EntryBlockData.EntryData> GetAllChainEntries(ChainHeadData chainHead) {
             EntryBlockData block = GetEntryBlockByKeyMR(chainHead);
             EntryBlockData blockPointer = block;
@@ -126,16 +137,25 @@ namespace Cryptid.Factom.API
         /// Returns all the entries in an Entryblock. Type of entry has timestamp and entryhash value
         /// </summary>
         /// <param name="chainHeadID">ChainID as string</param>
-        /// <returns></returns>
+        /// <returns>List of all entrtries</returns>
         public List<EntryBlockData.EntryData> GetAllChainEntries(byte[] chainHeadID) {
             ChainHeadData chainHead = GetChainHead(chainHeadID);
             return GetAllChainEntries(chainHead);
         }
 
+        /// <summary>
+        /// Used to send json object as POST data
+        /// </summary>
         private class WallerCommit {
             public string Message { get; set; }
         }
 
+        /// <summary>
+        /// Commits an entry to the Factom blockchain. Must wait 10 seconds if succeeds then call RevealChain
+        /// </summary>
+        /// <param name="entry">Entry to be committed</param>
+        /// <param name="name">Name of entry credit wallet</param>
+        /// <returns>ChainID</returns>
         public byte[] CommitEntry(EntryData entry, string name) {
             List<byte> byteList = new List<byte>();
 
@@ -171,10 +191,18 @@ namespace Cryptid.Factom.API
             return Entries.ChainIdOfFirstEntry(entry);
         }
 
+        /// <summary>
+        /// Used to serialize json as POST data
+        /// </summary>
         private class Reveal {
             public string Entry { get; set; }
         }
 
+        /// <summary>
+        /// Second and final step in adding an entry to a chain on the factom blockchain
+        /// </summary>
+        /// <param name="entry">Entry to be added</param>
+        /// <returns>Boolean true/false for success/failure</returns>
         public bool RevealEntry(EntryData entry) {
             Reveal rev = new Reveal();
             byte[] marshaledEntry = Entries.MarshalBinary(entry);

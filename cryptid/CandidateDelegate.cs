@@ -41,14 +41,13 @@ namespace Cryptid {
         /// <returns>The chain ID of the enrolled candidate</returns>
         public static byte[] EnrollCandidate(Candidate c, string password, RSAParameters privKey) {
             byte[] packed = Pack(c, password, privKey);
-            byte[] hexPacked = Encoding.UTF8.GetBytes(Convert.ToBase64String(packed));
 
             Entry entryApi = new Entry();
             Chain chainApi = new Chain();
 
             Chain.ChainType factomChain = null;
 
-            foreach (DataSegment segment in DataSegment.Segmentize(hexPacked, firstSegmentLength: DataSegment.DefaultMaxSegmentLength - ExtIDsLength)) {
+            foreach (DataSegment segment in DataSegment.Segmentize(packed, firstSegmentLength: DataSegment.DefaultMaxSegmentLength - ExtIDsLength)) {
                 byte[] dataToUpload = segment.Pack();
                 var factomEntry = entryApi.NewEntry(dataToUpload, null, null);
                 if (segment.CurrentSegment == 0) {
