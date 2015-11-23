@@ -3,6 +3,7 @@
 using System;
 using System.Linq;
 using System.Security.Cryptography;
+using Cryptid.Exceptions;
 using Cryptid.Utils;
 
 #endregion
@@ -69,11 +70,11 @@ namespace Cryptid {
             var prefix = Arrays.CopyOfRange(packed, 0, UpdatedRecordPrefix.Length);
 
             if (!Crypto.RSA_Verify(packed, sig, pubKey)) {
-                throw new Exception("Could not cryptographically verify candidate update record");
+                throw new DataVerifyException("Could not cryptographically verify candidate update record");
             }
 
             if (UpdatedRecordPrefix != prefix || packed.Length != ChainIdLength*2 + 512 + UpdatedRecordPrefix.Length) {
-                throw new Exception("Invalid data provided for packed candidate update record");
+                throw new RecordDataInvalidException("Invalid data provided for packed candidate update record");
             }
 
             return new CandidateUpdatedRecord(Arrays.CopyOfRange(packed, 0, ChainIdLength),

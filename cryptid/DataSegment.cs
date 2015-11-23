@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Cryptid.Exceptions;
 using Cryptid.Utils;
 
 #endregion
@@ -52,7 +53,7 @@ namespace Cryptid {
             _maxDataLength = GetMaxDataLength(maxSegmentLength);
 
             if (data.Length > _maxDataLength)
-                throw new Exception("Attempted to pack " + data.Length + " bytes in a segment that can only hold " +
+                throw new DataSegmentOverflowException("Attempted to pack " + data.Length + " bytes in a segment that can only hold " +
                                     _maxDataLength);
 
             CurrentSegment = currSegment;

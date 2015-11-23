@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading;
 using cryptid.Factom.API;
 using Cryptid;
+using Cryptid.Exceptions;
 using Cryptid.Factom.API;
 using Cryptid.Utils;
 using SourceAFIS.Simple;
@@ -92,7 +93,7 @@ namespace Cryptid {
         public static byte[] UpdateCandidate(Candidate newCandidate, string password, Fingerprint fp,
             RSAParameters privKey, byte[] chainToUpdate) {
             if (FullVerifyFromChain(chainToUpdate, password, fp, privKey) < 50f)
-                throw new Exception("Access confidence too low to update candidate.");
+                throw new AccessConfidenceTooLowException("Access confidence too low to update candidate.");
 
             var newChainId = EnrollCandidate(newCandidate, password, privKey);
 
@@ -259,15 +260,20 @@ namespace Cryptid {
         public static Candidate Unpack(byte[] packed, string password, RSAParameters pubKey) {
             // Check if the RSA signature is valid
             if (!VerifySignature(packed, pubKey))
-                throw new Exception("The packed data could not be cryptographically verified.");
+                throw new DataVerifyException("The packed data could not be cryptographically verified.");
 
             // Extract the UID for later
             var uid = Arrays.CopyOfRange(packed, 0, 64);
 
             // Decrypt candidate data
-            var data = Crypto.AES_Decrypt(Arrays.CopyOfRange(packed, 64, packed.Length - 512), password);
+            byte[] data;
+            try {
+                data = Crypto.AES_Decrypt(Arrays.CopyOfRange(packed, 64, packed.Length - 512), password);
+            } catch (CryptographicException) {
+                data = null;
+            }
 
-            if (data == null) throw new Exception("The provided password was not correct.");
+            if (data == null) throw new PasswordIncorrectException("The provided password was not correct.");
 
             // Set the candidate uid and deserialize
             var c = Candidate.Deserialize(data);

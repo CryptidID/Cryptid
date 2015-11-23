@@ -78,6 +78,13 @@
     <Compile Include="CardGenerator.cs" />
     <Compile Include="Crypto.cs" />
     <Compile Include="DataSegment.cs" />
+    <Compile Include="Exceptions\AccessConfidenceTooLowException.cs" />
+    <Compile Include="Exceptions\DataSegmentOverflowException.cs" />
+    <Compile Include="Exceptions\DataVerifyException.cs" />
+    <Compile Include="Exceptions\FactomChainException.cs" />
+    <Compile Include="Exceptions\FactonEntryException.cs" />
+    <Compile Include="Exceptions\PasswordIncorrectException.cs" />
+    <Compile Include="Exceptions\RecordDataInvalidException.cs" />
     <Compile Include="Factom\API\Entry.cs" />
     <Compile Include="Factom\API\Chain.cs" />
     <Compile Include="Factom\API\DataStructs.cs" />
