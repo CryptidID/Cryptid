@@ -246,5 +246,36 @@ namespace cryptidDemo {
                 _c = c;
             }
         }
+
+        private void loadBlockChain_Click(object sender, EventArgs e) {
+            if (string.IsNullOrEmpty(password.Text)) {
+                MessageBox.Show("You must enter the password associated with this ID.", "Error", MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                return;
+            }
+
+            var packed = CandidateDelegate.GetPackedCandidate(Convert.FromBase64String(chainId.Text));
+            output = packed;
+            var c = CandidateDelegate.Unpack(packed, password.Text, PrivateKey);
+
+            lastName.Text = c.Dcs;
+            firstName.Text = c.Dac;
+            middleName.Text = c.Dad;
+            issued.Value = c.Dbd;
+            dob.Value = c.Dbb;
+            sex.SelectedIndex = (int)c.Dbc - 1;
+            eye.SelectedIndex = (int)c.Day;
+            inches.Value = c.Dau.Inches;
+            feet.Value = c.Dau.Feet;
+            address.Text = c.Dag;
+            city.Text = c.Dai;
+            state.Text = c.Daj;
+            zipcode.Text = c.Dak.AnsiFormat;
+            country.Text = c.Dcg;
+            headshotBox.Image = c.Image;
+
+            _c = c;
+            
+        }
     }
 }
