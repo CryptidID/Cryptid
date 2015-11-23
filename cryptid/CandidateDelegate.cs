@@ -44,7 +44,6 @@ namespace Cryptid {
         /// <returns>The chain ID of the enrolled candidate</returns>
         public static byte[] EnrollCandidate(Candidate c, string password, RSAParameters privKey) {
             var packed = Pack(c, password, privKey);
-            var hexPacked = Encoding.UTF8.GetBytes(Convert.ToBase64String(packed));
 
             var entryApi = new Entry();
             var chainApi = new Chain();
@@ -53,8 +52,7 @@ namespace Cryptid {
 
             foreach (
                 var segment in
-                    DataSegment.Segmentize(hexPacked,
-                        firstSegmentLength: DataSegment.DefaultMaxSegmentLength - ExtIDsLength)) {
+                    DataSegment.Segmentize(packed, firstSegmentLength: DataSegment.DefaultMaxSegmentLength - ExtIDsLength)) {
                 var dataToUpload = segment.Pack();
                 var factomEntry = entryApi.NewEntry(dataToUpload, null, null);
                 if (segment.CurrentSegment == 0) {
@@ -94,7 +92,7 @@ namespace Cryptid {
         public static byte[] UpdateCandidate(Candidate newCandidate, string password, Fingerprint fp,
             RSAParameters privKey, byte[] chainToUpdate) {
             if (FullVerifyFromChain(chainToUpdate, password, fp, privKey) < 50f)
-                throw new Exception("Access confidence to low to update candidate.");
+                throw new Exception("Access confidence too low to update candidate.");
 
             var newChainId = EnrollCandidate(newCandidate, password, privKey);
 
