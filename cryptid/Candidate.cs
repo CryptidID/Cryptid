@@ -3,11 +3,13 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
 using Cryptid.Utils;
 using MsgPack;
 using MsgPack.Serialization;
+using Newtonsoft.Json;
 using SourceAFIS.Simple;
 
 #endregion
@@ -70,7 +72,20 @@ namespace Cryptid {
         public string Daj { get; set; }
         public PostalCode Dak { get; set; }
         public string Dcg { get; set; }
+        [JsonIgnore]
         public Image Image { get; set; }
+
+        public string ImageString {
+            get {
+                using (MemoryStream ms = new MemoryStream()) {
+                    Image.Save(ms, ImageFormat.Jpeg);
+                    byte[] imageBytes = ms.ToArray();
+                    string base64String = Convert.ToBase64String(imageBytes);
+                    return base64String;
+                }
+            }
+        }
+
         public Fingerprint Fingerprint { get; set; }
 
         public void PackToMessage(Packer packer, PackingOptions options) {
@@ -244,7 +259,7 @@ namespace Cryptid {
         public bool IsComplete() {
             if (string.IsNullOrWhiteSpace(Dcs)) return false;
             if (string.IsNullOrWhiteSpace(Dac)) return false;
-            if (string.IsNullOrWhiteSpace(Dad)) return false;
+            //if (string.IsNullOrWhiteSpace(Dad)) return false;
             if (string.IsNullOrWhiteSpace(Dag)) return false;
             if (string.IsNullOrWhiteSpace(Dai)) return false;
             if (string.IsNullOrWhiteSpace(Daj)) return false;

@@ -37,7 +37,7 @@ namespace CryptidRest.Controllers {
                         Keys.PublicKey(PublicKeyPath));
                 }
             } catch (Exception e) {
-                var resp = new HttpResponseMessage(HttpStatusCode.InternalServerError) {
+                var resp = new HttpResponseMessage(HttpStatusCode.OK) {
                     Content = new StringContent(JsonConvert.SerializeObject(new ApiError(e.Message))),
                     ReasonPhrase = "Internal Error Occured"
                 };
@@ -52,7 +52,7 @@ namespace CryptidRest.Controllers {
                 var packed = CandidateDelegate.GetPackedCandidate(Convert.FromBase64String(chainIdBase64));
                 return CandidateDelegate.Unpack(packed, password, Keys.PublicKey(PublicKeyPath));
             } catch (Exception e) {
-                var resp = new HttpResponseMessage(HttpStatusCode.InternalServerError) {
+                var resp = new HttpResponseMessage(HttpStatusCode.OK) {
                     Content = new StringContent(JsonConvert.SerializeObject(new ApiError(e.Message))),
                     ReasonPhrase = "Internal Error Occured"
                 };
@@ -67,7 +67,7 @@ namespace CryptidRest.Controllers {
                 return CandidateDelegate.Unpack(Convert.FromBase64String(packedBase64), password,
                     Keys.PublicKey(PublicKeyPath));
             } catch (Exception e) {
-                var resp = new HttpResponseMessage(HttpStatusCode.InternalServerError) {
+                var resp = new HttpResponseMessage(HttpStatusCode.OK) {
                     Content = new StringContent(JsonConvert.SerializeObject(new ApiError(e.Message))),
                     ReasonPhrase = "Internal Error Occured"
                 };
@@ -82,7 +82,7 @@ namespace CryptidRest.Controllers {
                 return CandidateDelegate.VerifySignature(Convert.FromBase64String(packedBase64),
                     Keys.PublicKey(PublicKeyPath));
             } catch (Exception e) {
-                var resp = new HttpResponseMessage(HttpStatusCode.InternalServerError) {
+                var resp = new HttpResponseMessage(HttpStatusCode.OK) {
                     Content = new StringContent(JsonConvert.SerializeObject(new ApiError(e.Message))),
                     ReasonPhrase = "Internal Error Occured"
                 };
