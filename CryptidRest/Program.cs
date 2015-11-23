@@ -19,7 +19,7 @@ namespace CryptidRest {
             var config = new HttpSelfHostConfiguration(ServiceAddress);
 
             config.MapHttpAttributeRoutes();
-            config.Formatters.JsonFormatter.SupportedMediaTypes.Add(new MediaTypeHeaderValue("text/html"));
+            config.Formatters.JsonFormatter.SupportedMediaTypes.Add(new MediaTypeHeaderValue("application/json"));
             config.EnableCors(new EnableCorsAttribute("*", "*", "*"));
 
 
