@@ -324,24 +324,23 @@ namespace cryptidDemo {
             DialogResult d = MessageBox.Show(Resources.UPDATE_ID_WARNING, Resources.ARE_YOU_SURE, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (d != DialogResult.Yes) return;
 
-            Fingerprint fp = new Fingerprint();
-            if (connectDialog.IsConnected) {
-                var scanForm = new ScanFingerForm();
-                var dr = scanForm.ShowDialog(this);
-                if (dr == DialogResult.OK) {
-                    fp.AsBitmap = scanForm.Fingerprint;
-                } else {
-                    scanForm.Dispose();
-                    return;
-                }
+             Fingerprint fp = new Fingerprint();
+             if (connectDialog.IsConnected) {
+                 var scanForm = new ScanFingerForm();
+                 var dr = scanForm.ShowDialog(this);
+                 if (dr == DialogResult.OK) {
+                     fp.AsBitmap = scanForm.Fingerprint;
+                 } else {
+                     scanForm.Dispose();
+                     return;
+                 }
 
-                scanForm.Dispose();
-            } else {
-                MessageBox.Show(Resources.FPS_NOT_CONNECTED_ERROR, Resources.ERROR, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            CandidateDelegate.UpdateCandidate(_c, password.Text, fp, PrivateKey, Convert.FromBase64String(chainId.Text));
+                 scanForm.Dispose();
+             } else {
+                 MessageBox.Show(Resources.FPS_NOT_CONNECTED_ERROR, Resources.ERROR, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                 return;
+             }
+            chainId.Text = Convert.ToBase64String(CandidateDelegate.UpdateCandidate(_c, password.Text, fp, PrivateKey, Convert.FromBase64String(chainId.Text)));
         }
     }
 }
