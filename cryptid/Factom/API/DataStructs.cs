@@ -32,7 +32,7 @@ namespace Cryptid.Factom.API {
                 ChainId = Strings.DecodeHexIntoBytes(entryStringFormat.ChainId),
                 Content = Strings.DecodeHexIntoBytes(entryStringFormat.Content)
             };
-
+            if (entryStringFormat.ExtIDs == null) return entry;
             var len = entryStringFormat.ExtIDs.Length;
             entry.ExtIDs = new byte[len][];
             for (var i = 0; i < len; i++) {
