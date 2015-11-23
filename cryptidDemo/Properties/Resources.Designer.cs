@@ -224,6 +224,15 @@ namespace CryptidDemo.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The provided password is incorrect!.
+        /// </summary>
+        internal static string PASSWORD_INCORRECT_ERROR {
+            get {
+                return ResourceManager.GetString("PASSWORD_INCORRECT_ERROR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The provided passwords do not match!.
         /// </summary>
         internal static string PASSWORDS_NOT_MATCH {
