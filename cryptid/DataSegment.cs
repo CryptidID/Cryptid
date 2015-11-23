@@ -12,7 +12,7 @@ namespace Cryptid {
     /// <summary>
     ///     Segments data into segments of a given size
     /// </summary>
-    internal class DataSegment {
+    public class DataSegment {
         /// <summary>
         ///     The minimum length of a Factom header
         /// </summary>

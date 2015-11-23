@@ -72,6 +72,7 @@
     <Compile Include="Factom\API\EntryTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CandidateTest.cs" />
+    <Compile Include="DataSegmentTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\cryptid\Cryptid.csproj">
