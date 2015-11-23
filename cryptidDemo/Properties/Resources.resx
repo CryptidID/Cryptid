@@ -156,4 +156,28 @@
   <data name="MUST_ENTER_PASSWORD_MESSAGE" xml:space="preserve">
     <value>You must enter the password associated with this ID.</value>
   </data>
+  <data name="UPLOAD_BLOCKCHAIN_WARNING" xml:space="preserve">
+    <value>This is an Irreversable operation! Proceeding will upload this ID to the blockchain under a new unlinked chain permenantly. Please assure all information is correct.</value>
+  </data>
+  <data name="GeneratorForm_uploadBlockchain_Click_Cannot_generate_an_and_ID_for_an_incomplete_candidate_" xml:space="preserve">
+    <value>Cannot generate an and ID for an incomplete candidate.</value>
+  </data>
+  <data name="ARE_YOU_SURE" xml:space="preserve">
+    <value>Are you sure?</value>
+  </data>
+  <data name="INFORMATION_OVERWRITE_WARNING" xml:space="preserve">
+    <value>This will replace all the information currently in the form. Do you wish to proceed?</value>
+  </data>
+  <data name="UPDATE_ID_WARNING" xml:space="preserve">
+    <value>This is an irreversible operation! Are you sure you wish to replace the ID on the chain (see chain ID field) with the provided information?</value>
+  </data>
+  <data name="PASSWORDS_NOT_MATCH" xml:space="preserve">
+    <value>The provided passwords do not match!</value>
+  </data>
+  <data name="CHAIN_ID_EMPTY" xml:space="preserve">
+    <value>Chain ID cannot be empty!</value>
+  </data>
+  <data name="NEED_CID_OR_CHAIN_ID_ERROR" xml:space="preserve">
+    <value>You must choose a .cid file or enter a chain ID</value>
+  </data>
 </root>

@@ -31,6 +31,8 @@
             this.password = new System.Windows.Forms.TextBox();
             this.showInfoButton = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
+            this.label2 = new System.Windows.Forms.Label();
+            this.chainID = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // openCidDialog
@@ -58,7 +60,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(14, 43);
+            this.label1.Location = new System.Drawing.Point(12, 76);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(56, 13);
             this.label1.TabIndex = 2;
@@ -66,16 +68,16 @@
             // 
             // password
             // 
-            this.password.Location = new System.Drawing.Point(76, 40);
+            this.password.Location = new System.Drawing.Point(74, 73);
             this.password.Name = "password";
-            this.password.Size = new System.Drawing.Size(221, 20);
+            this.password.Size = new System.Drawing.Size(223, 20);
             this.password.TabIndex = 3;
             this.password.UseSystemPasswordChar = true;
             this.password.TextChanged += new System.EventHandler(this.password_TextChanged);
             // 
             // showInfoButton
             // 
-            this.showInfoButton.Location = new System.Drawing.Point(141, 66);
+            this.showInfoButton.Location = new System.Drawing.Point(141, 99);
             this.showInfoButton.Name = "showInfoButton";
             this.showInfoButton.Size = new System.Drawing.Size(75, 23);
             this.showInfoButton.TabIndex = 4;
@@ -85,7 +87,7 @@
             // 
             // button3
             // 
-            this.button3.Location = new System.Drawing.Point(222, 66);
+            this.button3.Location = new System.Drawing.Point(222, 99);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(75, 23);
             this.button3.TabIndex = 5;
@@ -93,11 +95,29 @@
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(12, 45);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(71, 13);
+            this.label2.TabIndex = 6;
+            this.label2.Text = "OR  ID string:";
+            // 
+            // chainID
+            // 
+            this.chainID.Location = new System.Drawing.Point(89, 45);
+            this.chainID.Name = "chainID";
+            this.chainID.Size = new System.Drawing.Size(208, 20);
+            this.chainID.TabIndex = 7;
+            // 
             // AuthForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(309, 97);
+            this.ClientSize = new System.Drawing.Size(309, 127);
+            this.Controls.Add(this.chainID);
+            this.Controls.Add(this.label2);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.showInfoButton);
             this.Controls.Add(this.password);
@@ -123,5 +143,7 @@
         private System.Windows.Forms.TextBox password;
         private System.Windows.Forms.Button showInfoButton;
         private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.TextBox chainID;
     }
 }

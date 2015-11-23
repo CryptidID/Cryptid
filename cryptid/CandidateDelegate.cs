@@ -184,7 +184,7 @@ namespace Cryptid {
         /// <param name="chainId">The id of a chain owned by the candidate</param>
         /// <param name="pubKey">The public key to verify the data with</param>
         /// <returns>A list of all the chains owned by a candidate</returns>
-        public static List<byte[]> GetCandidateChainHistory(byte chainId, RSAParameters pubKey) {
+        public static List<byte[]> GetCandidateChainHistory(byte[] chainId, RSAParameters pubKey) {
             var toSort = new List<IRecord>();
             var ret = new List<byte[]>();
 

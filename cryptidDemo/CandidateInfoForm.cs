@@ -23,7 +23,7 @@ namespace CryptidDemo {
         private void CandidateInfoForm_Load(object sender, EventArgs e) {
         }
 
-        public void LoadCandidateInfo(byte[] packed, string pasword) {
+        public void LoadCandidateInfo(byte[] packed, string pasword, byte[] chainId = null) {
             try {
                 _c = CandidateDelegate.Unpack(packed, pasword, _publicKey);
             }
@@ -36,6 +36,13 @@ namespace CryptidDemo {
 
             headshotBox.Image = _c.Image;
             candidateDump.Text = JsonConvert.SerializeObject(_c, Formatting.Indented);
+
+            if (chainId != null) {
+                chainHistory.View = View.List;
+                foreach(var cid in CandidateDelegate.GetCandidateChainHistory(chainId, _publicKey)) {
+                    chainHistory.Items.Add(new ListViewItem(Convert.ToBase64String(cid)));
+                }
+            }
         }
     }
 }
