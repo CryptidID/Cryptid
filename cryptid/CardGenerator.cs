@@ -43,7 +43,7 @@ namespace Cryptid {
                         form.SetField(key, _cardCandidate.Dcs);
                     }
                     else if (key.Contains("FN_MN")) {
-                        form.SetField(key, _cardCandidate.Dac + ", " + _cardCandidate.Dad);
+                        form.SetField(key, _cardCandidate.Dac + (string.IsNullOrWhiteSpace(_cardCandidate.Dad) ? "" : ", " + _cardCandidate.Dad));
                     }
                     else if (key.Contains("SEX")) {
                         form.SetField(key, _cardCandidate.Dbc == Candidate.Sex.Male ? "M" : "F");
