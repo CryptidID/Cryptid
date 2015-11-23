@@ -9,6 +9,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using cryptid.Factom.API;
+using Cryptid.Exceptions;
 using Cryptid.Utils;
 using Newtonsoft.Json;
 using RestSharp;
@@ -58,7 +59,7 @@ namespace Cryptid.Factom.API
                 return DataStructs.ConvertStringFormatToByteFormat(chainHead);
             }
             catch (Exception) {
-                throw new Exception("Error when serializing the chainhead. In GetChainHead: " + resp.Content );
+                throw new FactomEntryException("Error when serializing the chainhead. In GetChainHead: " + resp.Content );
             }
         }
 
@@ -85,7 +86,7 @@ namespace Cryptid.Factom.API
 
             IRestResponse resp = client.Execute(req);
             if (resp.Content == "EBlock not found") {
-                throw new Exception("EBlock not Found, Zerohash looked up");
+                throw new FactomEntryException("EBlock not Found, Zerohash looked up");
             }
             DataStructs.EntryBlockDataStringFormat entryBlock = JsonConvert.DeserializeObject<DataStructs.EntryBlockDataStringFormat>(resp.Content);
 
@@ -185,7 +186,7 @@ namespace Cryptid.Factom.API
             req.AddUrlSegment("name", name);
             IRestResponse resp = clientMD.Execute(req);
             if (resp.StatusCode != HttpStatusCode.OK) {
-                throw new Exception("Entry Commit Failed. Message: " + resp.ErrorMessage);
+                throw new FactomEntryException("Entry Commit Failed. Message: " + resp.ErrorMessage);
             }
             Console.WriteLine("CommitEntry Resp = " + resp.StatusCode + "|" + resp.StatusCode);
             if (entry.ExtIDs != null) {
@@ -221,7 +222,7 @@ namespace Cryptid.Factom.API
             Console.WriteLine("RevealEntry Resp = " + resp.StatusCode + "|" + resp.StatusCode);
 
             if (resp.StatusCode != HttpStatusCode.OK) {
-                throw new Exception("Entry Reveal Failed. Message: " + resp.ErrorMessage);
+                throw new FactomEntryException("Entry Reveal Failed. Message: " + resp.ErrorMessage);
             }
             return true;
         }

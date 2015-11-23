@@ -5,6 +5,7 @@ using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Cryptid.Exceptions;
 using Cryptid.Factom.API;
 using Cryptid.Utils;
 using Newtonsoft.Json;
@@ -109,7 +110,7 @@ namespace cryptid.Factom.API
             Console.WriteLine("Message= " + com.Message); // TODO: Remove
 
             if (resp.StatusCode != HttpStatusCode.OK) {
-                throw new Exception("Chain Commit Failed. Message: " + resp.ErrorMessage);
+                throw new FactomChainException("Chain Commit Failed. Message: " + resp.ErrorMessage);
             }
             return Entries.ChainIdOfFirstEntry(c.FirstEntry);
         }
@@ -141,7 +142,7 @@ namespace cryptid.Factom.API
             Console.WriteLine("RevealChain Resp = " + resp.StatusCode); //TODO: Remove
 
             if (resp.StatusCode != HttpStatusCode.OK) {
-                throw new Exception("Chain Reveal Failed. Message: " + resp.ErrorMessage);
+                throw new FactomChainException("Chain Reveal Failed. Message: " + resp.ErrorMessage);
             }
             return true;
         }
