@@ -188,7 +188,11 @@ namespace Cryptid.Factom.API
                 throw new Exception("Entry Commit Failed. Message: " + resp.ErrorMessage);
             }
             Console.WriteLine("CommitEntry Resp = " + resp.StatusCode + "|" + resp.StatusCode);
-            return Entries.ChainIdOfFirstEntry(entry);
+            if (entry.ExtIDs != null) {
+                return Entries.ChainIdOfFirstEntry(entry);
+            } else {
+                return entry.ChainId;
+            }
         }
 
         /// <summary>

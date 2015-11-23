@@ -61,7 +61,7 @@ namespace Cryptid {
                     //New chain
                     factomEntry.ExtIDs = GenerateExtIDs(packed);
                     factomChain = chainApi.NewChain(factomEntry);
-                    chainApi.CommitChain(factomChain, FactomWallet); // Wallet Name
+                    //chainApi.CommitChain(factomChain, FactomWallet); // Wallet Name
                     Thread.Sleep(10100);
                     chainApi.RevealChain(factomChain);
                 }
@@ -69,7 +69,7 @@ namespace Cryptid {
                     //new entry
                     Debug.Assert(factomChain != null, "factomChain != null");
                     factomEntry.ChainId = factomChain.ChainId;
-                    entryApi.CommitEntry(factomEntry, FactomWallet);
+                    //entryApi.CommitEntry(factomEntry, FactomWallet);
                     Thread.Sleep(10100);
                     entryApi.RevealEntry(factomEntry);
                 }
