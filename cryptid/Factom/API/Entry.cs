@@ -37,10 +37,11 @@ namespace Cryptid.Factom.API
         /// <param name="extIds">Unique Ids used for first entry of chain to construct a unique chain ID</param>
         /// <param name="chainId">ChainID</param>
         /// <returns>EntryData object</returns>
-        public EntryData NewEntry(byte[] content, byte[][] extIds, string chainId) {
+        public EntryData NewEntry(byte[] content, byte[][] extIds, byte[] chainId) {
             EntryData entry = new EntryData();
             entry.Content = content;
             entry.ExtIDs = extIds;
+            entry.ChainId = chainId;
             return entry; 
         }
 
@@ -188,7 +189,7 @@ namespace Cryptid.Factom.API
             if (resp.StatusCode != HttpStatusCode.OK) {
                 throw new FactomEntryException("Entry Commit Failed. Message: " + resp.ErrorMessage);
             }
-            Console.WriteLine("CommitEntry Resp = " + resp.StatusCode + "|" + resp.StatusCode);
+            //Console.WriteLine("CommitEntry Resp = " + resp.StatusCode + "|" + resp.StatusCode);
             if (entry.ExtIDs != null) {
                 return Entries.ChainIdOfFirstEntry(entry);
             } else {

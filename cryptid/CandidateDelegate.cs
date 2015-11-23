@@ -101,8 +101,8 @@ namespace Cryptid {
             var cur = new CandidateUpdatedRecord(chainToUpdate, newChainId);
 
             var entryApi = new Entry();
-            var oldRecordEntry = entryApi.NewEntry(ovr.Pack(privKey), null, Arrays.ByteArrayToHex(newChainId));
-            var newRecordEntry = entryApi.NewEntry(cur.Pack(privKey), null, Arrays.ByteArrayToHex(chainToUpdate));
+            var oldRecordEntry = entryApi.NewEntry(ovr.Pack(privKey), null, newChainId);
+            var newRecordEntry = entryApi.NewEntry(cur.Pack(privKey), null, chainToUpdate);
 
             entryApi.CommitEntry(oldRecordEntry, FactomWallet);
             entryApi.CommitEntry(newRecordEntry, FactomWallet);
