@@ -206,7 +206,7 @@ namespace cryptidDemo {
             cidSaveDialog.Filter = "PDF File (*.pdf)|*.pdf";
 
             if (cidSaveDialog.ShowDialog() == DialogResult.OK) {
-                var cg = new CardGenerator(_c, cidSaveDialog.FileName);
+                var cg = new CardGenerator(_c, "cryptid-id-template.pdf");
                 cg.Generate(cidSaveDialog.FileName, Convert.FromBase64String(chainId.Text));
             }
         }
