@@ -180,4 +180,7 @@
   <data name="NEED_CID_OR_CHAIN_ID_ERROR" xml:space="preserve">
     <value>You must choose a .cid file or enter a chain ID</value>
   </data>
+  <data name="PASSWORD_INCORRECT_ERROR" xml:space="preserve">
+    <value>The provided password is incorrect!</value>
+  </data>
 </root>

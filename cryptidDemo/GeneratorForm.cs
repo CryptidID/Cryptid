@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Windows.Forms;
 using Cryptid;
+using Cryptid.Exceptions;
 using Cryptid.Scanners;
 using Cryptid.Utils;
 using CryptidDemo;
@@ -124,7 +125,13 @@ namespace cryptidDemo {
             }
 
             var data = CandidateDelegate.Pack(_c, password.Text, PrivateKey);
-            var unpacked = CandidateDelegate.Unpack(data, password.Text, PrivateKey);
+            Candidate unpacked;
+            try {
+                unpacked = CandidateDelegate.Unpack(data, password.Text, PrivateKey);
+            } catch (PasswordIncorrectException) {
+                MessageBox.Show(Resources.PASSWORD_INCORRECT_ERROR, Resources.ERROR, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
 
             rawOutput.Text = BitConverter.ToString(data);
             uidOutput.Text = BitConverter.ToString(unpacked.Uid);

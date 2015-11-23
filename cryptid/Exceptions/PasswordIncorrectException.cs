@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Cryptid.Exceptions {
-    class PasswordIncorrectException : Exception {
+    public class PasswordIncorrectException : Exception {
         public PasswordIncorrectException() {
         }
 
