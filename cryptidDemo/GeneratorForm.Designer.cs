@@ -62,6 +62,7 @@
             this.tabPage6 = new System.Windows.Forms.TabPage();
             this.chainId = new System.Windows.Forms.TextBox();
             this.tabPage5 = new System.Windows.Forms.TabPage();
+            this.updateID = new System.Windows.Forms.Button();
             this.loadBlockChain = new System.Windows.Forms.Button();
             this.loadCryptidIdButton = new System.Windows.Forms.Button();
             this.genCard = new System.Windows.Forms.Button();
@@ -78,6 +79,7 @@
             this.label15 = new System.Windows.Forms.Label();
             this.password = new System.Windows.Forms.TextBox();
             this.cidSaveDialog = new System.Windows.Forms.SaveFileDialog();
+            this.confirmPassword = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.headshotBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.feet)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.inches)).BeginInit();
@@ -430,6 +432,7 @@
             // 
             // tabPage5
             // 
+            this.tabPage5.Controls.Add(this.updateID);
             this.tabPage5.Controls.Add(this.loadBlockChain);
             this.tabPage5.Controls.Add(this.loadCryptidIdButton);
             this.tabPage5.Controls.Add(this.genCard);
@@ -442,11 +445,21 @@
             this.tabPage5.Text = "Misc";
             this.tabPage5.UseVisualStyleBackColor = true;
             // 
+            // updateID
+            // 
+            this.updateID.Location = new System.Drawing.Point(265, 33);
+            this.updateID.Name = "updateID";
+            this.updateID.Size = new System.Drawing.Size(257, 23);
+            this.updateID.TabIndex = 6;
+            this.updateID.Text = "Update Existing ID";
+            this.updateID.UseVisualStyleBackColor = true;
+            this.updateID.Click += new System.EventHandler(this.updateID_Click);
+            // 
             // loadBlockChain
             // 
-            this.loadBlockChain.Location = new System.Drawing.Point(265, 37);
+            this.loadBlockChain.Location = new System.Drawing.Point(6, 62);
             this.loadBlockChain.Name = "loadBlockChain";
-            this.loadBlockChain.Size = new System.Drawing.Size(257, 23);
+            this.loadBlockChain.Size = new System.Drawing.Size(253, 23);
             this.loadBlockChain.TabIndex = 4;
             this.loadBlockChain.Text = "Load From Blockchain";
             this.loadBlockChain.UseVisualStyleBackColor = true;
@@ -464,9 +477,9 @@
             // 
             // genCard
             // 
-            this.genCard.Location = new System.Drawing.Point(4, 66);
+            this.genCard.Location = new System.Drawing.Point(265, 62);
             this.genCard.Name = "genCard";
-            this.genCard.Size = new System.Drawing.Size(518, 23);
+            this.genCard.Size = new System.Drawing.Size(257, 23);
             this.genCard.TabIndex = 2;
             this.genCard.Text = "Generate Identification Card";
             this.genCard.UseMnemonic = false;
@@ -475,7 +488,7 @@
             // 
             // uploadBlockchain
             // 
-            this.uploadBlockchain.Location = new System.Drawing.Point(4, 36);
+            this.uploadBlockchain.Location = new System.Drawing.Point(4, 33);
             this.uploadBlockchain.Name = "uploadBlockchain";
             this.uploadBlockchain.Size = new System.Drawing.Size(255, 23);
             this.uploadBlockchain.TabIndex = 1;
@@ -542,7 +555,7 @@
             // 
             // generateButton
             // 
-            this.generateButton.Location = new System.Drawing.Point(186, 303);
+            this.generateButton.Location = new System.Drawing.Point(186, 315);
             this.generateButton.Name = "generateButton";
             this.generateButton.Size = new System.Drawing.Size(313, 23);
             this.generateButton.TabIndex = 17;
@@ -552,7 +565,7 @@
             // 
             // fingerprintButton
             // 
-            this.fingerprintButton.Location = new System.Drawing.Point(344, 274);
+            this.fingerprintButton.Location = new System.Drawing.Point(344, 286);
             this.fingerprintButton.Name = "fingerprintButton";
             this.fingerprintButton.Size = new System.Drawing.Size(155, 23);
             this.fingerprintButton.TabIndex = 16;
@@ -562,7 +575,7 @@
             // 
             // headshotButton
             // 
-            this.headshotButton.Location = new System.Drawing.Point(186, 274);
+            this.headshotButton.Location = new System.Drawing.Point(186, 286);
             this.headshotButton.Name = "headshotButton";
             this.headshotButton.Size = new System.Drawing.Size(148, 23);
             this.headshotButton.TabIndex = 15;
@@ -588,11 +601,20 @@
             this.password.UseSystemPasswordChar = true;
             this.password.TextChanged += new System.EventHandler(this.password_TextChanged);
             // 
+            // confirmPassword
+            // 
+            this.confirmPassword.Location = new System.Drawing.Point(186, 260);
+            this.confirmPassword.Name = "confirmPassword";
+            this.confirmPassword.Size = new System.Drawing.Size(313, 20);
+            this.confirmPassword.TabIndex = 34;
+            this.confirmPassword.UseSystemPasswordChar = true;
+            // 
             // GeneratorForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1061, 332);
+            this.ClientSize = new System.Drawing.Size(1061, 342);
+            this.Controls.Add(this.confirmPassword);
             this.Controls.Add(this.label15);
             this.Controls.Add(this.password);
             this.Controls.Add(this.generateButton);
@@ -711,5 +733,7 @@
         private System.Windows.Forms.Button loadBlockChain;
         private System.Windows.Forms.TabPage tabPage6;
         private System.Windows.Forms.TextBox chainId;
+        private System.Windows.Forms.Button updateID;
+        private System.Windows.Forms.TextBox confirmPassword;
     }
 }

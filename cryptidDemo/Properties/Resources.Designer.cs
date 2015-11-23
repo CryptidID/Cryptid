@@ -61,6 +61,15 @@ namespace CryptidDemo.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Are you sure?.
+        /// </summary>
+        internal static string ARE_YOU_SURE {
+            get {
+                return ResourceManager.GetString("ARE_YOU_SURE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Auth likelyhood: .
         /// </summary>
         internal static string AUTH_LIKLEYHOOD_MESSAGE {
@@ -84,6 +93,15 @@ namespace CryptidDemo.Properties {
         internal static string CANNOT_SAVE_IF_NOT_GENERATED_OR_INCOMPLETE {
             get {
                 return ResourceManager.GetString("CANNOT_SAVE_IF_NOT_GENERATED_OR_INCOMPLETE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Chain ID cannot be empty!.
+        /// </summary>
+        internal static string CHAIN_ID_EMPTY {
+            get {
+                return ResourceManager.GetString("CHAIN_ID_EMPTY", resourceCulture);
             }
         }
         
@@ -133,6 +151,25 @@ namespace CryptidDemo.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot generate an and ID for an incomplete candidate..
+        /// </summary>
+        internal static string GeneratorForm_uploadBlockchain_Click_Cannot_generate_an_and_ID_for_an_incomplete_candidate_ {
+            get {
+                return ResourceManager.GetString("GeneratorForm_uploadBlockchain_Click_Cannot_generate_an_and_ID_for_an_incomplete_" +
+                        "candidate_", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This will replace all the information currently in the form. Do you wish to proceed?.
+        /// </summary>
+        internal static string INFORMATION_OVERWRITE_WARNING {
+            get {
+                return ResourceManager.GetString("INFORMATION_OVERWRITE_WARNING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Image Files|*.jpg.
         /// </summary>
         internal static string JPG_FILTER {
@@ -147,6 +184,15 @@ namespace CryptidDemo.Properties {
         internal static string MUST_ENTER_PASSWORD_MESSAGE {
             get {
                 return ResourceManager.GetString("MUST_ENTER_PASSWORD_MESSAGE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You must choose a .cid file or enter a chain ID.
+        /// </summary>
+        internal static string NEED_CID_OR_CHAIN_ID_ERROR {
+            get {
+                return ResourceManager.GetString("NEED_CID_OR_CHAIN_ID_ERROR", resourceCulture);
             }
         }
         
@@ -178,11 +224,38 @@ namespace CryptidDemo.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The provided passwords do not match!.
+        /// </summary>
+        internal static string PASSWORDS_NOT_MATCH {
+            get {
+                return ResourceManager.GetString("PASSWORDS_NOT_MATCH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to PDF File (*.pdf)|*.pdf.
         /// </summary>
         internal static string PDF_FILTER {
             get {
                 return ResourceManager.GetString("PDF_FILTER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This is an irreversible operation! Are you sure you wish to replace the ID on the chain (see chain ID field) with the provided information?.
+        /// </summary>
+        internal static string UPDATE_ID_WARNING {
+            get {
+                return ResourceManager.GetString("UPDATE_ID_WARNING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This is an Irreversable operation! Proceeding will upload this ID to the blockchain under a new unlinked chain permenantly. Please assure all information is correct..
+        /// </summary>
+        internal static string UPLOAD_BLOCKCHAIN_WARNING {
+            get {
+                return ResourceManager.GetString("UPLOAD_BLOCKCHAIN_WARNING", resourceCulture);
             }
         }
     }

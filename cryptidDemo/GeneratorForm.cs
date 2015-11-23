@@ -8,6 +8,7 @@ using Cryptid;
 using Cryptid.Scanners;
 using Cryptid.Utils;
 using CryptidDemo;
+using CryptidDemo.Properties;
 using SourceAFIS.Simple;
 using Keys = Cryptid.Utils.Keys;
 
@@ -44,7 +45,7 @@ namespace cryptidDemo {
 
         private void headshotButton_Click(object sender, EventArgs e) {
             headshotDialog.DefaultExt = "*.jpg";
-            headshotDialog.Filter = "Image Files|*.jpg";
+            headshotDialog.Filter = Resources.JPG_FILTER;
             headshotDialog.FileName = "";
             if (headshotDialog.ShowDialog() == DialogResult.OK) {
                 headshotBox.ImageLocation = headshotDialog.FileName;
@@ -112,13 +113,13 @@ namespace cryptidDemo {
 
         private void generateButton_Click(object sender, EventArgs e) {
             if (!_c.IsComplete()) {
-                MessageBox.Show("Cannot generate an and ID for an incomplete candidate.", "Error", MessageBoxButtons.OK,
+                MessageBox.Show(Resources.GeneratorForm_uploadBlockchain_Click_Cannot_generate_an_and_ID_for_an_incomplete_candidate_, Resources.ERROR, MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(password.Text)) {
-                MessageBox.Show("Password cannot be empty!.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(Resources.PASSWORD_EMPTY_ERROR, Resources.ERROR, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
@@ -151,7 +152,7 @@ namespace cryptidDemo {
                 Enabled = true;
             } else {
                 //TODO: Allow to choose fingerprint image?
-                MessageBox.Show("You are not connected to a fingerprint scanner!", "Error", MessageBoxButtons.OK,
+                MessageBox.Show(Resources.FPS_NOT_CONNECTED_ERROR, Resources.ERROR, MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
             }
         }
@@ -166,13 +167,13 @@ namespace cryptidDemo {
 
         private void save_Click(object sender, EventArgs e) {
             if (output == null) {
-                MessageBox.Show("Cannot save ID if none has been generated!", "Error", MessageBoxButtons.OK,
+                MessageBox.Show(Resources.CANNOT_SAVE_IF_NOT_GENERATED_ERROR, Resources.ERROR, MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
                 return;
             }
 
             cidSaveDialog.FileName = _c.Dcs + "-" + _c.Dad + "-" + _c.Dac + ".cid";
-            cidSaveDialog.Filter = "Cryptid ID File (*.cid)|*.cid";
+            cidSaveDialog.Filter = Resources.CRYPTID_ID_FILTER;
 
             if (cidSaveDialog.ShowDialog() == DialogResult.OK) {
                 File.WriteAllBytes(cidSaveDialog.FileName, output);
@@ -181,29 +182,46 @@ namespace cryptidDemo {
 
         private void uploadBlockchain_Click(object sender, EventArgs e) {
             if (!_c.IsComplete()) {
-                MessageBox.Show("Cannot generate an and ID for an incomplete candidate.", "Error", MessageBoxButtons.OK,
+                MessageBox.Show(Resources.GeneratorForm_uploadBlockchain_Click_Cannot_generate_an_and_ID_for_an_incomplete_candidate_, Resources.ERROR, MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(password.Text)) {
-                MessageBox.Show("Password cannot be empty!.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            if (string.IsNullOrWhiteSpace(chainId.Text)) {
+                MessageBox.Show(Resources.CHAIN_ID_EMPTY, Resources.ERROR, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
+            if (string.IsNullOrWhiteSpace(password.Text)) {
+                MessageBox.Show(Resources.PASSWORD_EMPTY_ERROR, Resources.ERROR, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            if (!password.Text.Equals(confirmPassword.Text)) {
+                MessageBox.Show(Resources.PASSWORDS_NOT_MATCH, Resources.ERROR, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            DialogResult d = MessageBox.Show(Resources.UPLOAD_BLOCKCHAIN_WARNING, Resources.ARE_YOU_SURE, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (d != DialogResult.Yes) return;
 
             chainId.Text = Convert.ToBase64String(CandidateDelegate.EnrollCandidate(_c, password.Text, PrivateKey));
         }
 
         private void genCard_Click(object sender, EventArgs e) {
+            if (string.IsNullOrWhiteSpace(chainId.Text)) {
+                MessageBox.Show(Resources.CHAIN_ID_EMPTY, Resources.ERROR, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
             if (_c == null || !_c.IsComplete()) {
-                MessageBox.Show("Cannot generate card if no ID has been generated or the candidate is incomplete!",
+                MessageBox.Show(Resources.CANNOT_SAVE_IF_NOT_GENERATED_OR_INCOMPLETE,
                     "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
             cidSaveDialog.FileName = _c.Dcs + "-" + _c.Dad + "-" + _c.Dac + ".pdf";
-            cidSaveDialog.Filter = "PDF File (*.pdf)|*.pdf";
+            cidSaveDialog.Filter = Resources.PDF_FILTER;
 
             if (cidSaveDialog.ShowDialog() == DialogResult.OK) {
                 var cg = new CardGenerator(_c, "cryptid-id-template.pdf");
@@ -213,50 +231,24 @@ namespace cryptidDemo {
 
         private void loadCryptidIdButton_Click(object sender, EventArgs e) {
             if (string.IsNullOrEmpty(password.Text)) {
-                MessageBox.Show("You must enter the password associated with this ID.", "Error", MessageBoxButtons.OK,
+                MessageBox.Show(Resources.MUST_ENTER_PASSWORD_MESSAGE, Resources.ERROR, MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
                 return;
             }
 
 
             headshotDialog.DefaultExt = "*.cid";
-            headshotDialog.Filter = "Cryptid ID File (*.cid)|*.cid";
+            headshotDialog.Filter = Resources.CRYPTID_ID_FILTER;
             headshotDialog.FileName = "";
             if (headshotDialog.ShowDialog() == DialogResult.OK) {
                 var packed = File.ReadAllBytes(headshotDialog.FileName);
-                output = packed;
                 var c = CandidateDelegate.Unpack(packed, password.Text, PrivateKey);
-
-                lastName.Text = c.Dcs;
-                firstName.Text = c.Dac;
-                middleName.Text = c.Dad;
-                issued.Value = c.Dbd;
-                dob.Value = c.Dbb;
-                sex.SelectedIndex = (int)c.Dbc - 1;
-                eye.SelectedIndex = (int)c.Day;
-                inches.Value = c.Dau.Inches;
-                feet.Value = c.Dau.Feet;
-                address.Text = c.Dag;
-                city.Text = c.Dai;
-                state.Text = c.Daj;
-                zipcode.Text = c.Dak.AnsiFormat;
-                country.Text = c.Dcg;
-                headshotBox.Image = c.Image;
-
-                _c = c;
+                SetCandidate(c, packed);
             }
         }
 
-        private void loadBlockChain_Click(object sender, EventArgs e) {
-            if (string.IsNullOrEmpty(password.Text)) {
-                MessageBox.Show("You must enter the password associated with this ID.", "Error", MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
-                return;
-            }
-
-            var packed = CandidateDelegate.GetPackedCandidate(Convert.FromBase64String(chainId.Text));
+        private void SetCandidate(Candidate c, byte[] packed) {
             output = packed;
-            var c = CandidateDelegate.Unpack(packed, password.Text, PrivateKey);
 
             lastName.Text = c.Dcs;
             firstName.Text = c.Dac;
@@ -274,8 +266,75 @@ namespace cryptidDemo {
             country.Text = c.Dcg;
             headshotBox.Image = c.Image;
 
+            password.Text = "";
+            confirmPassword.Text = "";
+
             _c = c;
-            
+        }
+
+        private void loadBlockChain_Click(object sender, EventArgs e) {
+            if (string.IsNullOrEmpty(password.Text)) {
+                MessageBox.Show(Resources.MUST_ENTER_PASSWORD_MESSAGE, Resources.ERROR, MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(chainId.Text)) {
+                MessageBox.Show(Resources.CHAIN_ID_EMPTY, Resources.ERROR, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            DialogResult d = MessageBox.Show(Resources.INFORMATION_OVERWRITE_WARNING, Resources.ARE_YOU_SURE, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (d != DialogResult.Yes) return;
+
+            var packed = CandidateDelegate.GetPackedCandidate(Convert.FromBase64String(chainId.Text));
+            var c = CandidateDelegate.Unpack(packed, password.Text, PrivateKey);
+            SetCandidate(c, packed);
+        }
+
+        private void updateID_Click(object sender, EventArgs e) {
+            if (!_c.IsComplete()) {
+                MessageBox.Show(Resources.GeneratorForm_uploadBlockchain_Click_Cannot_generate_an_and_ID_for_an_incomplete_candidate_, Resources.ERROR, MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(chainId.Text)) {
+                MessageBox.Show(Resources.CHAIN_ID_EMPTY, Resources.ERROR, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(password.Text)) {
+                MessageBox.Show(Resources.PASSWORD_EMPTY_ERROR, Resources.ERROR, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            if (!password.Text.Equals(confirmPassword.Text)) {
+                MessageBox.Show(Resources.PASSWORDS_NOT_MATCH, Resources.ERROR, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            DialogResult d = MessageBox.Show(Resources.UPDATE_ID_WARNING, Resources.ARE_YOU_SURE, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (d != DialogResult.Yes) return;
+
+            Fingerprint fp = new Fingerprint();
+            if (connectDialog.IsConnected) {
+                var scanForm = new ScanFingerForm();
+                var dr = scanForm.ShowDialog(this);
+                if (dr == DialogResult.OK) {
+                    fp.AsBitmap = scanForm.Fingerprint;
+                } else {
+                    scanForm.Dispose();
+                    return;
+                }
+
+                scanForm.Dispose();
+            } else {
+                MessageBox.Show(Resources.FPS_NOT_CONNECTED_ERROR, Resources.ERROR, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            CandidateDelegate.UpdateCandidate(_c, password.Text, fp, PrivateKey, Convert.FromBase64String(chainId.Text));
         }
     }
 }
