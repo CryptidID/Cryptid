@@ -96,6 +96,7 @@
             this.chainHistory.Size = new System.Drawing.Size(495, 161);
             this.chainHistory.TabIndex = 0;
             this.chainHistory.UseCompatibleStateImageBehavior = false;
+            this.chainHistory.DoubleClick += new System.EventHandler(this.chainHistory_DoubleClick);
             // 
             // CandidateInfoForm
             // 

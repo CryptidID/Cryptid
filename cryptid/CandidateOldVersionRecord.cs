@@ -64,19 +64,20 @@ namespace Cryptid {
         /// <returns>The record object</returns>
         public static CandidateOldVersionRecord Unpack(byte[] packed, RSAParameters pubKey) {
             var sig = Arrays.CopyOfRange(packed, packed.Length - 512, packed.Length);
+            var data = Arrays.CopyOfRange(packed, 0, packed.Length - 512);
             var prefix = Arrays.CopyOfRange(packed, 0, CandidateOldVersionPrefix.Length);
 
-            if (!Crypto.RSA_Verify(packed, sig, pubKey)) {
+            if (!Crypto.RSA_Verify(data, sig, pubKey)) {
                 throw new DataVerifyException("Could not cryptographically verify candidate update record");
             }
 
-            if (CandidateOldVersionPrefix != prefix ||
-                packed.Length != ChainIdLength*2 + 512 + CandidateOldVersionPrefix.Length) {
+            data = Arrays.CopyOfRange(data, CandidateOldVersionPrefix.Length, data.Length);
+
+            if (!Bytes.Equality(CandidateOldVersionPrefix, prefix) || packed.Length != ChainIdLength*2 + 512 + CandidateOldVersionPrefix.Length) {
                 throw new RecordDataInvalidException("Invalid data provided for packed candidate update record");
             }
 
-            return new CandidateOldVersionRecord(Arrays.CopyOfRange(packed, 0, ChainIdLength),
-                Arrays.CopyOfRange(packed, ChainIdLength, ChainIdLength*2));
+            return new CandidateOldVersionRecord(Arrays.CopyOfRange(data, 0, ChainIdLength), Arrays.CopyOfRange(data, ChainIdLength, ChainIdLength*2));
         }
     }
 }

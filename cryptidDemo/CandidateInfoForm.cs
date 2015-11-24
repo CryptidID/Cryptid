@@ -44,5 +44,10 @@ namespace CryptidDemo {
                 }
             }
         }
+
+        private void chainHistory_DoubleClick(object sender, EventArgs e) {
+            if (chainHistory.SelectedItems.Count < 1) return;
+            Clipboard.SetText(chainHistory.SelectedItems[0].Text);
+        }
     }
 }

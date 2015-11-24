@@ -53,8 +53,10 @@ namespace Cryptid.Factom.API
         public ChainHeadData GetChainHead(byte[] hash) {
             var hashString = Arrays.ByteArrayToHex(hash);
             var req = new RestRequest("/chain-head/{hash}", Method.GET);
+            // var x = Arrays.ByteArrayToHex(hash);
             req.AddUrlSegment("hash", hashString);
             IRestResponse resp = client.Execute(req);
+            if(resp.Content.Contains("Chain not found")) throw new FactomEntryException("Chain not found");
             try {
                 DataStructs.ChainHeadDataStringFormat chainHead = JsonConvert.DeserializeObject<DataStructs.ChainHeadDataStringFormat>(resp.Content);
                 return DataStructs.ConvertStringFormatToByteFormat(chainHead);
