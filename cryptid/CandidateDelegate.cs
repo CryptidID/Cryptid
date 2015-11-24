@@ -198,11 +198,6 @@ namespace Cryptid {
                     var cur = (CandidateUpdatedRecord) curr;
                     if (!ret.Any(x => x.SequenceEqual(cur.PreviousChain))) {
                         ret.Add(cur.PreviousChain);
-
-                        var chainidNow = Arrays.ByteArrayToHex(chainId);
-                        var PREVChaIn = Arrays.ByteArrayToHex(cur.PreviousChain);
-                        var CurChaIm = Arrays.ByteArrayToHex(cur.CurrentChain);
-
                         toSort.AddRange(GetCandidateUpdatedRecords(cur.PreviousChain, pubKey));
                         toSort.AddRange(GetOldVersionRecords(cur.PreviousChain, pubKey));
                     }
