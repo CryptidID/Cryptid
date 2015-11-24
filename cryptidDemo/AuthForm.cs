@@ -5,7 +5,6 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Windows.Forms;
 using Cryptid;
-using Cryptid.Utils;
 using CryptidDemo.Properties;
 using SourceAFIS.Simple;
 using Keys = Cryptid.Utils.Keys;
@@ -38,7 +37,8 @@ namespace CryptidDemo {
 
         private void showInfoButton_Click(object sender, EventArgs e) {
             if (PackedData == null && string.IsNullOrWhiteSpace(chainID.Text)) {
-                MessageBox.Show(Resources.NEED_CID_OR_CHAIN_ID_ERROR, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(Resources.NEED_CID_OR_CHAIN_ID_ERROR, "Error", MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
                 return;
             }
 
@@ -49,7 +49,7 @@ namespace CryptidDemo {
             }
             else {
                 var info = new CandidateInfoForm();
-                byte[] packed = CandidateDelegate.GetPackedCandidate(Convert.FromBase64String(chainID.Text));
+                var packed = CandidateDelegate.GetPackedCandidate(Convert.FromBase64String(chainID.Text));
                 info.LoadCandidateInfo(packed, Password, Convert.FromBase64String(chainID.Text));
                 info.Show();
             }

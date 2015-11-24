@@ -48,13 +48,13 @@ namespace Cryptid {
         /// <param name="maxSegmentLength">The maximum data length for each segment</param>
         public DataSegment(byte[] data, ushort currSegment, ushort maxSegments,
             int maxSegmentLength = DefaultMaxSegmentLength) {
-
             _maxSegmentLength = maxSegmentLength;
             _maxDataLength = GetMaxDataLength(maxSegmentLength);
 
             if (data.Length > _maxDataLength)
-                throw new DataSegmentOverflowException("Attempted to pack " + data.Length + " bytes in a segment that can only hold " +
-                                    _maxDataLength);
+                throw new DataSegmentOverflowException("Attempted to pack " + data.Length +
+                                                       " bytes in a segment that can only hold " +
+                                                       _maxDataLength);
 
             CurrentSegment = currSegment;
             MaxSegments = maxSegments;

@@ -4,7 +4,6 @@ using System;
 using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
-using Cryptid;
 using Cryptid.Utils;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
@@ -16,15 +15,35 @@ using Image = iTextSharp.text.Image;
 #endregion
 
 namespace Cryptid {
+    /// <summary>
+    ///     Generates a Cryptid ID card image for a specified candidate
+    /// </summary>
     public class CardGenerator {
+        /// <summary>
+        ///     The candidate to create this card for.
+        /// </summary>
         private readonly Candidate _cardCandidate;
+
+        /// <summary>
+        ///     The PDF template for the Cryptid ID
+        /// </summary>
         private readonly string _pdfTemplateFile;
 
+        /// <summary>
+        ///     Creates a new CardGenerator instance
+        /// </summary>
+        /// <param name="cardCandidate">The candidate to create the card for</param>
+        /// <param name="pdfTemplateFile">The PDF template to generate the card</param>
         public CardGenerator(Candidate cardCandidate, string pdfTemplateFile) {
             _cardCandidate = cardCandidate;
             _pdfTemplateFile = pdfTemplateFile;
         }
 
+        /// <summary>
+        ///     Generates the Cryptid ID card
+        /// </summary>
+        /// <param name="outputFile">The locaton to output the Cryptid ID</param>
+        /// <param name="chainId">The chainId of this candidate</param>
         public void Generate(string outputFile, byte[] chainId) {
             if (_cardCandidate.Uid == null) throw new Exception("A UID is required to generate a new card!");
 
@@ -43,7 +62,9 @@ namespace Cryptid {
                         form.SetField(key, _cardCandidate.Dcs);
                     }
                     else if (key.Contains("FN_MN")) {
-                        form.SetField(key, _cardCandidate.Dac + (string.IsNullOrWhiteSpace(_cardCandidate.Dad) ? "" : ", " + _cardCandidate.Dad));
+                        form.SetField(key,
+                            _cardCandidate.Dac +
+                            (string.IsNullOrWhiteSpace(_cardCandidate.Dad) ? "" : ", " + _cardCandidate.Dad));
                     }
                     else if (key.Contains("SEX")) {
                         form.SetField(key, _cardCandidate.Dbc == Candidate.Sex.Male ? "M" : "F");
@@ -102,6 +123,11 @@ namespace Cryptid {
             }
         }
 
+        /// <summary>
+        ///     Converts an iText image to a Bitmap
+        /// </summary>
+        /// <param name="img">The iText image</param>
+        /// <returns>The bitmap for this image</returns>
         public Bitmap ImageToBitmap(Image img) {
             var bmp = new Bitmap((int) img.Width, (int) img.Height, CSImaging.PixelFormat.Format24bppRgb);
             var rect = new CSRectangle(0, 0, bmp.Width, bmp.Height);
@@ -111,6 +137,11 @@ namespace Cryptid {
             return bmp;
         }
 
+        /// <summary>
+        ///     Trims the whitespace around a bitmap
+        /// </summary>
+        /// <param name="source">The bitmap to trim</param>
+        /// <returns>The trimmed bitmap</returns>
         private Bitmap TrimBitmap(Bitmap source) {
             CSRectangle srcRect;
             CSImaging.BitmapData data = null;

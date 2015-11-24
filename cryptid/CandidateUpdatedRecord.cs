@@ -1,6 +1,5 @@
 ﻿#region
 
-using System;
 using System.Linq;
 using System.Security.Cryptography;
 using Cryptid.Exceptions;
@@ -9,6 +8,9 @@ using Cryptid.Utils;
 #endregion
 
 namespace Cryptid {
+    /// <summary>
+    ///     An interface for any cryptid records
+    /// </summary>
     public interface IRecord {
     }
 
@@ -76,11 +78,13 @@ namespace Cryptid {
 
             data = Arrays.CopyOfRange(data, UpdatedRecordPrefix.Length, data.Length);
 
-            if (!Bytes.Equality(UpdatedRecordPrefix, prefix) || packed.Length != ChainIdLength*2 + 512 + UpdatedRecordPrefix.Length) {
+            if (!Bytes.Equality(UpdatedRecordPrefix, prefix) ||
+                packed.Length != ChainIdLength*2 + 512 + UpdatedRecordPrefix.Length) {
                 throw new RecordDataInvalidException("Invalid data provided for packed candidate update record");
             }
 
-            return new CandidateUpdatedRecord(Arrays.CopyOfRange(data, 0, ChainIdLength), Arrays.CopyOfRange(data, ChainIdLength, ChainIdLength*2));
+            return new CandidateUpdatedRecord(Arrays.CopyOfRange(data, 0, ChainIdLength),
+                Arrays.CopyOfRange(data, ChainIdLength, ChainIdLength*2));
         }
     }
 }

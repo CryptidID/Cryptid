@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Cryptid.Exceptions {
-    class FactomEntryException : Exception {
+    /// <summary>
+    ///     This exception is thrown when an error occurs in
+    ///     the scope of a Factom entry.
+    /// </summary>
+    internal class FactomEntryException : Exception {
         public FactomEntryException() {
         }
 

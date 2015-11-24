@@ -1,6 +1,5 @@
 ﻿#region
 
-using System;
 using System.Linq;
 using System.Security.Cryptography;
 using Cryptid.Exceptions;
@@ -73,11 +72,13 @@ namespace Cryptid {
 
             data = Arrays.CopyOfRange(data, CandidateOldVersionPrefix.Length, data.Length);
 
-            if (!Bytes.Equality(CandidateOldVersionPrefix, prefix) || packed.Length != ChainIdLength*2 + 512 + CandidateOldVersionPrefix.Length) {
+            if (!Bytes.Equality(CandidateOldVersionPrefix, prefix) ||
+                packed.Length != ChainIdLength*2 + 512 + CandidateOldVersionPrefix.Length) {
                 throw new RecordDataInvalidException("Invalid data provided for packed candidate update record");
             }
 
-            return new CandidateOldVersionRecord(Arrays.CopyOfRange(data, 0, ChainIdLength), Arrays.CopyOfRange(data, ChainIdLength, ChainIdLength*2));
+            return new CandidateOldVersionRecord(Arrays.CopyOfRange(data, 0, ChainIdLength),
+                Arrays.CopyOfRange(data, ChainIdLength, ChainIdLength*2));
         }
     }
 }

@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Cryptid.Exceptions {
-    class RecordDataInvalidException : Exception {
+    internal class RecordDataInvalidException : Exception {
+        /// <summary>
+        ///     This exception is thrown when an IRecord contains
+        ///     invalid data.
+        /// </summary>
         public RecordDataInvalidException() {
         }
 

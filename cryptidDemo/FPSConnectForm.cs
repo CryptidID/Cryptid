@@ -43,8 +43,8 @@ namespace CryptidDemo {
         private void connectButton_Click(object sender, EventArgs e) {
             connectProgress.Visible = true;
             connectButton.Enabled = false;
-            FPS_GT511C3.Close();
-            var status = FPS_GT511C3.Open(Port, Baud);
+            FpsGt511C1R.Close();
+            var status = FpsGt511C1R.Open(Port, Baud);
             if (status == 1) {
                 DialogResult = DialogResult.OK;
                 IsConnected = true;
@@ -56,7 +56,7 @@ namespace CryptidDemo {
                 IsConnected = false;
                 connectBg.BackColor = Color.Red;
                 connectText.Text = Resources.FPS_DISCONNECTED;
-                FPS_GT511C3.Close();
+                FpsGt511C1R.Close();
 
                 MessageBox.Show(
                     $"Got connect error #{status}.\nYou may need to manually reset the device and try again.");

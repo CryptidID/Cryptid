@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Cryptid.Exceptions {
-    class DataSegmentOverflowException : Exception {
+    /// <summary>
+    ///     This exception is to be thrown when an attempt is made
+    ///     to store too much data in a DataSegment.
+    /// </summary>
+    internal class DataSegmentOverflowException : Exception {
         public DataSegmentOverflowException() {
         }
 
