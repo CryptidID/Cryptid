@@ -213,6 +213,7 @@ namespace cryptidDemo {
             if (d != DialogResult.Yes) return;
 
             chainId.Text = Convert.ToBase64String(CandidateDelegate.EnrollCandidate(_c, password.Text, PrivateKey));
+            Clipboard.SetText(chainId.Text);
         }
 
         private void genCard_Click(object sender, EventArgs e) {
@@ -341,6 +342,7 @@ namespace cryptidDemo {
                  return;
              }
             chainId.Text = Convert.ToBase64String(CandidateDelegate.UpdateCandidate(_c, password.Text, fp, PrivateKey, Convert.FromBase64String(chainId.Text)));
+            Clipboard.SetText(chainId.Text);
         }
     }
 }

@@ -67,18 +67,20 @@ namespace Cryptid {
         /// <returns>The record object</returns>
         public static CandidateUpdatedRecord Unpack(byte[] packed, RSAParameters pubKey) {
             var sig = Arrays.CopyOfRange(packed, packed.Length - 512, packed.Length);
+            var data = Arrays.CopyOfRange(packed, 0, packed.Length - 512);
             var prefix = Arrays.CopyOfRange(packed, 0, UpdatedRecordPrefix.Length);
 
-            if (!Crypto.RSA_Verify(packed, sig, pubKey)) {
+            if (!Crypto.RSA_Verify(data, sig, pubKey)) {
                 throw new DataVerifyException("Could not cryptographically verify candidate update record");
             }
 
-            if (UpdatedRecordPrefix != prefix || packed.Length != ChainIdLength*2 + 512 + UpdatedRecordPrefix.Length) {
+            data = Arrays.CopyOfRange(data, UpdatedRecordPrefix.Length, data.Length);
+
+            if (!Bytes.Equality(UpdatedRecordPrefix, prefix) || packed.Length != ChainIdLength*2 + 512 + UpdatedRecordPrefix.Length) {
                 throw new RecordDataInvalidException("Invalid data provided for packed candidate update record");
             }
 
-            return new CandidateUpdatedRecord(Arrays.CopyOfRange(packed, 0, ChainIdLength),
-                Arrays.CopyOfRange(packed, ChainIdLength, ChainIdLength*2));
+            return new CandidateUpdatedRecord(Arrays.CopyOfRange(data, 0, ChainIdLength), Arrays.CopyOfRange(data, ChainIdLength, ChainIdLength*2));
         }
     }
 }

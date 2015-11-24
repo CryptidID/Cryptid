@@ -162,6 +162,7 @@ namespace Cryptid {
         }
 
         /// <summary>
+        /// Get all Candidate update records in a chain
         /// </summary>
         /// <param name="chainId"></param>
         /// <param name="pubKey">The public key to verify the data with</param>
@@ -188,12 +189,20 @@ namespace Cryptid {
             var toSort = new List<IRecord>();
             var ret = new List<byte[]>();
 
+            toSort.AddRange(GetCandidateUpdatedRecords(chainId, pubKey));
+            toSort.AddRange(GetOldVersionRecords(chainId, pubKey));
+
             while (toSort.Count > 0) {
                 var curr = toSort[0];
                 if (curr is CandidateUpdatedRecord) {
                     var cur = (CandidateUpdatedRecord) curr;
                     if (!ret.Any(x => x.SequenceEqual(cur.PreviousChain))) {
                         ret.Add(cur.PreviousChain);
+
+                        var chainidNow = Arrays.ByteArrayToHex(chainId);
+                        var PREVChaIn = Arrays.ByteArrayToHex(cur.PreviousChain);
+                        var CurChaIm = Arrays.ByteArrayToHex(cur.CurrentChain);
+
                         toSort.AddRange(GetCandidateUpdatedRecords(cur.PreviousChain, pubKey));
                         toSort.AddRange(GetOldVersionRecords(cur.PreviousChain, pubKey));
                     }
