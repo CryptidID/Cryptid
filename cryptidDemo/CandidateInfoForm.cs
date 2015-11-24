@@ -39,7 +39,7 @@ namespace CryptidDemo {
 
             if (chainId != null) {
                 chainHistory.View = View.List;
-                foreach(var cid in CandidateDelegate.GetCandidateChainHistory(chainId, _publicKey)) {
+                foreach (var cid in CandidateDelegate.GetCandidateChainHistory(chainId, _publicKey)) {
                     chainHistory.Items.Add(new ListViewItem(Convert.ToBase64String(cid)));
                 }
             }

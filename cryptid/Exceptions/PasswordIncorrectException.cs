@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Cryptid.Exceptions {
+    /// <summary>
+    ///     This exception is thrown when an incorrect password is
+    ///     provided to decrypt data.
+    /// </summary>
     public class PasswordIncorrectException : Exception {
         public PasswordIncorrectException() {
         }

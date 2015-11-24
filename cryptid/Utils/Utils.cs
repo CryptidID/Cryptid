@@ -14,13 +14,22 @@ using Cryptid.Factom.API;
 
 namespace Cryptid.Utils {
     public static class Keys {
+        /// <summary>
+        ///     Gets an RSA private key at the specified path
+        /// </summary>
+        /// <param name="path">The path to the private key</param>
+        /// <returns>The private key RSA parameters</returns>
         public static RSAParameters PrivateKey(string path) {
             var k = new RSACryptoServiceProvider();
             k.FromXmlString(File.ReadAllText(path));
             return k.ExportParameters(true);
         }
 
-
+        /// <summary>
+        ///     Gets an RSA public key at the specified path
+        /// </summary>
+        /// <param name="path">The path to the public key</param>
+        /// <returns>The public key RSA parameters</returns>
         public static RSAParameters PublicKey(string path) {
             var k = new RSACryptoServiceProvider();
             k.FromXmlString(File.ReadAllText(path));
@@ -28,6 +37,10 @@ namespace Cryptid.Utils {
         }
     }
 
+    /// <summary>
+    ///     Provides a way to easily assign a string
+    ///     to an enum.
+    /// </summary>
     public class StringValue : Attribute {
         public StringValue(string value) {
             Value = value;
@@ -38,6 +51,15 @@ namespace Cryptid.Utils {
 
 
     public static class Arrays {
+        /// <summary>
+        ///     Copys a section of an enumerable into another array
+        /// </summary>
+        /// <typeparam name="T">The enumerable's type</typeparam>
+        /// <param name="source">The source enumerable</param>
+        /// <param name="index">The start index of the slice</param>
+        /// <param name="length">The length of the slice</param>
+        /// <param name="padToLength">Should we pad the slice to the length specified</param>
+        /// <returns></returns>
         public static T[] CopySlice<T>(this T[] source, int index, int length, bool padToLength = false) {
             var n = length;
             T[] slice = null;
@@ -54,11 +76,26 @@ namespace Cryptid.Utils {
             return slice;
         }
 
+        /// <summary>
+        ///     Slices an enumerable into the specified number of parts
+        /// </summary>
+        /// <typeparam name="T">The enumerable's type</typeparam>
+        /// <param name="source">The enumerable to cut</param>
+        /// <param name="count">The number of slices</param>
+        /// <param name="padToLength">Whether or not to pad the slices to an equal length</param>
+        /// <returns></returns>
         public static IEnumerable<T[]> Slices<T>(this T[] source, int count, bool padToLength = false) {
             for (var i = 0; i < source.Length; i += count)
                 yield return source.CopySlice(i, count, padToLength);
         }
 
+        /// <summary>
+        ///     Convience function to emulate Java's CopyOfRange
+        /// </summary>
+        /// <param name="src">The byte array to copfrom</param>
+        /// <param name="start">The index to cut from</param>
+        /// <param name="end">The index to cut to</param>
+        /// <returns></returns>
         public static byte[] CopyOfRange(byte[] src, int start, int end) {
             var len = end - start;
             var dest = new byte[len];
@@ -92,7 +129,7 @@ namespace Cryptid.Utils {
         }
 
         /// <summary>
-        /// Checks if two byte arrays are equal
+        ///     Checks if two byte arrays are equal
         /// </summary>
         /// <param name="a1">Byte[] to be compared</param>
         /// <param name="b1">Byte[] to be compared</param>
@@ -111,6 +148,12 @@ namespace Cryptid.Utils {
             return false;
         }
 
+        /// <summary>
+        ///     Checks if a byte sequence begins with another byte sequence
+        /// </summary>
+        /// <param name="haystack">The sequence to check</param>
+        /// <param name="needle">The sequence we want to find in the haystack</param>
+        /// <returns>Whether or not needle was found in haystack</returns>
         public static bool StartsWith(byte[] haystack, byte[] needle) {
             if (needle.Length > haystack.Length) return false;
             for (var i = 0; i < needle.Length; i++) {
@@ -133,7 +176,7 @@ namespace Cryptid.Utils {
 
     public static class Entries {
         /// <summary>
-        /// Gets a hash of an entry
+        ///     Gets a hash of an entry
         /// </summary>
         /// <param name="entry">EntryData to be hashed</param>
         /// <returns>Hash of entry</returns>
@@ -148,7 +191,7 @@ namespace Cryptid.Utils {
         }
 
         /// <summary>
-        /// Passing the first entry of a Chain will get the chainId of that entry. Needs the ExtIDs to do this successfully
+        ///     Passing the first entry of a Chain will get the chainId of that entry. Needs the ExtIDs to do this successfully
         /// </summary>
         /// <param name="entry">Entry object</param>
         /// <returns>ChainID</returns>
@@ -163,7 +206,7 @@ namespace Cryptid.Utils {
         }
 
         /// <summary>
-        /// Marshals an entry into a byte[] to be sent to restAPI
+        ///     Marshals an entry into a byte[] to be sent to restAPI
         /// </summary>
         /// <param name="e">Entry to be marshaled</param>
         /// <returns>Marshaled entry</returns>
@@ -197,7 +240,7 @@ namespace Cryptid.Utils {
         }
 
         /// <summary>
-        /// Helper function of MarshalBinary
+        ///     Helper function of MarshalBinary
         /// </summary>
         /// <param name="e"></param>
         /// <returns></returns>
@@ -216,7 +259,7 @@ namespace Cryptid.Utils {
         }
 
         /// <summary>
-        /// Helper function of MarshalBinary
+        ///     Helper function of MarshalBinary
         /// </summary>
         /// <param name="e"></param>
         /// <returns></returns>
@@ -242,7 +285,7 @@ namespace Cryptid.Utils {
         }
 
         /// <summary>
-        /// Caculates the cost of an entry
+        ///     Caculates the cost of an entry
         /// </summary>
         /// <param name="entry"></param>
         /// <returns></returns>
@@ -274,6 +317,11 @@ namespace Cryptid.Utils {
             {0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x70, 0x80, 0x90, 0xa0, 0xb0, 0xc0, 0xd0, 0xe0, 0xf0}
         };
 
+        /// <summary>
+        ///     Gets a random string of a specified length
+        /// </summary>
+        /// <param name="length">The length of the string</param>
+        /// <returns>The random string</returns>
         public static string RandomString(int length) {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             var random = new Random();
@@ -282,7 +330,7 @@ namespace Cryptid.Utils {
         }
 
         /// <summary>
-        /// Converts string hex into byte[]
+        ///     Converts string hex into byte[]
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
@@ -301,7 +349,7 @@ namespace Cryptid.Utils {
         }
 
         /// <summary>
-        ///  If hex string has "-", this method removes them
+        ///     If hex string has "-", this method removes them
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
@@ -310,7 +358,7 @@ namespace Cryptid.Utils {
         }
 
         /// <summary>
-        /// Helper function of Hex functions
+        ///     Helper function of Hex functions
         /// </summary>
         /// <param name="c"></param>
         /// <returns></returns>
@@ -361,6 +409,13 @@ namespace Cryptid.Utils {
     }
 
     public static class ControlExtensions {
+        /// <summary>
+        ///     Extension method to set a property in a threadsafe manor
+        /// </summary>
+        /// <typeparam name="TResult">The thread result</typeparam>
+        /// <param name="@this">The control to set the property on</param>
+        /// <param name="property">The property to change</param>
+        /// <param name="value">The new value of the property</param>
         public static void SetPropertyThreadSafe<TResult>(
             this Control @this,
             Expression<Func<TResult>> property,

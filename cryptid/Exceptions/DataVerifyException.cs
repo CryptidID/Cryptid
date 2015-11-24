@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Cryptid.Exceptions {
-    class DataVerifyException : Exception {
+    /// <summary>
+    ///     This exception is thrown when signed data can
+    ///     not be verified using the provided public key.
+    /// </summary>
+    internal class DataVerifyException : Exception {
         public DataVerifyException() {
         }
 

@@ -1,6 +1,5 @@
 ﻿#region
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -8,7 +7,6 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using cryptid.Factom.API;
-using Cryptid;
 using Cryptid.Exceptions;
 using Cryptid.Factom.API;
 using Cryptid.Utils;
@@ -17,9 +15,19 @@ using SourceAFIS.Simple;
 #endregion
 
 namespace Cryptid {
+    /// <summary>
+    ///     Handles all CandidateDelegate; Basically, any action you need to perform
+    ///     on a Candidate should be done here.
+    /// </summary>
     public static class CandidateDelegate {
+        /// <summary>
+        ///     The name of the Factom wallet to use
+        /// </summary>
         private const string FactomWallet = "CCNEntryCreds";
 
+        /// <summary>
+        ///     The length of our external IDs
+        /// </summary>
         private const int ExtIDsLength = 102; //2 byte header per ExtID + 2 sha256 hash + 32 byte random string
 
         /// <summary>
@@ -53,7 +61,8 @@ namespace Cryptid {
 
             foreach (
                 var segment in
-                    DataSegment.Segmentize(packed, firstSegmentLength: DataSegment.DefaultMaxSegmentLength - ExtIDsLength)) {
+                    DataSegment.Segmentize(packed,
+                        firstSegmentLength: DataSegment.DefaultMaxSegmentLength - ExtIDsLength)) {
                 var dataToUpload = segment.Pack();
                 var factomEntry = entryApi.NewEntry(dataToUpload, null, null);
                 if (segment.CurrentSegment == 0) {
@@ -162,7 +171,7 @@ namespace Cryptid {
         }
 
         /// <summary>
-        /// Get all Candidate update records in a chain
+        ///     Get all Candidate update records in a chain
         /// </summary>
         /// <param name="chainId"></param>
         /// <param name="pubKey">The public key to verify the data with</param>
@@ -273,7 +282,8 @@ namespace Cryptid {
             byte[] data;
             try {
                 data = Crypto.AES_Decrypt(Arrays.CopyOfRange(packed, 64, packed.Length - 512), password);
-            } catch (CryptographicException) {
+            }
+            catch (CryptographicException) {
                 data = null;
             }
 

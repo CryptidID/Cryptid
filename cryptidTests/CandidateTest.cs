@@ -2,7 +2,6 @@
 
 using System;
 using System.Drawing;
-using System.IO;
 using System.Security.Cryptography;
 using Cryptid;
 using Cryptid.Utils;

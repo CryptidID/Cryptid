@@ -16,10 +16,10 @@ using Keys = Cryptid.Utils.Keys;
 namespace cryptidDemo {
     //TODO: Auto generate template images/save
     public partial class GeneratorForm : Form {
+        private readonly FpsConnectForm connectDialog = new FpsConnectForm();
         private readonly RSAParameters PrivateKey = Keys.PrivateKey("private.xml");
 
         private Candidate _c = new Candidate();
-        private readonly FpsConnectForm connectDialog = new FpsConnectForm();
         private byte[] output;
 
         public GeneratorForm() {
@@ -34,12 +34,12 @@ namespace cryptidDemo {
             connectDialog.Close();
             Enabled = true;
 
-            eye.DataSource = Enum.GetValues(typeof(Candidate.EyeColor)).Cast<Candidate.EyeColor>();
-            sex.DataSource = Enum.GetValues(typeof(Candidate.Sex)).Cast<Candidate.Sex>();
+            eye.DataSource = Enum.GetValues(typeof (Candidate.EyeColor)).Cast<Candidate.EyeColor>();
+            sex.DataSource = Enum.GetValues(typeof (Candidate.Sex)).Cast<Candidate.Sex>();
 
             _c.Dbd = _c.Dbb = dob.Value = issued.Value = DateTime.Today;
-            _c.Dbc = (Candidate.Sex)Enum.Parse(typeof(Candidate.Sex), sex.SelectedText);
-            _c.Day = (Candidate.EyeColor)Enum.Parse(typeof(Candidate.EyeColor), eye.SelectedText);
+            _c.Dbc = (Candidate.Sex) Enum.Parse(typeof (Candidate.Sex), sex.SelectedText);
+            _c.Day = (Candidate.EyeColor) Enum.Parse(typeof (Candidate.EyeColor), eye.SelectedText);
 
             _c.Dau = new Candidate.Height(0, 0);
         }
@@ -92,20 +92,20 @@ namespace cryptidDemo {
 
         private void eye_SelectedIndexChanged(object sender, EventArgs e) {
             _c.Day = eye.SelectedItem is Candidate.EyeColor
-                ? (Candidate.EyeColor)eye.SelectedItem
+                ? (Candidate.EyeColor) eye.SelectedItem
                 : Candidate.EyeColor.Unknown;
         }
 
         private void sex_SelectedIndexChanged(object sender, EventArgs e) {
-            _c.Dbc = eye.SelectedItem is Candidate.Sex ? (Candidate.Sex)sex.SelectedItem : Candidate.Sex.Male;
+            _c.Dbc = eye.SelectedItem is Candidate.Sex ? (Candidate.Sex) sex.SelectedItem : Candidate.Sex.Male;
         }
 
         private void feet_ValueChanged(object sender, EventArgs e) {
-            _c.Dau = new Candidate.Height((int)feet.Value, (int)inches.Value);
+            _c.Dau = new Candidate.Height((int) feet.Value, (int) inches.Value);
         }
 
         private void inches_ValueChanged(object sender, EventArgs e) {
-            _c.Dau = new Candidate.Height((int)feet.Value, (int)inches.Value);
+            _c.Dau = new Candidate.Height((int) feet.Value, (int) inches.Value);
         }
 
         private void dob_ValueChanged(object sender, EventArgs e) {
@@ -114,13 +114,17 @@ namespace cryptidDemo {
 
         private void generateButton_Click(object sender, EventArgs e) {
             if (!_c.IsComplete()) {
-                MessageBox.Show(Resources.GeneratorForm_uploadBlockchain_Click_Cannot_generate_an_and_ID_for_an_incomplete_candidate_, Resources.ERROR, MessageBoxButtons.OK,
+                MessageBox.Show(
+                    Resources
+                        .GeneratorForm_uploadBlockchain_Click_Cannot_generate_an_and_ID_for_an_incomplete_candidate_,
+                    Resources.ERROR, MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(password.Text)) {
-                MessageBox.Show(Resources.PASSWORD_EMPTY_ERROR, Resources.ERROR, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(Resources.PASSWORD_EMPTY_ERROR, Resources.ERROR, MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
                 return;
             }
 
@@ -128,8 +132,10 @@ namespace cryptidDemo {
             Candidate unpacked;
             try {
                 unpacked = CandidateDelegate.Unpack(data, password.Text, PrivateKey);
-            } catch (PasswordIncorrectException) {
-                MessageBox.Show(Resources.PASSWORD_INCORRECT_ERROR, Resources.ERROR, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            catch (PasswordIncorrectException) {
+                MessageBox.Show(Resources.PASSWORD_INCORRECT_ERROR, Resources.ERROR, MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
                 return;
             }
 
@@ -157,7 +163,8 @@ namespace cryptidDemo {
                 scanForm.Dispose();
 
                 Enabled = true;
-            } else {
+            }
+            else {
                 //TODO: Allow to choose fingerprint image?
                 MessageBox.Show(Resources.FPS_NOT_CONNECTED_ERROR, Resources.ERROR, MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
@@ -168,7 +175,7 @@ namespace cryptidDemo {
         }
 
         public virtual void Dispose() {
-            FPS_GT511C3.Close();
+            FpsGt511C1R.Close();
             Dispose(true);
         }
 
@@ -189,7 +196,10 @@ namespace cryptidDemo {
 
         private void uploadBlockchain_Click(object sender, EventArgs e) {
             if (!_c.IsComplete()) {
-                MessageBox.Show(Resources.GeneratorForm_uploadBlockchain_Click_Cannot_generate_an_and_ID_for_an_incomplete_candidate_, Resources.ERROR, MessageBoxButtons.OK,
+                MessageBox.Show(
+                    Resources
+                        .GeneratorForm_uploadBlockchain_Click_Cannot_generate_an_and_ID_for_an_incomplete_candidate_,
+                    Resources.ERROR, MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
                 return;
             }
@@ -200,16 +210,19 @@ namespace cryptidDemo {
             }
 
             if (string.IsNullOrWhiteSpace(password.Text)) {
-                MessageBox.Show(Resources.PASSWORD_EMPTY_ERROR, Resources.ERROR, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(Resources.PASSWORD_EMPTY_ERROR, Resources.ERROR, MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
                 return;
             }
 
             if (!password.Text.Equals(confirmPassword.Text)) {
-                MessageBox.Show(Resources.PASSWORDS_NOT_MATCH, Resources.ERROR, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(Resources.PASSWORDS_NOT_MATCH, Resources.ERROR, MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
                 return;
             }
 
-            DialogResult d = MessageBox.Show(Resources.UPLOAD_BLOCKCHAIN_WARNING, Resources.ARE_YOU_SURE, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            var d = MessageBox.Show(Resources.UPLOAD_BLOCKCHAIN_WARNING, Resources.ARE_YOU_SURE, MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
             if (d != DialogResult.Yes) return;
 
             chainId.Text = Convert.ToBase64String(CandidateDelegate.EnrollCandidate(_c, password.Text, PrivateKey));
@@ -263,8 +276,8 @@ namespace cryptidDemo {
             middleName.Text = c.Dad;
             issued.Value = c.Dbd;
             dob.Value = c.Dbb;
-            sex.SelectedIndex = (int)c.Dbc - 1;
-            eye.SelectedIndex = (int)c.Day;
+            sex.SelectedIndex = (int) c.Dbc - 1;
+            eye.SelectedIndex = (int) c.Day;
             inches.Value = c.Dau.Inches;
             feet.Value = c.Dau.Feet;
             address.Text = c.Dag;
@@ -292,7 +305,8 @@ namespace cryptidDemo {
                 return;
             }
 
-            DialogResult d = MessageBox.Show(Resources.INFORMATION_OVERWRITE_WARNING, Resources.ARE_YOU_SURE, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            var d = MessageBox.Show(Resources.INFORMATION_OVERWRITE_WARNING, Resources.ARE_YOU_SURE,
+                MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (d != DialogResult.Yes) return;
 
             var packed = CandidateDelegate.GetPackedCandidate(Convert.FromBase64String(chainId.Text));
@@ -302,7 +316,10 @@ namespace cryptidDemo {
 
         private void updateID_Click(object sender, EventArgs e) {
             if (!_c.IsComplete()) {
-                MessageBox.Show(Resources.GeneratorForm_uploadBlockchain_Click_Cannot_generate_an_and_ID_for_an_incomplete_candidate_, Resources.ERROR, MessageBoxButtons.OK,
+                MessageBox.Show(
+                    Resources
+                        .GeneratorForm_uploadBlockchain_Click_Cannot_generate_an_and_ID_for_an_incomplete_candidate_,
+                    Resources.ERROR, MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
                 return;
             }
@@ -313,35 +330,43 @@ namespace cryptidDemo {
             }
 
             if (string.IsNullOrWhiteSpace(password.Text)) {
-                MessageBox.Show(Resources.PASSWORD_EMPTY_ERROR, Resources.ERROR, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(Resources.PASSWORD_EMPTY_ERROR, Resources.ERROR, MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
                 return;
             }
 
             if (!password.Text.Equals(confirmPassword.Text)) {
-                MessageBox.Show(Resources.PASSWORDS_NOT_MATCH, Resources.ERROR, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(Resources.PASSWORDS_NOT_MATCH, Resources.ERROR, MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
                 return;
             }
 
-            DialogResult d = MessageBox.Show(Resources.UPDATE_ID_WARNING, Resources.ARE_YOU_SURE, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            var d = MessageBox.Show(Resources.UPDATE_ID_WARNING, Resources.ARE_YOU_SURE, MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
             if (d != DialogResult.Yes) return;
 
-             Fingerprint fp = new Fingerprint();
-             if (connectDialog.IsConnected) {
-                 var scanForm = new ScanFingerForm();
-                 var dr = scanForm.ShowDialog(this);
-                 if (dr == DialogResult.OK) {
-                     fp.AsBitmap = scanForm.Fingerprint;
-                 } else {
-                     scanForm.Dispose();
-                     return;
-                 }
+            var fp = new Fingerprint();
+            if (connectDialog.IsConnected) {
+                var scanForm = new ScanFingerForm();
+                var dr = scanForm.ShowDialog(this);
+                if (dr == DialogResult.OK) {
+                    fp.AsBitmap = scanForm.Fingerprint;
+                }
+                else {
+                    scanForm.Dispose();
+                    return;
+                }
 
-                 scanForm.Dispose();
-             } else {
-                 MessageBox.Show(Resources.FPS_NOT_CONNECTED_ERROR, Resources.ERROR, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                 return;
-             }
-            chainId.Text = Convert.ToBase64String(CandidateDelegate.UpdateCandidate(_c, password.Text, fp, PrivateKey, Convert.FromBase64String(chainId.Text)));
+                scanForm.Dispose();
+            }
+            else {
+                MessageBox.Show(Resources.FPS_NOT_CONNECTED_ERROR, Resources.ERROR, MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                return;
+            }
+            chainId.Text =
+                Convert.ToBase64String(CandidateDelegate.UpdateCandidate(_c, password.Text, fp, PrivateKey,
+                    Convert.FromBase64String(chainId.Text)));
             Clipboard.SetText(chainId.Text);
         }
     }

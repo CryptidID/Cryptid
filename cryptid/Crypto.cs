@@ -5,14 +5,23 @@ using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
-using Cryptid.Utils;
 
 #endregion
 
 namespace Cryptid {
+    /// <summary>
+    ///     This class contains all the general cryptographic
+    ///     functions for Cryptid
+    /// </summary>
     public static class Crypto {
+        /// <summary>
+        ///     The RSA key size to use
+        /// </summary>
         private const int RsaKeySize = 4096;
 
+        /// <summary>
+        ///     The Cryptid salt
+        /// </summary>
         public static readonly byte[] CryptidSalt = {
             0x1c, 0x9f, 0x1d, 0x8a, 0x11, 0x98, 0xfe, 0x3f, 0xf7, 0xb7, 0x9a, 0xf1,
             0x0f, 0xf3, 0x30, 0xf0, 0x05, 0x49, 0x87, 0x9c, 0x92, 0x70, 0xe2, 0x9c, 0x6c, 0x88, 0xff, 0x2b, 0xfd, 0x13,
@@ -38,20 +47,43 @@ namespace Cryptid {
             0xc9, 0x72
         };
 
+        /// <summary>
+        ///     A SHA256 hash of the Cryptid salt
+        /// </summary>
         public static readonly byte[] CryptidSaltHash = SHA256.Create().ComputeHash(CryptidSalt);
 
+        /// <summary>
+        ///     Encrypts a set of data with AES256 CBC. Passwords are hashed with SHA256 and
+        ///     then derived with RFC2898 to get the final key.
+        /// </summary>
+        /// <param name="data">The data to encrypt</param>
+        /// <param name="password">The password to encrypt the data with</param>
+        /// <returns>The encrypted data</returns>
         public static byte[] AES_Encrypt(byte[] data, string password) {
             var passwordBytes = Encoding.UTF8.GetBytes(password);
             passwordBytes = SHA256.Create().ComputeHash(passwordBytes);
             return AES_Encrypt(data, passwordBytes);
         }
 
+        /// <summary>
+        ///     Decrypts a set of data with AES256 CBC. Passwords are hashed with SHA256 and
+        ///     then derived with RFC2898 to get the final key.
+        /// </summary>
+        /// <param name="data">The data to decrypt</param>
+        /// <param name="password">The password to decrypt the data</param>
+        /// <returns>The decrypted data</returns>
         public static byte[] AES_Decrypt(byte[] data, string password) {
             var passwordBytes = Encoding.UTF8.GetBytes(password);
             passwordBytes = SHA256.Create().ComputeHash(passwordBytes);
             return AES_Decrypt(data, passwordBytes);
         }
 
+        /// <summary>
+        ///     Encrypts a set of data with AES256 CBC. Keys are derived with RFC2898.
+        /// </summary>
+        /// <param name="bytesToBeEncrypted">The data to be encrypted</param>
+        /// <param name="passwordBytes">The password to encrypt the data</param>
+        /// <returns>tThe encrypted data</returns>
         internal static byte[] AES_Encrypt(byte[] bytesToBeEncrypted, byte[] passwordBytes) {
             byte[] encryptedBytes;
 
@@ -78,6 +110,12 @@ namespace Cryptid {
             return encryptedBytes;
         }
 
+        /// <summary>
+        ///     Decrypts a set of data with AES256 CBC. Keys are derived with RFC2898.
+        /// </summary>
+        /// <param name="bytesToBeEncrypted">The data to decrypt</param>
+        /// <param name="passwordBytes">The password to decrypt the data</param>
+        /// <returns>The decrypted data</returns>
         internal static byte[] AES_Decrypt(byte[] bytesToBeDecrypted, byte[] passwordBytes) {
             byte[] decryptedBytes;
 
@@ -104,6 +142,12 @@ namespace Cryptid {
             return decryptedBytes;
         }
 
+        /// <summary>
+        ///     Signs a set of data with a provided RSA private key
+        /// </summary>
+        /// <param name="data">The data to sign</param>
+        /// <param name="privKey">The RSAParameters representing the private key</param>
+        /// <returns>The signature of the data</returns>
         public static byte[] RSA_Sign(byte[] data, RSAParameters privKey) {
             byte[] signedBytes;
             using (var rsa = new RSACryptoServiceProvider()) {
@@ -122,6 +166,13 @@ namespace Cryptid {
             return signedBytes;
         }
 
+        /// <summary>
+        ///     Verifies an RSA signature for a set of data
+        /// </summary>
+        /// <param name="data">The data to verify</param>
+        /// <param name="sig">The signature to verify with</param>
+        /// <param name="pubKey">The public key to use to verify</param>
+        /// <returns>Whether or not the data was verified</returns>
         public static bool RSA_Verify(byte[] data, byte[] sig, RSAParameters pubKey) {
             using (var rsa = new RSACryptoServiceProvider()) {
                 try {
@@ -138,10 +189,18 @@ namespace Cryptid {
             return false;
         }
 
+        /// <summary>
+        ///     Double hash a set of data with SHA256
+        /// </summary>
+        /// <param name="toHash">The data to hash</param>
+        /// <returns>The double hash of the data</returns>
         public static byte[] Sha256D(byte[] toHash) {
             return SHA256.Create().ComputeHash(SHA256.Create().ComputeHash(toHash));
         }
 
+        /// <summary>
+        ///     This class is for the CRC32 hashing algorithm
+        /// </summary>
         public sealed class Crc32 : HashAlgorithm {
             public const uint DefaultPolynomial = 0xedb88320u;
             public const uint DefaultSeed = 0xffffffffu;

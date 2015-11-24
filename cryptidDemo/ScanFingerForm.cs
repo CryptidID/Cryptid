@@ -30,12 +30,12 @@ namespace CryptidDemo {
         private void ScanFingerForm_Load(object sender, EventArgs e) {
             var t = Task.Factory.StartNew(() => {
                 CurrentState = State.FingerNotPressed;
-                FPS_GT511C3.SetCmosLed(true);
-                while (FPS_GT511C3.IsPressingFinger() != 0) Task.Delay(1000);
+                FpsGt511C1R.SetCmosLed(true);
+                while (FpsGt511C1R.IsPressingFinger() != 0) Task.Delay(1000);
                 CurrentState = State.FingerPressed;
                 CurrentState = State.TransferingData;
-                Fingerprint = FPS_GT511C3.GetRawImage();
-                FPS_GT511C3.SetCmosLed(false);
+                Fingerprint = FpsGt511C1R.GetRawImage();
+                FpsGt511C1R.SetCmosLed(false);
                 CurrentState = State.TransferComplete;
                 DialogResult = DialogResult.OK;
                 SafeClose();
