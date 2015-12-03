@@ -8,7 +8,6 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Windows.Forms;
-using Cryptid.Factom.API;
 
 #endregion
 
@@ -116,19 +115,6 @@ namespace Cryptid.Utils {
 
     public static class Bytes {
         /// <summary>
-        ///     Will correct a little endian byte[]
-        /// </summary>
-        /// <param name="bytes"></param>
-        /// <returns></returns>
-        public static byte[] CheckEndian(byte[] bytes) {
-            if (BitConverter.IsLittleEndian) {
-                var byteList = bytes.Reverse(); // Must be in bigendian
-                return byteList.ToArray();
-            }
-            return bytes;
-        }
-
-        /// <summary>
         ///     Checks if two byte arrays are equal
         /// </summary>
         /// <param name="a1">Byte[] to be compared</param>
@@ -160,152 +146,6 @@ namespace Cryptid.Utils {
                 if (haystack[i] != needle[i]) return false;
             }
             return true;
-        }
-    }
-
-    public static class Times {
-        public static byte[] MilliTime() {
-            var unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-            // 6 Byte millisec unix time
-            var unixMilliLong = (long) (DateTime.UtcNow - unixEpoch).TotalMilliseconds;
-            var unixBytes = Bytes.CheckEndian(BitConverter.GetBytes(unixMilliLong));
-            unixBytes = Arrays.CopyOfRange(unixBytes, 2, unixBytes.Length);
-            return unixBytes;
-        }
-    }
-
-    public static class Entries {
-        /// <summary>
-        ///     Gets a hash of an entry
-        /// </summary>
-        /// <param name="entry">EntryData to be hashed</param>
-        /// <returns>Hash of entry</returns>
-        public static byte[] HashEntry(DataStructs.EntryData entry) {
-            var data = MarshalBinary(entry);
-            var h1 = SHA512.Create().ComputeHash(data);
-            var h2 = new byte[h1.Length + data.Length];
-            h1.CopyTo(h2, 0);
-            data.CopyTo(h2, h1.Length);
-            var h3 = SHA256.Create().ComputeHash(h2);
-            return h3;
-        }
-
-        /// <summary>
-        ///     Passing the first entry of a Chain will get the chainId of that entry. Needs the ExtIDs to do this successfully
-        /// </summary>
-        /// <param name="entry">Entry object</param>
-        /// <returns>ChainID</returns>
-        public static byte[] ChainIdOfFirstEntry(DataStructs.EntryData entry) {
-            var byteList = new List<byte>();
-            foreach (var ext in entry.ExtIDs) {
-                byteList.AddRange(SHA256.Create().ComputeHash(ext));
-            }
-            var b = byteList.ToArray();
-            var chainInfo = SHA256.Create().ComputeHash(b);
-            return chainInfo;
-        }
-
-        /// <summary>
-        ///     Marshals an entry into a byte[] to be sent to restAPI
-        /// </summary>
-        /// <param name="e">Entry to be marshaled</param>
-        /// <returns>Marshaled entry</returns>
-        public static byte[] MarshalBinary(DataStructs.EntryData e) {
-            var entryBStruct = new List<byte>();
-            var idsSize = MarshalExtIDsSize(e);
-
-
-            idsSize = Bytes.CheckEndian(idsSize);
-            // Header 
-            // 1 byte version
-            byte version = 0;
-            entryBStruct.Add(version);
-            // 32 byte chainid
-            var chain = e.ChainId;
-            entryBStruct.AddRange(chain);
-            // Ext Ids Size
-            entryBStruct.AddRange(idsSize);
-
-            // Payload
-            // ExtIDS
-            if (e.ExtIDs != null) {
-                var ids = MarshalExtIDsBinary(e);
-                entryBStruct.AddRange(ids);
-            }
-            // Content
-            var content = e.Content;
-            entryBStruct.AddRange(content);
-
-            return entryBStruct.ToArray();
-        }
-
-        /// <summary>
-        ///     Helper function of MarshalBinary
-        /// </summary>
-        /// <param name="e"></param>
-        /// <returns></returns>
-        private static byte[] MarshalExtIDsBinary(DataStructs.EntryData e) {
-            var byteList = new List<byte>();
-            foreach (var exId in e.ExtIDs) {
-                // 2 byte size of ExtID
-                var extLen = Convert.ToInt16(exId.Length);
-                var bytes = BitConverter.GetBytes(extLen);
-                bytes = Bytes.CheckEndian(bytes);
-                byteList.AddRange(bytes);
-                var extIdStr = exId;
-                byteList.AddRange(extIdStr);
-            }
-            return byteList.ToArray();
-        }
-
-        /// <summary>
-        ///     Helper function of MarshalBinary
-        /// </summary>
-        /// <param name="e"></param>
-        /// <returns></returns>
-        private static byte[] MarshalExtIDsSize(DataStructs.EntryData e) {
-            if (e.ExtIDs == null) {
-                short extLen = 0;
-                var bytes = BitConverter.GetBytes(extLen);
-                return Bytes.CheckEndian(bytes);
-            }
-            else {
-                var totalSize = 0;
-                foreach (var extElement in e.ExtIDs) {
-                    totalSize += extElement.Length + 2;
-                }
-
-                var extLen = Convert.ToInt16(totalSize);
-
-
-                var bytes = BitConverter.GetBytes(extLen);
-                return bytes;
-                // return Bytes.CheckEndian(bytes);
-            }
-        }
-
-        /// <summary>
-        ///     Caculates the cost of an entry
-        /// </summary>
-        /// <param name="entry"></param>
-        /// <returns></returns>
-        public static sbyte EntryCost(DataStructs.EntryData entry) {
-            var entryBinary = MarshalBinary(entry);
-            var len = entryBinary.Length - 35;
-            if (len > 10240) {
-                //Error, cannot be larger than 10kb
-                throw new ArgumentException("Parameter cannot exceed 10kb of content", nameof(entry));
-            }
-            var r = len%1024;
-            var n = (sbyte) (len/1024); // Capacity of Entry Payment
-
-            if (r > 0) {
-                n += 1;
-            }
-            if (n < 1) {
-                n = 1;
-            }
-            return n;
         }
     }
 

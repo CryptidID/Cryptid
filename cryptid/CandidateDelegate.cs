@@ -6,11 +6,13 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
-using cryptid.Factom.API;
 using Cryptid.Exceptions;
-using Cryptid.Factom.API;
 using Cryptid.Utils;
 using SourceAFIS.Simple;
+using FactomAPI;
+using Arrays = Cryptid.Utils.Arrays;
+using Bytes = Cryptid.Utils.Bytes;
+using Strings = Cryptid.Utils.Strings;
 
 #endregion
 
@@ -54,9 +56,6 @@ namespace Cryptid {
         public static byte[] EnrollCandidate(Candidate c, string password, RSAParameters privKey) {
             var packed = Pack(c, password, privKey);
 
-            var entryApi = new Entry();
-            var chainApi = new Chain();
-
             Chain.ChainType factomChain = null;
 
             foreach (
@@ -64,22 +63,22 @@ namespace Cryptid {
                     DataSegment.Segmentize(packed,
                         firstSegmentLength: DataSegment.DefaultMaxSegmentLength - ExtIDsLength)) {
                 var dataToUpload = segment.Pack();
-                var factomEntry = entryApi.NewEntry(dataToUpload, null, null);
+                var factomEntry = Entry.NewEntry(dataToUpload, null, null);
                 if (segment.CurrentSegment == 0) {
                     //New chain
                     factomEntry.ExtIDs = GenerateExtIDs(packed);
-                    factomChain = chainApi.NewChain(factomEntry);
-                    chainApi.CommitChain(factomChain, FactomWallet); // Wallet Name
+                    factomChain = Chain.NewChain(factomEntry);
+                    Chain.CommitChain(factomChain, FactomWallet); // Wallet Name
                     Thread.Sleep(10100);
-                    chainApi.RevealChain(factomChain);
+                    Chain.RevealChain(factomChain);
                 }
                 else {
                     //new entry
                     Debug.Assert(factomChain != null, "factomChain != null");
                     factomEntry.ChainId = factomChain.ChainId;
-                    entryApi.CommitEntry(factomEntry, FactomWallet);
+                    Entry.CommitEntry(factomEntry, FactomWallet);
                     Thread.Sleep(10100);
-                    entryApi.RevealEntry(factomEntry);
+                    Entry.RevealEntry(factomEntry);
                 }
             }
 
@@ -109,17 +108,16 @@ namespace Cryptid {
             var ovr = new CandidateOldVersionRecord(chainToUpdate, newChainId);
             var cur = new CandidateUpdatedRecord(chainToUpdate, newChainId);
 
-            var entryApi = new Entry();
-            var oldRecordEntry = entryApi.NewEntry(ovr.Pack(privKey), null, newChainId);
-            var newRecordEntry = entryApi.NewEntry(cur.Pack(privKey), null, chainToUpdate);
+            var oldRecordEntry = Entry.NewEntry(ovr.Pack(privKey), null, newChainId);
+            var newRecordEntry = Entry.NewEntry(cur.Pack(privKey), null, chainToUpdate);
 
-            entryApi.CommitEntry(oldRecordEntry, FactomWallet);
-            entryApi.CommitEntry(newRecordEntry, FactomWallet);
+            Entry.CommitEntry(oldRecordEntry, FactomWallet);
+            Entry.CommitEntry(newRecordEntry, FactomWallet);
 
             Thread.Sleep(10100);
 
-            entryApi.RevealEntry(oldRecordEntry);
-            entryApi.RevealEntry(newRecordEntry);
+            Entry.RevealEntry(oldRecordEntry);
+            Entry.RevealEntry(newRecordEntry);
 
             return newChainId;
         }
@@ -143,9 +141,8 @@ namespace Cryptid {
         /// <param name="chainId">The id of the chain to get the candidate data from</param>
         /// <returns>The packed candidate data</returns>
         public static byte[] GetPackedCandidate(byte[] chainId) {
-            var entryApi = new Entry();
-            var entries = entryApi.GetAllChainEntries(chainId);
-            var entriesData = entries.Select(e => entryApi.GetEntryData(e).Content).ToList();
+            var entries = Chain.GetAllChainEntries(chainId);
+            var entriesData = entries.Select(e => Entry.GetEntryData(e).Content).ToList();
             var segments = new List<DataSegment>();
             foreach (var data in entriesData) {
                 if (Bytes.StartsWith(data, DataSegment.DataSegmentPrefix)) segments.Add(DataSegment.Unpack(data));
@@ -159,9 +156,8 @@ namespace Cryptid {
         /// <param name="pubKey">The public key to verify the data with</param>
         /// <returns></returns>
         public static List<CandidateOldVersionRecord> GetOldVersionRecords(byte[] chainId, RSAParameters pubKey) {
-            var entryApi = new Entry();
-            var entries = entryApi.GetAllChainEntries(chainId);
-            var entriesData = entries.Select(e => entryApi.GetEntryData(e).Content).ToList();
+            var entries = Chain.GetAllChainEntries(chainId);
+            var entriesData = entries.Select(e => Entry.GetEntryData(e).Content).ToList();
             var records = new List<CandidateOldVersionRecord>();
             foreach (var data in entriesData) {
                 if (Bytes.StartsWith(data, CandidateOldVersionRecord.CandidateOldVersionPrefix))
@@ -177,9 +173,8 @@ namespace Cryptid {
         /// <param name="pubKey">The public key to verify the data with</param>
         /// <returns></returns>
         public static List<CandidateUpdatedRecord> GetCandidateUpdatedRecords(byte[] chainId, RSAParameters pubKey) {
-            var entryApi = new Entry();
-            var entries = entryApi.GetAllChainEntries(chainId);
-            var entriesData = entries.Select(e => entryApi.GetEntryData(e).Content).ToList();
+            var entries = Chain.GetAllChainEntries(chainId);
+            var entriesData = entries.Select(e => Entry.GetEntryData(e).Content).ToList();
             var records = new List<CandidateUpdatedRecord>();
             foreach (var data in entriesData) {
                 if (Bytes.StartsWith(data, CandidateUpdatedRecord.UpdatedRecordPrefix))
