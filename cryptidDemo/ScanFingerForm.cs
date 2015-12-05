@@ -31,7 +31,7 @@ namespace CryptidDemo {
             var t = Task.Factory.StartNew(() => {
                 CurrentState = State.FingerNotPressed;
                 FpsGt511C1R.SetCmosLed(true);
-                while (FpsGt511C1R.IsPressingFinger() != 0) Task.Delay(1000);
+                while (!FpsGt511C1R.IsPressingFinger()) Task.Delay(1000);
                 CurrentState = State.FingerPressed;
                 CurrentState = State.TransferingData;
                 Fingerprint = FpsGt511C1R.GetRawImage();
